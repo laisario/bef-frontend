@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
-import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
+import { Box, Link, Button, Drawer, Typography, Stack } from '@mui/material';
 // mock
 import account from '../../../_mock/account';
 // hooks
@@ -12,6 +12,9 @@ import useResponsive from '../../../hooks/useResponsive';
 import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
+import { Avatar } from '../../../components/avatar'
+import Iconify from '../../../components/iconify';
+import { useAuth } from '../../../context/Auth';
 //
 import navConfig from './config';
 
@@ -36,6 +39,7 @@ Nav.propTypes = {
 
 export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
+  const { user } = useAuth()
 
   const isDesktop = useResponsive('up', 'lg');
 
@@ -49,56 +53,60 @@ export default function Nav({ openNav, onCloseNav }) {
   const renderContent = (
     <Scrollbar
       sx={{
-        height: 1,
-        '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
+        height: '100%',
+        flex: 1,
+        '& .simplebar-content': { height: '100%', display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'space-between' },
+        '& .simplebar-content::before': { display: 'none' },
+        '& .simplebar-content::after': { display: 'none' },
+        py: 5
       }}
     >
-      <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
-        <Logo />
+      <Box>
+        <Box px={5} sx={{ display: 'inline-flex', justifyContent: 'center' }}>
+          <Logo />
+        </Box>
+
+        <Box sx={{ my: 5, mx: 2.5 }}>
+          <Link underline="none">
+            <StyledAccount>
+              <Avatar size={36} />
+
+              <Box sx={{ ml: 2 }}>
+                <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
+                  {user?.nome}
+                </Typography>
+
+                {/* <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Pessoa Juridica
+                </Typography> */}
+              </Box>
+            </StyledAccount>
+          </Link>
+        </Box>
+
+        <NavSection data={navConfig} />
       </Box>
 
-      <Box sx={{ mb: 5, mx: 2.5 }}>
-        <Link underline="none">
-          <StyledAccount>
-            <Avatar src={account.photoURL} alt="photoURL" />
-
-            <Box sx={{ ml: 2 }}>
-              <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {account.displayName}
-              </Typography>
-
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {account.role}
-              </Typography>
-            </Box>
-          </StyledAccount>
-        </Link>
-      </Box>
-
-      <NavSection data={navConfig} />
-
-      <Box sx={{ flexGrow: 1 }} />
-
-      <Box sx={{ px: 2.5, pb: 3, mt: 10 }}>
-        <Stack alignItems="center" spacing={3} sx={{ pt: 5, borderRadius: 2, position: 'relative' }}>
+      <Box>
+        <Stack alignItems="center" spacing={3} px={2}>
           <Box
             component="img"
             src="/assets/illustrations/illustration_avatar.png"
-            sx={{ width: 100, position: 'absolute', top: -50 }}
+            sx={{ width: 100 }}
           />
 
           <Box sx={{ textAlign: 'center' }}>
             <Typography gutterBottom variant="h6">
-              Get more?
+              Precisa duma calibrada?
             </Typography>
 
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              From only $69
+              Deixe seus instrumentos calibradinhos a partir de R$ 99,90
             </Typography>
           </Box>
 
-          <Button href="https://material-ui.com/store/items/minimal-dashboard/" target="_blank" variant="contained">
-            Upgrade to Pro
+          <Button href="https://material-ui.com/store/items/minimal-dashboard/" startIcon={<Iconify icon="eva:plus-fill" />} target="_blank" variant="contained">
+            Novo pedido
           </Button>
         </Stack>
       </Box>

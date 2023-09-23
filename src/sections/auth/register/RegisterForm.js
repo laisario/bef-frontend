@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 // @mui
-import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox } from '@mui/material';
+import { Link, Box, Stack, IconButton, InputAdornment, TextField, Checkbox, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
 import Iconify from '../../../components/iconify';
-
 import { useAuth } from '../../../context/Auth';
+import PasswordStrengthMeter from './PasswordStrengthMeter';
 
 // ----------------------------------------------------------------------
 
-export default function LoginForm() {
+export default function RegisterForm() {
   const navigate = useNavigate();
   const { login, loading } = useAuth()
 
@@ -33,8 +33,8 @@ export default function LoginForm() {
     <form onSubmit={handleSubmit}>
       <Stack spacing={3}>
         <TextField error={!!error} name="email" label="Email" value={email} onChange={(e) => { if (error) { setError(null) } setEmail(e.target.value) }} />
-
         <TextField
+          fullWidth
           error={!!error}
           helperText={!!error && error}
           name="password"
@@ -51,12 +51,18 @@ export default function LoginForm() {
               </InputAdornment>
             ),
           }}
+          sx={{ marginBottom: 0 }}
         />
+        <PasswordStrengthMeter password={password} />
       </Stack>
 
-      <LoadingButton disabled={!email || !password} loading={loading} sx={{ mt: 4 }} type="submit" fullWidth size="large" variant="contained" onClick={handleSubmit}>
-        Entrar
-      </LoadingButton>
+      <Box display="flex" alignItems="center" justifyContent="space-between" mt={4}>
+          <Link to="/login" component={RouterLink} variant="subtitle2" sx={{ textDecoration: 'none', cursor: 'pointer' }}><Typography><Iconify icon={'eva:arrow-ios-back-fill'} />Voltar</Typography></Link>
+        <LoadingButton endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />} loading={loading} sx={{ maxWidth: '45%' }} type="submit" fullWidth size="large" variant="contained" onClick={handleSubmit}>
+          Continuar
+        </LoadingButton>
+      </Box>
+
     </form>
   );
 }

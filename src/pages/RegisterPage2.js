@@ -4,12 +4,14 @@ import { styled } from '@mui/material/styles';
 import { Link, Container, Typography, Divider, Stack, Button, Box } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 // hooks
+import BasicInformation from '../sections/auth/register/steps/BasicInformation';
 import useResponsive from '../hooks/useResponsive';
 // components
 import Logo from '../components/logo';
 import Iconify from '../components/iconify';
 // sections
 import { LoginForm } from '../sections/auth/login';
+import { RegisterForm } from '../sections/auth/register';
 
 // ----------------------------------------------------------------------
 
@@ -23,6 +25,7 @@ const StyledRoot = styled(Container)(({ theme }) => ({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    flex: 1
   }
 }));
 
@@ -32,33 +35,31 @@ const LogoBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   marginBottom: theme.spacing(8),
   [theme.breakpoints.up('md')]: {
-    flex: 1,
     marginBottom: 0,
   }
 }))
 
 // ----------------------------------------------------------------------
 
-export default function LoginPage() {
+export default function RegisterPage2() {
   const mdUp = useResponsive('up', 'md');
   return (
     <>
       <Helmet>
-        <title> Login | Minimal UI </title>
+        <title> Criar conta | B&F Metrologia </title>
       </Helmet>
 
-      <Container maxWidth="xs">
-          <Typography variant="h3" gutterBottom>
-            Entrar
-          </Typography>
+      <Container maxWidth="sm">
+        <Typography variant="h3" gutterBottom>
+          Criar conta
+        </Typography>
 
-          <Typography variant="body2" sx={{ mb: 5 }}>
-            Nao tem uma conta? {''}
-            <Link to="/register" component={RouterLink} variant="subtitle2" sx={{ textDecoration: 'none', cursor: 'pointer' }}>Criar conta</Link>
-          </Typography>
+        <Typography variant="body2" sx={{ mb: 5 }}>
+          Deixe seus instrumentos calibradinhos com a gente
+        </Typography>
 
-          <LoginForm />
-        </Container>
+        <BasicInformation />
+      </Container>
     </>
   );
 }

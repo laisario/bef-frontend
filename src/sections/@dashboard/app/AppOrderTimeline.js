@@ -1,9 +1,10 @@
 // @mui
 import PropTypes from 'prop-types';
-import { Card, Typography, CardHeader, CardContent } from '@mui/material';
+import { Box, Button, Card, Divider, Typography, CardHeader, CardContent } from '@mui/material';
 import { Timeline, TimelineDot, TimelineItem, TimelineContent, TimelineSeparator, TimelineConnector } from '@mui/lab';
 // utils
 import { fDateTime } from '../../../utils/formatTime';
+import Iconify from '../../../components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -23,14 +24,22 @@ export default function AppOrderTimeline({ title, subheader, list, ...other }) {
           '& .MuiTimelineItem-missingOppositeContent:before': {
             display: 'none',
           },
+          py: 2,
         }}
       >
-        <Timeline>
-          {list.map((item, index) => (
+        <Timeline sx={{p: 0}}>
+          {list?.map((item, index) => (
             <OrderItem key={item.id} item={item} isLast={index === list.length - 1} />
           ))}
         </Timeline>
+
       </CardContent>
+        <Divider />
+        <Box sx={{ p: 2, textAlign: 'right' }}>
+          <Button size="small" color="inherit" endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>
+            Ver todos
+          </Button>
+        </Box>
     </Card>
   );
 }
@@ -42,23 +51,18 @@ OrderItem.propTypes = {
   item: PropTypes.shape({
     time: PropTypes.instanceOf(Date),
     title: PropTypes.string,
-    type: PropTypes.string,
+    status: PropTypes.string,
   }),
 };
 
 function OrderItem({ item, isLast }) {
-  const { type, title, time } = item;
+  const { status, title, time } = item;
   return (
     <TimelineItem>
       <TimelineSeparator>
         <TimelineDot
-          color={
-            (type === 'order1' && 'primary') ||
-            (type === 'order2' && 'success') ||
-            (type === 'order3' && 'info') ||
-            (type === 'order4' && 'warning') ||
-            'error'
-          }
+          variant={status === "F" ? "filled" : "outlined"}
+          color={status === "F" ? "primary" : "secondary"}
         />
         {isLast ? null : <TimelineConnector />}
       </TimelineSeparator>

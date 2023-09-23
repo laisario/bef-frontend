@@ -10,6 +10,7 @@ import Logo from '../components/logo';
 import Iconify from '../components/iconify';
 // sections
 import { LoginForm } from '../sections/auth/login';
+import { RegisterForm } from '../sections/auth/register';
 
 // ----------------------------------------------------------------------
 
@@ -23,6 +24,7 @@ const StyledRoot = styled(Container)(({ theme }) => ({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    flex: 1
   }
 }));
 
@@ -32,33 +34,31 @@ const LogoBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   marginBottom: theme.spacing(8),
   [theme.breakpoints.up('md')]: {
-    flex: 1,
     marginBottom: 0,
   }
 }))
 
 // ----------------------------------------------------------------------
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const mdUp = useResponsive('up', 'md');
   return (
     <>
       <Helmet>
-        <title> Login | Minimal UI </title>
+        <title> Configurar acesso | B&F Metrologia </title>
       </Helmet>
 
-      <Container maxWidth="xs">
-          <Typography variant="h3" gutterBottom>
-            Entrar
-          </Typography>
+      <Container maxWidth="sm">
+        <Typography variant="h3" gutterBottom>
+          Configurar acesso
+        </Typography>
 
-          <Typography variant="body2" sx={{ mb: 5 }}>
-            Nao tem uma conta? {''}
-            <Link to="/register" component={RouterLink} variant="subtitle2" sx={{ textDecoration: 'none', cursor: 'pointer' }}>Criar conta</Link>
-          </Typography>
+        <Typography variant="body2" sx={{ mb: 5 }}>
+          Deixe sua conta bem segura
+        </Typography>
 
-          <LoginForm />
-        </Container>
+        <RegisterForm />
+      </Container>
     </>
   );
 }

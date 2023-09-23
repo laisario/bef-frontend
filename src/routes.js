@@ -2,6 +2,7 @@ import { Navigate, useRoutes } from 'react-router-dom';
 // layouts
 import DashboardLayout from './layouts/dashboard';
 import SimpleLayout from './layouts/simple';
+import AuthLayout from './layouts/auth';
 //
 import BlogPage from './pages/BlogPage';
 import UserPage from './pages/UserPage';
@@ -9,6 +10,8 @@ import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
+import RegisterPage from './pages/RegisterPage';
+import RegisterPage2 from './pages/RegisterPage2';
 
 // ----------------------------------------------------------------------
 
@@ -26,8 +29,14 @@ export default function Router() {
       ],
     },
     {
-      path: 'login',
-      element: <LoginPage />,
+      path: '/',
+      element: <AuthLayout />,
+      children: [
+        { element: <Navigate to="/login" />, index: true },
+        { path: 'login', element: <LoginPage /> },
+        { path: 'register', element: <RegisterPage /> },
+        { path: 'register2', element: <RegisterPage2 /> },
+      ],
     },
     {
       element: <SimpleLayout />,
