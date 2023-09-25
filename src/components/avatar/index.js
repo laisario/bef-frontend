@@ -1,5 +1,5 @@
-import avatar from './Avatar';
+import AvatarComponent from './Avatar';
 
-export const Avatar = avatar
+export const Avatar = AvatarComponent
 
 export default {Avatar}
