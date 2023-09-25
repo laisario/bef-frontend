@@ -12,8 +12,8 @@ import FormLabel from '@mui/material/FormLabel';
 
 import Iconify from '../../../../components/iconify';
 import { useAuth } from '../../../../context/Auth';
-import useCNPJ, { validarCNPJ, formatCNPJ } from '../../../../hooks/useCNPJ'
-import { validarCPF, formatCPF } from '../../../../hooks/useCPF'
+import useCNPJ from '../../../../hooks/useCNPJ'
+import useCPF from '../../../../hooks/useCPF'
 
 // ----------------------------------------------------------------------
 
@@ -29,8 +29,8 @@ export default function BasicInformation() {
     const { login, loading } = useAuth()
 
     const [error, setError] = useState(null)
-    const cnpjResult = useCNPJ(CNPJ)
-    console.log(cnpjResult)
+    const { razaoSocial: razaoSocialFromApi, inscricaoEstadual, cnpj: cnpjFormatado, isValid: cnpjValido } = useCNPJ(CNPJ)
+    const { cpf: cpfFormatado, isValid: cpfValido } = useCPF(CPF)
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -49,18 +49,18 @@ export default function BasicInformation() {
 
             {tipo === "E" && (
                 <FormControl sx={{ width: '100%', gap: 3, mb: 4 }}>
-                    <TextField fullWidth error={!!CNPJ?.length >= 14 && !validarCNPJ(CNPJ)} name="CNPJ" label="CNPJ" placeholder='Digite o CNPJ da empresa' value={CNPJ} onChange={(e) => { if (error) { setError(null) } setCNPJ(e.target.value) }} />
-                    {validarCNPJ(CNPJ) && <>
-                        <TextField fullWidth name="razaoSocial" label="Razao Social" value={cnpjResult?.razaoSocial || razaoSocial} onChange={(e) => { if (error) { setError(null) } setRazaoSocial(e.target.value) }} />
-                        <TextField fullWidth name="IE" label="Inscricao Estadual" value={cnpjResult?.inscricaoEstadual || IE} onChange={(e) => { if (error) { setError(null) } setIE(e.target.value) }} />
+                    <TextField fullWidth helperText={!cnpjValido && CNPJ?.length >= 14 && "Por favor, digite um CNPJ valido"} error={!cnpjValido && CNPJ?.length >= 14} name="CNPJ" label="CNPJ" placeholder='Digite o CNPJ da empresa' value={cnpjFormatado || CNPJ} onChange={(e) => { if (error) { setError(null) } setCNPJ(e.target.value) }} />
+                    {cnpjValido && <>
+                        <TextField fullWidth name="razaoSocial" label="Razao Social" disabled={!!razaoSocialFromApi} value={razaoSocialFromApi || razaoSocial} onChange={(e) => { if (error) { setError(null) } setRazaoSocial(e.target.value) }} />
+                        <TextField fullWidth name="IE" label="Inscricao Estadual" disabled={!!inscricaoEstadual} value={inscricaoEstadual || IE} onChange={(e) => { if (error) { setError(null) } setIE(e.target.value) }} />
                     </>}
                 </FormControl>
             )}
 
             {tipo === "P" && (
                 <FormControl sx={{ width: '100%', gap: 3, mb: 4 }}>
-                    <TextField fullWidth error={!!CPF?.length >= 14 && !validarCNPJ(CPF)} name="CPF" label="CPF" placeholder='Digite o seu CPF' value={CPF} onChange={(e) => { if (error) { setError(null) } setCPF(e.target.value) }} />
-                    {validarCPF(CPF) && <>
+                    <TextField fullWidth error={!cpfValido && CPF?.length >= 11} name="CPF" label="CPF" placeholder='Digite o seu CPF' value={cpfFormatado || CPF} onChange={(e) => { if (error) { setError(null) } setCPF(e.target.value) }} />
+                    {cpfValido && <>
                         <TextField fullWidth name="nome" label="Nome Completo" value={nome} onChange={(e) => { if (error) { setError(null) } setNome(e.target.value) }} />
                         <TextField fullWidth name="telefone" label="Telefone" value={telefone} onChange={(e) => { if (error) { setError(null) } setTelefone(e.target.value) }} />
                     </>}
@@ -77,7 +77,6 @@ export default function BasicInformation() {
                     Continuar
                 </LoadingButton>
             </Box>
-
         </form>
     );
 }

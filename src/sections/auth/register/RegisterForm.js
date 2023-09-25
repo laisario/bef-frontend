@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 // @mui
-import { Link, Box, Stack, IconButton, InputAdornment, TextField, Checkbox, Typography } from '@mui/material';
+import { Link, Box, Stack, IconButton, InputAdornment, TextField, Checkbox, Typography, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
 import Iconify from '../../../components/iconify';
@@ -12,21 +12,17 @@ import PasswordStrengthMeter from './PasswordStrengthMeter';
 
 export default function RegisterForm() {
   const navigate = useNavigate();
-  const { login, loading } = useAuth()
+  const { login } = useAuth()
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null)
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    const { error } = await login(email, password);
-    if (error) {
-      setError(error)
-      return null
-    };
-    return navigate('/dashboard', { replace: true });
+
+    return navigate('/register', { replace: true });
   };
 
   return (
@@ -57,12 +53,9 @@ export default function RegisterForm() {
       </Stack>
 
       <Box display="flex" alignItems="center" justifyContent="space-between" mt={4}>
-          <Link to="/login" component={RouterLink} variant="subtitle2" sx={{ textDecoration: 'none', cursor: 'pointer' }}><Typography><Iconify icon={'eva:arrow-ios-back-fill'} />Voltar</Typography></Link>
-        <LoadingButton endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />} loading={loading} sx={{ maxWidth: '45%' }} type="submit" fullWidth size="large" variant="contained" onClick={handleSubmit}>
-          Continuar
-        </LoadingButton>
+        <Button variant="text" component={RouterLink} to="/register2" startIcon={<Iconify icon={'eva:arrow-ios-back-fill'} />}>Voltar</Button>
+        <Button variant="contained" component={RouterLink} size="large" to="/register2" sx={{minWidth: '45%'}} endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>Continuar</Button>
       </Box>
-
     </form>
   );
 }
