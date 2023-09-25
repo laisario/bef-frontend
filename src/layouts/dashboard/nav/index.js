@@ -97,11 +97,11 @@ export default function Nav({ openNav, onCloseNav }) {
 
           <Box sx={{ textAlign: 'center' }}>
             <Typography gutterBottom variant="h6">
-              Precisa duma calibrada?
+              Precisa de uma calibrada?
             </Typography>
 
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Deixe seus instrumentos calibradinhos a partir de R$ 99,90
+              Calibre seus instrumentos a partir de R$ 99,90
             </Typography>
           </Box>
 
