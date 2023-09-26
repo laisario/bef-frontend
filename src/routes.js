@@ -5,7 +5,7 @@ import SimpleLayout from './layouts/simple';
 import AuthLayout from './layouts/auth';
 //
 import BlogPage from './pages/BlogPage';
-import UserPage from './pages/UserPage';
+import PedidosPage from './pages/Orders';
 import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import ProductsPage from './pages/ProductsPage';
@@ -24,7 +24,7 @@ export default function Router() {
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
-        { path: 'user', element: <UserPage /> },
+        { path: 'pedidos', element: <PedidosPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
       ],
