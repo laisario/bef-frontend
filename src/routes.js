@@ -12,6 +12,7 @@ import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 import RegisterPage from './pages/RegisterPage';
 import RegisterPage2 from './pages/RegisterPage2';
+import RegisterPage3 from './pages/RegisterPage3';
 
 // ----------------------------------------------------------------------
 
@@ -36,6 +37,7 @@ export default function Router() {
         { path: 'login', element: <LoginPage /> },
         { path: 'register', element: <RegisterPage /> },
         { path: 'register2', element: <RegisterPage2 /> },
+        { path: 'register3', element: <RegisterPage3 /> },
       ],
     },
     {

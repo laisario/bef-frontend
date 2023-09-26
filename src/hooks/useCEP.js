@@ -1,4 +1,6 @@
 import { useQuery } from 'react-query'
+import axios from 'axios'
+import { useMemo } from 'react';
 
 const regexCep = /^[0-9]{8}$/;
 
@@ -9,7 +11,7 @@ export function validarCEP(value = '') {
     return regexCep.test(cep)
 }
 
-export function formatCNPJ(value = '') {
+export function formatCEP(value = '') {
     const valid = validarCEP(value)
 
     if (!valid) return ''
@@ -25,19 +27,23 @@ export function formatCNPJ(value = '') {
 }
 
 const useCEP = (cep) => {
+    const isValid = useMemo(() =>  validarCEP(cep), [cep])
+
     const { data, error, isLoading } = useQuery(['cep', cep], async () => {
-        const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`)
+        const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`, { withCredentials: false })
         return response?.data
     }, {
-        enabled: validarCEP(cep)
+        enabled: isValid
     })
-  
+
 
     return {
         rua: data?.logradouro,
         bairro: data?.bairro,
         cidade: data?.localidade,
-        estado: data?.uf
+        estado: data?.uf,
+        isValid,
+        cep: formatCEP(cep)
     }
 }
 
