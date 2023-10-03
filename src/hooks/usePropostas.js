@@ -8,10 +8,17 @@ const usePropostas = () => {
         return response?.data
     })
 
+    const getOrder = async (id) => {
+        const response = await axios.get(`/propostas/${id}`)
+        return response?.data
+
+    }
+
     return {
         todasPropostas: data,
         error,
-        isLoading
+        isLoading,
+        getOrder
     }
 }
 

@@ -1,152 +1,78 @@
 import { Helmet } from 'react-helmet-async';
-import { filter } from 'lodash';
-import { sentenceCase } from 'change-case';
-import { useState } from 'react';
+import React, { useState } from 'react';
 // @mui
 import {
   Card,
   Table,
   Stack,
-  Paper,
-  Avatar,
   Button,
-  Popover,
-  Checkbox,
   TableRow,
-  MenuItem,
   TableBody,
   TableCell,
   Container,
   Typography,
-  IconButton,
   TableContainer,
-  TablePagination,
+  Modal,
+  Box,
+  Link,
 } from '@mui/material';
-import { format } from 'date-fns'
-import ptLocale from 'date-fns/locale/pt-BR'
+import { styled } from '@mui/system';
 
 // components
+import Form from '../components/orders/Form';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
+import { UserListHead } from '../sections/@dashboard/user';
 // mock
 import USERLIST from '../_mock/user';
+
+// hooks
+import usePropostas from '../hooks/usePropostas';
+import { fDateTime } from '../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'id', label: '', alignRight: false },
   { id: 'name', label: 'Instrumentos', alignRight: false },
-  { id: 'company', label: 'Data', alignRight: false },
+  { id: 'data', label: 'Data', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function applySortFilter(array, comparator, query) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
-  }
-  return stabilizedThis.map((el) => el[0]);
-}
+const FormBox = styled(Box)({
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+});
 
 export default function UserPage() {
-  const [open, setOpen] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [loading, setIsLoading] = useState(false);
+  const { todasPropostas } = usePropostas();
+  console.log(todasPropostas);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
-  const [page, setPage] = useState(0);
-
-  const [order, setOrder] = useState('asc');
-
-  const [selected, setSelected] = useState([]);
-
-  const [orderBy, setOrderBy] = useState('name');
-
-  const [filterName, setFilterName] = useState('');
-
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
+  const statusProposta = {
+    null: 'Proposta em análise',
+    false: 'Proposta negada',
+    true: 'Proposta aprovada',
   };
 
-  const handleCloseMenu = () => {
-    setOpen(null);
+  const colorStatusProposta = {
+    null: 'info',
+    false: 'error',
+    true: 'success',
   };
-
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
-  };
-
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
-
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
-
-  const isNotFound = !filteredUsers.length && !!filterName;
-
   return (
     <>
       <Helmet>
@@ -158,110 +84,55 @@ export default function UserPage() {
           <Typography variant="h4" gutterBottom>
             Meus pedidos
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+          <Button variant="contained" onClick={handleOpen} startIcon={<Iconify icon="eva:plus-fill" />}>
             Novo pedido
           </Button>
         </Stack>
 
         <Card>
-
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <UserListHead
-                  order={order}
-                  orderBy={orderBy}
-                  headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
-                  numSelected={selected.length}
-                  onRequestSort={handleRequestSort}
-                  onSelectAllClick={handleSelectAllClick}
-                />
+                <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => {
-                    const { id, name, role, status, company, avatarUrl, isVerified } = row;
+                  {todasPropostas.map((row, index) => {
+                    const { id, identificacao_instrumento: name, data_criacao: dataCriacao, aprovacao: status } = row;
+                    const data = new Date(dataCriacao);
 
                     return (
                       <TableRow hover key={id} tabIndex={-1}>
                         <TableCell align="left">{index + 1}</TableCell>
 
                         <TableCell align="left">
-                          {name}
+                          <Link href={`/dashboard/pedido/${id}`} underline="none">
+                            {name}
+                          </Link>
                         </TableCell>
 
-
-                        <TableCell align="left">{format(company, "d 'de' MMMM 'de' y", { locale: ptLocale })}</TableCell>
+                        <TableCell align="left">{fDateTime(data)}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={(status === 'Em analise' && 'info') || 'success'}>{sentenceCase(status)}</Label>
+                          <Label color={colorStatusProposta[status]}>{statusProposta[status]}</Label>
                         </TableCell>
                       </TableRow>
                     );
                   })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
                 </TableBody>
-
-                {isNotFound && (
-                  <TableBody>
-                    <TableRow>
-                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                        <Paper
-                          sx={{
-                            textAlign: 'center',
-                          }}
-                        >
-                          <Typography variant="h6" paragraph>
-                            Not found
-                          </Typography>
-
-                          <Typography variant="body2">
-                            No results found for &nbsp;
-                            <strong>&quot;{filterName}&quot;</strong>.
-                            <br /> Try checking for typos or using complete words.
-                          </Typography>
-                        </Paper>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                )}
               </Table>
             </TableContainer>
           </Scrollbar>
         </Card>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <FormBox>
+            <Form setOpen={setOpen} />
+          </FormBox>
+        </Modal>
       </Container>
-
-      <Popover
-        open={Boolean(open)}
-        anchorEl={open}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
-            },
-          },
-        }}
-      >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
-      </Popover>
     </>
   );
 }
