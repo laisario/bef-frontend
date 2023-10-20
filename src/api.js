@@ -6,7 +6,7 @@ const createAxiosInstance = () => {
             'Content-Type': 'application/json'
         },
         withCredentials: true,
-        baseURL: 'https://rkp2023.pythonanywhere.com/',
+        baseURL: process.env.REACT_APP_API_URL,
     });
 
     instance.interceptors.request.use((config) => {

@@ -4,25 +4,25 @@ import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { Link, Box, Stack, IconButton, InputAdornment, TextField, Checkbox, Typography, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
-import Iconify from '../../../components/iconify';
-import { useAuth } from '../../../context/Auth';
-import PasswordStrengthMeter from './PasswordStrengthMeter';
+import Iconify from '../../../../components/iconify';
+import { useAuth } from '../../../../context/Auth';
+import PasswordStrengthMeter from './components/PasswordStrengthMeter';
 
 // ----------------------------------------------------------------------
 
 export default function AuthInformation() {
   const navigate = useNavigate();
-  const { login } = useAuth()
+  const { registerAuth, loading } = useAuth()
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null)
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-
-    return navigate('/register', { replace: true });
+    await registerAuth({ email, password })
+    navigate('/login');
   };
 
   return (
@@ -54,7 +54,7 @@ export default function AuthInformation() {
 
       <Box display="flex" alignItems="center" justifyContent="space-between" mt={4}>
         <Button variant="text" component={RouterLink} to="/register2" startIcon={<Iconify icon={'eva:arrow-ios-back-fill'} />}>Voltar</Button>
-        <Button variant="contained" component={RouterLink} size="large" to="/register2" sx={{minWidth: '45%'}} endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>Continuar</Button>
+        <LoadingButton loading={loading} variant="contained" size="large" sx={{minWidth: '45%'}} onClick={handleSubmit} endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>Continuar</LoadingButton>
       </Box>
     </form>
   );

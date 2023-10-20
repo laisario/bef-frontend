@@ -10,10 +10,10 @@ import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
-import RegisterPage from './pages/RegisterPage';
-import RegisterPage2 from './pages/RegisterPage2';
-import RegisterPage3 from './pages/RegisterPage3';
 import OrderDetails from './pages/OrderDetails';
+import RegisterAuthPage from './pages/register/auth';
+import RegisterBasicsPage from './pages/register/basics';
+import RegisterLocationPage from './pages/register/location';
 
 // ----------------------------------------------------------------------
 
@@ -37,9 +37,16 @@ export default function Router() {
       children: [
         { element: <Navigate to="/login" />, index: true },
         { path: 'login', element: <LoginPage /> },
-        { path: 'register', element: <RegisterPage /> },
-        { path: 'register2', element: <RegisterPage2 /> },
-        { path: 'register3', element: <RegisterPage3 /> },
+      ],
+    },
+    {
+      path: '/register',
+      element: <AuthLayout />,
+      children: [
+        { element: <Navigate to="/register/basics" />, index: true },
+        { path: 'auth', element: <RegisterAuthPage /> },
+        { path: 'basics', element: <RegisterBasicsPage /> },
+        { path: 'location', element: <RegisterLocationPage /> },
       ],
     },
     {
