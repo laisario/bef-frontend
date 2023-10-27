@@ -11,14 +11,13 @@ const usePropostas = () => {
     const getOrder = async (id) => {
         const response = await axios.get(`/propostas/${id}`)
         return response?.data
-
     }
 
     return {
         todasPropostas: data,
         error,
         isLoading,
-        getOrder
+        getOrder,
     }
 }
 

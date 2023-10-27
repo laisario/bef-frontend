@@ -97,7 +97,8 @@ export default function Nav({ openNav, onCloseNav }) {
 
           <Box sx={{ textAlign: 'center' }}>
             <Typography gutterBottom variant="h6">
-              Precisa de uma calibrada?
+              Precisando
+               de uma calibração ai?
             </Typography>
 
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>

@@ -19,6 +19,7 @@ import {
 import { styled } from '@mui/system';
 
 // components
+import useInstrumentos from '../hooks/useInstrumentos';
 import Form from '../components/orders/Form';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
@@ -36,8 +37,8 @@ import { fDateTime } from '../utils/formatTime';
 
 const TABLE_HEAD = [
   { id: 'id', label: '', alignRight: false },
-  { id: 'name', label: 'Instrumentos', alignRight: false },
   { id: 'data', label: 'Data', alignRight: false },
+  { id: 'total', label: 'Total', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
 ];
 
@@ -58,7 +59,8 @@ export default function UserPage() {
   const [open, setOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const { todasPropostas } = usePropostas();
-  console.log(todasPropostas);
+  const { todosInstrumentos } = useInstrumentos();
+  console.log(todosInstrumentos);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -95,21 +97,18 @@ export default function UserPage() {
               <Table>
                 <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
                 <TableBody>
-                  {todasPropostas.map((row, index) => {
-                    const { id, identificacao_instrumento: name, data_criacao: dataCriacao, aprovacao: status } = row;
+                  {todasPropostas?.map((row, index) => {
+                    const { id, total, data_criacao: dataCriacao, aprovacao: status } = row;
                     const data = new Date(dataCriacao);
-
                     return (
-                      <TableRow hover key={id} tabIndex={-1}>
+                      <TableRow hover key={id} tabIndex={-1} component={Link} href={`/dashboard/pedido/${id}`} underline="none">
                         <TableCell align="left">{index + 1}</TableCell>
 
                         <TableCell align="left">
-                          <Link href={`/dashboard/pedido/${id}`} underline="none">
-                            {name}
-                          </Link>
+                          {fDateTime(data)}
                         </TableCell>
 
-                        <TableCell align="left">{fDateTime(data)}</TableCell>
+                        <TableCell align="left">R$ {total}</TableCell>
 
                         <TableCell align="left">
                           <Label color={colorStatusProposta[status]}>{statusProposta[status]}</Label>
