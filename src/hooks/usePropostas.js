@@ -3,7 +3,7 @@ import axios from '../api'
 
 
 const usePropostas = () => {
-    const { data, error, isLoading } = useQuery(['propostas'], async () => {
+    const { data, error, isLoading, refetch } = useQuery(['propostas'], async () => {
         const response = await axios.get('/propostas', { params: { page_size: 9999 } })
         return response?.data
     })
@@ -13,11 +13,17 @@ const usePropostas = () => {
         return response?.data
     }
 
+    const deleteOrder = async (id) => {
+        await axios.delete(`/propostas/${id}`)
+    }
+
     return {
         todasPropostas: data,
         error,
         isLoading,
         getOrder,
+        deleteOrder,
+        refetch,
     }
 }
 

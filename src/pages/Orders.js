@@ -15,11 +15,12 @@ import {
   Modal,
   Box,
   Link,
+  Alert,
+  Snackbar,
 } from '@mui/material';
 import { styled } from '@mui/system';
-
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 // components
-import useInstrumentos from '../hooks/useInstrumentos';
 import Form from '../components/orders/Form';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
@@ -58,9 +59,17 @@ const FormBox = styled(Box)({
 export default function UserPage() {
   const [open, setOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
+  const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
   const { todasPropostas } = usePropostas();
-  const { todosInstrumentos } = useInstrumentos();
-  console.log(todosInstrumentos);
+  const { vertical, horizontal, propostaEnviada } = alert;
+
+  const handleCloseAlert = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setAlert((prevAlert) => ({...prevAlert, propostaEnviada: false}));
+  };
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -101,12 +110,17 @@ export default function UserPage() {
                     const { id, total, data_criacao: dataCriacao, aprovacao: status } = row;
                     const data = new Date(dataCriacao);
                     return (
-                      <TableRow hover key={id} tabIndex={-1} component={Link} href={`/dashboard/pedido/${id}`} underline="none">
+                      <TableRow
+                        hover
+                        key={id}
+                        tabIndex={-1}
+                        component={Link}
+                        href={`/dashboard/pedido/${id}`}
+                        underline="none"
+                      >
                         <TableCell align="left">{index + 1}</TableCell>
 
-                        <TableCell align="left">
-                          {fDateTime(data)}
-                        </TableCell>
+                        <TableCell align="left">{fDateTime(data)}</TableCell>
 
                         <TableCell align="left">R$ {total}</TableCell>
 
@@ -128,9 +142,26 @@ export default function UserPage() {
           aria-describedby="modal-modal-description"
         >
           <FormBox>
-            <Form setOpen={setOpen} />
+            <Form setOpen={setOpen} setAlert={setAlert} />
           </FormBox>
         </Modal>
+
+        <Stack spacing={2} sx={{ width: '100%' }}>
+          <Snackbar
+            open={propostaEnviada}
+            anchorOrigin={{ vertical, horizontal }}
+            key={vertical + horizontal}
+            onClose={handleCloseAlert}
+          >
+            <Alert
+              onClose={handleCloseAlert}
+              severity="success"
+              sx={{ width: '100%' }}
+            >
+              Sua proposta foi enviada com sucesso!
+            </Alert>
+          </Snackbar>
+        </Stack>
       </Container>
     </>
   );

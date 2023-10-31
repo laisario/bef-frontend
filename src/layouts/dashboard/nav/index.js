@@ -106,7 +106,7 @@ export default function Nav({ openNav, onCloseNav }) {
             </Typography>
           </Box>
 
-          <Button href="https://material-ui.com/store/items/minimal-dashboard/" startIcon={<Iconify icon="eva:plus-fill" />} target="_blank" variant="contained">
+          <Button href="/dashboard/pedidos" startIcon={<Iconify icon="eva:plus-fill" />} target="_blank" variant="contained">
             Novo pedido
           </Button>
         </Stack>

@@ -1,12 +1,8 @@
 import { Grid, Typography } from '@mui/material';
 import React from 'react';
 
-function TitleCard({title}) {
-  return (
-    <Grid sx={{ padding: 2 }} md={2} item>
-      <Typography variant='h6'>{title}</Typography>
-    </Grid>
-  );
+function TitleCard({ title }) {
+  return <Typography variant="h6">{title}</Typography>;
 }
 
 export default TitleCard;
