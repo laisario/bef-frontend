@@ -1,29 +1,19 @@
 import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
 // @mui
-import { Container, Stack, Typography } from '@mui/material';
+import { Container, Typography } from '@mui/material';
 // components
-import { ProductSort, ProductList, ProductCartWidget, ProductFilterSidebar } from '../sections/@dashboard/products';
+import { ProductList } from '../sections/@dashboard/products';
 // mock
-import PRODUCTS from '../_mock/products';
+import useInstrumentos from '../hooks/useInstrumentos';
 
 // ----------------------------------------------------------------------
 
 export default function ProductsPage() {
-  const [openFilter, setOpenFilter] = useState(false);
-
-  const handleOpenFilter = () => {
-    setOpenFilter(true);
-  };
-
-  const handleCloseFilter = () => {
-    setOpenFilter(false);
-  };
-
+  const { todosInstrumentos } = useInstrumentos()
   return (
     <>
       <Helmet>
-        <title> Dashboard: Products | Minimal UI </title>
+        <title> Instrumentos | B&F </title>
       </Helmet>
 
       <Container>
@@ -31,7 +21,8 @@ export default function ProductsPage() {
           Meus Instrumentos
         </Typography>
 
-        <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 5 }}>
+        {/* Feature filters */}
+        {/* <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 5 }}>
           <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
             <ProductFilterSidebar
               openFilter={openFilter}
@@ -40,9 +31,9 @@ export default function ProductsPage() {
             />
             <ProductSort />
           </Stack>
-        </Stack>
+        </Stack> */}
 
-        <ProductList products={PRODUCTS} />
+        <ProductList products={todosInstrumentos} />
       </Container>
     </>
   );

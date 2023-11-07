@@ -2,6 +2,7 @@
 import PropTypes from 'prop-types';
 import { Box, Button, Card, Divider, Typography, CardHeader, CardContent } from '@mui/material';
 import { Timeline, TimelineDot, TimelineItem, TimelineContent, TimelineSeparator, TimelineConnector } from '@mui/lab';
+import { useNavigate } from 'react-router-dom';
 // utils
 import { fDateTime } from '../../../utils/formatTime';
 import Iconify from '../../../components/iconify';
@@ -15,6 +16,7 @@ AppOrderTimeline.propTypes = {
 };
 
 export default function AppOrderTimeline({ title, subheader, list, ...other }) {
+  const navigate = useNavigate()
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
@@ -36,7 +38,7 @@ export default function AppOrderTimeline({ title, subheader, list, ...other }) {
       </CardContent>
         <Divider />
         <Box sx={{ p: 2, textAlign: 'right' }}>
-          <Button size="small" color="inherit" endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>
+          <Button size="small" color="inherit" onClick={() => navigate('/dashboard/pedidos')} endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>
             Ver todos
           </Button>
         </Box>

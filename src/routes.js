@@ -1,6 +1,7 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 // layouts
 import DashboardLayout from './layouts/dashboard';
+import AdminLayout from './layouts/admin';
 import SimpleLayout from './layouts/simple';
 import AuthLayout from './layouts/auth';
 //
@@ -14,6 +15,11 @@ import OrderDetails from './pages/OrderDetails';
 import RegisterAuthPage from './pages/register/auth';
 import RegisterBasicsPage from './pages/register/basics';
 import RegisterLocationPage from './pages/register/location';
+import PedidosPageAdmin from './pages/admin/PedidosPageAdmin';
+import DetalhesPedidoPageAdmin from './pages/admin/DetalhesPedidoPageAdmin';
+import HomePageAdmin from './pages/admin/HomePageAdmin';
+import ProductDetailPage from './pages/ProductDetailPage';
+import ProductsPageAdmin from './pages/admin/ProductsPageAdmin';
 
 // ----------------------------------------------------------------------
 
@@ -27,7 +33,8 @@ export default function Router() {
         { path: 'app', element: <DashboardAppPage /> },
         { path: 'pedidos', element: <PedidosPage /> },
         { path: 'pedido/:id', element: <OrderDetails /> },
-        { path: 'products', element: <ProductsPage /> },
+        { path: 'produtos', element: <ProductsPage /> },
+        { path: 'produto/:id', element: <ProductDetailPage /> },
         { path: 'blog', element: <BlogPage /> },
       ],
     },
@@ -60,6 +67,18 @@ export default function Router() {
     {
       path: '*',
       element: <Navigate to="/404" replace />,
+    },
+    {
+      path: '/admin',
+      element: <AdminLayout />,
+      children: [
+        { element: <Navigate to="/admin/home" />, index: true },
+        { path: 'home', element: <HomePageAdmin /> },
+        { path: 'pedidos', element: <PedidosPageAdmin /> },
+        { path: 'pedido/:id', element: <DetalhesPedidoPageAdmin /> },
+        { path: 'produtos', element: <ProductsPageAdmin/> },
+        // { path: 'blog', element: <BlogPage /> },
+      ],
     },
   ]);
 

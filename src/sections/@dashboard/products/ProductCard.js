@@ -1,22 +1,22 @@
 import PropTypes from 'prop-types';
 // @mui
-import { Box, Card, Link, Typography, Stack } from '@mui/material';
-import { styled } from '@mui/material/styles';
-// utils
-import { fCurrency } from '../../../utils/formatNumber';
-// components
-import Label from '../../../components/label';
-import { ColorPreview } from '../../../components/color-utils';
+import { Box, Card, Link, Typography, Stack, Chip, Divider, useTheme } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
-const StyledProductImg = styled('img')({
-  top: 0,
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-  position: 'absolute',
-});
+const posicaoInstrumento = {
+  U: 'Em uso',
+  E: 'Em estoque',
+  I: 'Inativo',
+  F: 'Fora de uso',
+};
+
+const colorPosicaoInstrumento = {
+  U: 'succes',
+  E: 'secondary',
+  I: 'info',
+  F: 'warnig',
+};
 
 // ----------------------------------------------------------------------
 
@@ -25,54 +25,28 @@ ShopProductCard.propTypes = {
 };
 
 export default function ShopProductCard({ product }) {
-  const { name, cover, price, colors, status, priceSale } = product;
-
   return (
     <Card>
-      <Box sx={{ pt: '100%', position: 'relative' }}>
-        {status && (
-          <Label
-            variant="filled"
-            color={(status === 'sale' && 'error') || 'info'}
-            sx={{
-              zIndex: 9,
-              top: 16,
-              right: 16,
-              position: 'absolute',
-              textTransform: 'uppercase',
-            }}
-          >
-            {status}
-          </Label>
-        )}
-        <StyledProductImg alt={name} src={cover} />
-      </Box>
-
-      <Stack spacing={2} sx={{ p: 3 }}>
-        <Link color="inherit" underline="hover">
-          <Typography variant="subtitle2" noWrap>
-            {name}
+      <Link href={`/dashboard/produto/${product.id}`} color="inherit" underline="hover">
+        <Box sx={{ p: 5, display: 'flex', justifyContent: 'center', backgroundColor: '#FF9E75' }}>
+          <Typography color="white" border="solid" px={5} mx={1} py={2} borderRadius={4} variant='subtitle1'>{product.tag}</Typography>
+        </Box>
+        <Divider />
+        <Stack sx={{ p: 3 }}>
+          <Typography variant="subtitle1" noWrap>
+            {product?.instrumento?.tipo_de_instrumento.descricao}
           </Typography>
-        </Link>
-
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <ColorPreview colors={colors} />
-          <Typography variant="subtitle1">
-            <Typography
-              component="span"
-              variant="body1"
-              sx={{
-                color: 'text.disabled',
-                textDecoration: 'line-through',
-              }}
-            >
-              {priceSale && fCurrency(priceSale)}
-            </Typography>
-            &nbsp;
-            {fCurrency(price)}
+          <Typography variant="subtitle2" noWrap>
+            {product?.instrumento.tipo_de_instrumento.modelo}
+          </Typography>
+          <Typography variant="caption text" noWrap>
+            {product?.instrumento.tipo_de_instrumento.fabricante}
           </Typography>
         </Stack>
-      </Stack>
+        <Box sx={{ pr: 5, pb: 5, display: 'flex', justifyContent: 'flex-end' }}>
+          <Chip label={posicaoInstrumento[product?.posicao]} color={colorPosicaoInstrumento[product?.posicao]} />
+        </Box>
+      </Link>
     </Card>
   );
 }

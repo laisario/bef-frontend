@@ -5,8 +5,7 @@ import Card from '@mui/material/Card';
 import { Helmet } from 'react-helmet-async';
 
 import { useTheme } from '@emotion/react';
-import TitleCard from '../components/orders/titleCard';
-import usePropostas from '../hooks/usePropostas';
+import useOrders from '../hooks/useOrders';
 import CardInformation from '../components/orders/CardInformation';
 import Iconify from '../components/iconify';
 import { capitalizeFirstLetter as CFL } from '../utils/formatString';
@@ -32,26 +31,10 @@ const colorAprovacaoProposta = {
 };
 
 function OrderDetails() {
-  const [order, setOrder] = useState();
   const { id } = useParams();
-  const { getOrder, deleteOrder, refetch } = usePropostas();
-  const navigate = useNavigate();
+  const { order, deleteOrder, aprovar, recusar } = useOrders(id);
   const theme = useTheme();
-
-  const deleteProposta = async () => {
-    deleteOrder(id);
-    await refetch();
-    navigate('/dashboard/pedidos');
-  };
-
-  useEffect(() => {
-    (async () => {
-      const response = await getOrder(id);
-      console.log(response)
-      setOrder(response);
-    })();
-  }, []);
-
+  console.log(order);
   return (
     <>
       <Helmet>
@@ -68,15 +51,32 @@ function OrderDetails() {
             </Typography>
           </Box>
           <Box>
-            <Button onClick={deleteProposta} color="info">
+            <Button onClick={deleteOrder} color="info">
               <Iconify icon="eva:trash-2-fill" />
             </Button>
             {/* <Button color="info">
               <Iconify icon="eva:edit-2-fill" />
             </Button> */}
-            <Button variant="contained" startIcon={<Iconify icon="eva:checkmark-fill" />}>
-              Aprovar pedido
-            </Button>
+            {order?.aprovacao === null && (
+              <>
+                <Button
+                  variant="contained"
+                  sx={{ marginX: 2 }}
+                  onClick={() => aprovar()}
+                  startIcon={<Iconify icon="eva:checkmark-fill" />}
+                >
+                  Aprovar pedido
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => recusar()}
+                  startIcon={<Iconify icon="ph:x-bold" />}
+                >
+                  Recusar pedido
+                </Button>
+              </>
+            )}
           </Box>
         </Stack>
         <Paper sx={{ padding: 4 }}>
@@ -96,15 +96,62 @@ function OrderDetails() {
                 Endereço de entrega: {order?.endereco_de_entrega}
               </Typography>
             </Box>
-            <Chip label={aprovacaoProposta[order?.aprovacao]} color={colorAprovacaoProposta[order?.aprovacao]} variant="outlined" />
+            <Chip
+              label={aprovacaoProposta[order?.aprovacao]}
+              color={colorAprovacaoProposta[order?.aprovacao]}
+              variant="outlined"
+            />
           </Grid>
           <Typography variant="h6" my={2}>
             Instrumentos
           </Typography>
-          <Box display="flex" gap={3} sx={{overflowX: 'auto'}} width="100%">
-            {order?.instrumentos?.map((instrumento) => (
-              <CardInformation instrumento={instrumento} key={instrumento.id} />
-            ))}
+          <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
+            {order?.instrumentos?.map(
+              (
+                {
+                  tag,
+                  numero_de_serie: numeroDeSerie,
+                  posicao,
+                  data_ultima_calibracao: dataUltimaCalibracao,
+                  status: { nome },
+                  instrumento: {
+                    maximo,
+                    minimo,
+                    unidade,
+                    capacidade_de_medicao: { valor, unidade: unidadeMedicao },
+                    tipo_de_instrumento: {descricao}
+                  },
+                },
+                index
+              ) => (
+                <CardInformation
+                  instrumento={{
+                    tag,
+                    numero_de_serie: numeroDeSerie,
+                    data_ultima_calibracao: dataUltimaCalibracao,
+                    status: nome,
+                    informacoes_adicionais: order.informacoes_adicionais,
+                    local: order.local,
+                    maximo,
+                    minimo,
+                    unidade,
+                    valor,
+                    unidadeMedicao,
+                    posicao,
+                    descricao
+                  }}
+                  key={index}
+                  specialCases={{ numero_de_serie: 'Número de série', data_ultima_calibracao: 'Última Calibração' }}
+                  titles={[
+                    'tag',
+                    'numero_de_serie',
+                    'data_ultima_calibracao',
+                    'status',
+                    'informacoes_adicionais',
+                  ]}
+                />
+              )
+            )}
           </Box>
           <Typography my={2} variant="h6">
             Informações Adicionais

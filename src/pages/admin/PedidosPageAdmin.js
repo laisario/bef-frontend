@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import React, { useState } from 'react';
+import { useState } from 'react';
 // @mui
 import {
   Card,
@@ -19,26 +19,24 @@ import {
   Snackbar,
 } from '@mui/material';
 import { styled } from '@mui/system';
+import useOrders from '../../hooks/useOrders'
 // components
-import Form from '../components/orders/Form';
-import Label from '../components/label';
-import Iconify from '../components/iconify';
-import Scrollbar from '../components/scrollbar';
+import Label from '../../components/label';
+import Iconify from '../../components/iconify';
+import Scrollbar from '../../components/scrollbar';
 // sections
-import { UserListHead } from '../sections/@dashboard/user';
+import { UserListHead } from '../../sections/@dashboard/user';
 // mock
-import USERLIST from '../_mock/user';
+import USERLIST from '../../_mock/user';
 
-// hooks
-import useOrders from '../hooks/useOrders';
-import { fDateTime } from '../utils/formatTime';
+import { fDateTime } from '../../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'id', label: '', alignRight: false },
   { id: 'data', label: 'Data', alignRight: false },
-  { id: 'total', label: 'Total', alignRight: false },
+  { id: 'cliente', label: 'Cliente', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
 ];
 
@@ -55,13 +53,12 @@ const FormBox = styled(Box)({
   p: 4,
 });
 
-export default function UserPage() {
+function PedidosPageAdmin() {
   const [open, setOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
   const { todasPropostas } = useOrders();
   const { vertical, horizontal, propostaEnviada } = alert;
-
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -92,7 +89,7 @@ export default function UserPage() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Meus pedidos
+            Pedidos
           </Typography>
           <Button variant="contained" onClick={handleOpen} startIcon={<Iconify icon="eva:plus-fill" />}>
             Novo pedido
@@ -106,7 +103,7 @@ export default function UserPage() {
                 <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
                 <TableBody>
                   {todasPropostas?.map((row, index) => {
-                    const { id, total, data_criacao: dataCriacao, aprovacao: status } = row;
+                    const { id, total, data_criacao: dataCriacao, aprovacao: status, cliente } = row;
                     const data = new Date(dataCriacao);
                     return (
                       <TableRow
@@ -114,14 +111,14 @@ export default function UserPage() {
                         key={id}
                         tabIndex={-1}
                         component={Link}
-                        href={`/dashboard/pedido/${id}`}
+                        href={`/admin/pedido/${id}`}
                         underline="none"
                       >
                         <TableCell align="left">{index + 1}</TableCell>
 
                         <TableCell align="left">{fDateTime(data)}</TableCell>
 
-                        <TableCell align="left">R$ {total}</TableCell>
+                        <TableCell align="left">{cliente}</TableCell>
 
                         <TableCell align="left">
                           <Label color={colorStatusProposta[status]}>{statusProposta[status]}</Label>
@@ -141,7 +138,7 @@ export default function UserPage() {
           aria-describedby="modal-modal-description"
         >
           <FormBox>
-            <Form setOpen={setOpen} setAlert={setAlert} />
+            {/* Colocar formulario para criar nova proposta */}
           </FormBox>
         </Modal>
 
@@ -165,3 +162,5 @@ export default function UserPage() {
     </>
   );
 }
+
+export default PedidosPageAdmin

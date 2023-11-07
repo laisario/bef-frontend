@@ -87,7 +87,7 @@ export default function Nav({ openNav, onCloseNav }) {
         <NavSection data={navConfig} />
       </Box>
 
-      <Box>
+      {/* <Box>
         <Stack alignItems="center" spacing={3} px={2}>
           <Box
             component="img"
@@ -102,7 +102,7 @@ export default function Nav({ openNav, onCloseNav }) {
             </Typography>
 
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Calibre seus instrumentos a partir de R$ 35,00
+              Calibre seus instrumentos a partir de R$ 99,90
             </Typography>
           </Box>
 
@@ -110,7 +110,7 @@ export default function Nav({ openNav, onCloseNav }) {
             Novo pedido
           </Button>
         </Stack>
-      </Box>
+      </Box> */}
     </Scrollbar>
   );
 

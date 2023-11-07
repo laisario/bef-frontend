@@ -49,7 +49,7 @@ const SUCCESS = {
   main: '#54D62C',
   dark: '#229A16',
   darker: '#08660D',
-  contrastText: '#212121',
+  contrastText: '#fff',
 };
 
 const WARNING = {

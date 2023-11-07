@@ -9,7 +9,6 @@ import Iconify from '../../../components/iconify';
 //
 import AccountPopover from './AccountPopover';
 
-
 // ----------------------------------------------------------------------
 
 const NAV_WIDTH = 280;

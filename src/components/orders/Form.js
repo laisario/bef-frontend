@@ -18,7 +18,7 @@ import Chip from '@mui/material/Chip';
 import { useState } from 'react';
 import axios from '../../api';
 import useInstrumentos from '../../hooks/useInstrumentos';
-import usePropostas from '../../hooks/usePropostas';
+import useOrders from '../../hooks/useOrders';
 
 function Form({ setOpen, setAlert}) {
   const [informacoesAdicionais, setInformacoesAdicionais] = useState('');
@@ -26,7 +26,7 @@ function Form({ setOpen, setAlert}) {
   const [loading, setIsLoading] = useState(false);
   const [instrumentosSelecionados, setInstrumentosSelecionados] = useState([]);
   const { todosInstrumentos } = useInstrumentos();
-  const { refetch } = usePropostas()
+  const { refetch } = useOrders()
   const handleChange = (event) => {
     const {
       target: { value },
