@@ -40,7 +40,7 @@ export default function AuthLayout() {
                 <LogoBox>
                     <Logo sx={{ maxWidth: 300 }} disabledLink />
                     <Typography color="grey.700" align="center" variant="h3">
-                        Gestao Metrologica
+                        Gestão Metrológica
                     </Typography>
                 </LogoBox>
                 <Outlet />
