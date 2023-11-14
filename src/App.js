@@ -1,4 +1,4 @@
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
@@ -19,7 +19,7 @@ const queryClient = new QueryClient();
 export default function App() {
   return (
     <HelmetProvider>
-      <BrowserRouter>
+      <HashRouter>
         <AuthProvider>
           <ThemeProvider>
             <QueryClientProvider client={queryClient}>
@@ -29,7 +29,7 @@ export default function App() {
             </QueryClientProvider>
           </ThemeProvider>
         </AuthProvider>
-      </BrowserRouter>
+      </HashRouter>
     </HelmetProvider>
   );
 }
