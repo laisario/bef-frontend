@@ -6,12 +6,14 @@ import useOrders from '../hooks/useOrders';
 // sections
 import { AppNewsUpdate, AppOrderTimeline, AppWidgetSummary } from '../sections/@dashboard/app';
 import { isExpired } from '../utils/formatTime';
+import { useAuth } from '../context/Auth';
 
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
   const { todosInstrumentos, instrumentosCalibrados, instrumentosVencidos, isLoading } = useInstrumentos();
-  const { todasPropostas, pedidosEmAnalise } = useOrders();
+  const { data, pedidosEmAnalise } = useOrders();
+
   return (
     <>
       <Helmet>
@@ -88,7 +90,7 @@ export default function DashboardAppPage() {
             <Grid item xs={12} md={5} lg={4}>
               <AppOrderTimeline
                 title="Pedidos"
-                list={todasPropostas?.slice(0, 5)?.map((proposta, index) => ({
+                list={data?.slice(0, 5)?.map((proposta, index) => ({
                   id: proposta?.id,
                   title: `Pedido ${proposta?.id}`,
                   status: proposta?.status,

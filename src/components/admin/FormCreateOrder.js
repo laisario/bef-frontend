@@ -19,20 +19,28 @@ import { useState } from 'react';
 import axios from '../../api';
 import useInstrumentos from '../../hooks/useInstrumentos';
 import useOrders from '../../hooks/useOrders';
+import useClients from '../../hooks/useClients';
 
-function Form({ setOpen, setAlert}) {
-  const [informacoesAdicionais, setInformacoesAdicionais] = useState('');
+function FormCreateOrder({ setOpen, setAlert }) {
+  const [form, setForm] = useState({
+    cliente: '',
+    informacoesAdicionais: '',
+    instrumentosSelecionados: [],
+  });
   const [errMsg, setErrMsg] = useState('');
   const [loading, setIsLoading] = useState(false);
-  const [instrumentosSelecionados, setInstrumentosSelecionados] = useState([]);
   const { todosInstrumentos } = useInstrumentos();
-  const { refetch } = useOrders()
+  const { refetch } = useOrders();
+  const { clientes } = useClients();
   const handleChange = (event) => {
     const {
-      target: { value },
+      target: { value, name },
     } = event;
-    setInstrumentosSelecionados(value);
+    setForm((prevForm) => ({ ...prevForm, [name]: value }));
   };
+
+  const instrumentosPorCliente = todosInstrumentos?.filter((instrumento) => instrumento.cliente.id === form.cliente)
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,18 +48,18 @@ function Form({ setOpen, setAlert}) {
     try {
       setIsLoading(true);
       await axios.post('/propostas/', {
-        instrumentos: instrumentosSelecionados,
-        informacoes_adicionais: informacoesAdicionais,
+        instrumentos: form.instrumentosSelecionados,
+        informacoes_adicionais: form.informacoesAdicionais,
+        cliente: form.cliente,
       });
       setIsLoading(false);
-      setAlert((prevAlert) => ({...prevAlert, propostaEnviada: true}));
+      setAlert((prevAlert) => ({ ...prevAlert, propostaEnviada: true }));
       setOpen(false);
-      await refetch()
+      await refetch();
       return { error: false };
     } catch (err) {
       setIsLoading(false);
       setErrMsg(err.message);
-      console.log(err);
       return { error: true };
     }
   };
@@ -73,41 +81,58 @@ function Form({ setOpen, setAlert}) {
         </Typography>
       </Grid>
       <Grid item>
-        <Box component="form" onSubmit={handleSubmit} noValidate>
+        <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2} noValidate>
+          <FormControl fullWidth>
+            <InputLabel id="cliente-select">Cliente</InputLabel>
+            <Select
+              labelId="cliente-select"
+              name="cliente"
+              id="cliente-select"
+              value={form.cliente}
+              label="Cliente"
+              onChange={handleChange}
+            >
+              {clientes?.map((cliente) => (
+                <MenuItem key={cliente.id} value={cliente.id}>
+                  {cliente.empresa} - {cliente.nome}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <FormControl fullWidth>
             <InputLabel id="demo-multiple-chip-label">Instrumentos</InputLabel>
             <Select
               labelId="demo-multiple-chip-label"
               id="demo-multiple-chip"
               multiple
-              value={instrumentosSelecionados}
+              name="instrumentosSelecionados"
+              value={form.instrumentosSelecionados}
               onChange={handleChange}
               input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
               renderValue={(selected) => (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {selected.map((value) => (
-                    <Chip key={value} label={todosInstrumentos?.find(instrumento => instrumento.id === value)?.tag} />
+                    <Chip key={value} label={instrumentosPorCliente?.find(instrumento => instrumento.id === value)?.tag} />
                   ))}
                 </Box>
               )}
             >
-              {todosInstrumentos?.map((instrumento) => (
+              {instrumentosPorCliente?.map((instrumento) => (
                 <MenuItem key={instrumento.id} value={instrumento.id}>
-                  {instrumento.tag} - {instrumento.numero_de_serie} -{' '}
+                  <strong>{instrumento.tag}</strong>: {instrumento.numero_de_serie} -{' '}
                   {instrumento.instrumento.tipo_de_instrumento.descricao} {instrumento.instrumento.minimo}{' '}
-                  {instrumento.instrumento.maximo} {instrumento.instrumento.unidade} -
+                  {instrumento.instrumento.maximo} {instrumento.instrumento.unidade}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
           <TextField
-            margin="normal"
             type="text"
             multiline
             name="informacoesAdicionais"
-            value={informacoesAdicionais}
+            value={form.informacoesAdicionais}
             label="Informações adicionais"
-            onChange={(e) => setInformacoesAdicionais(e.target.value)}
+            onChange={handleChange}
             placeholder="Informações adicionais"
             fullWidth
             error={errMsg}
@@ -123,4 +148,4 @@ function Form({ setOpen, setAlert}) {
   );
 }
 
-export default Form;
+export default FormCreateOrder;

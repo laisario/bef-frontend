@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Box, Button, Chip, Container, Grid, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Chip, Container, Grid, Link, Paper, Stack, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { Helmet } from 'react-helmet-async';
 
@@ -10,7 +10,7 @@ import CardInformation from '../../components/orders/CardInformation';
 import Iconify from '../../components/iconify';
 import { capitalizeFirstLetter as CFL } from '../../utils/formatString';
 import { fDateTime } from '../../utils/formatTime';
-import FormEditProposta from '../../components/admin/FormEditProposta';
+import FormEditProposta from '../../components/admin/FormEditOrder';
 
 const formaPagamento = {
   CD: 'Débito',
@@ -34,9 +34,7 @@ const colorAprovacaoProposta = {
 function DetalhesPedidoPageAdmin() {
   const [edit, setEdit] = useState(false);
   const { id } = useParams();
-  const { order, deleteOrder, aprovar, recusar, finalizar } = useOrders(id);
-  console.log('order', order);
-  const navigate = useNavigate();
+  const { data, deleteOrder} = useOrders(id);
   const theme = useTheme();
   return (
     <>
@@ -47,57 +45,60 @@ function DetalhesPedidoPageAdmin() {
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Box direction="column">
             <Typography variant="h4" gutterBottom>
-              Pedido número: {order?.numero}
+              Pedido número: {data?.numero}
             </Typography>
             <Typography variant="h6" gutterBottom>
-              {fDateTime(order?.data_criacao)}
+              {fDateTime(data?.data_criacao)}
             </Typography>
           </Box>
-          <Box>
-            <Button onClick={deleteOrder} color="info">
+          <Box display="flex" gap={2}>
+            <Button onClick={deleteOrder} color="secondary">
               <Iconify icon="eva:trash-2-fill" />
             </Button>
-            {!edit && (
-              <Button onClick={() => setEdit(true)} color="info">
-                <Iconify icon="eva:edit-2-fill" />
+            {data?.status !== 'F' ? (
+              <Button variant="contained" onClick={() => setEdit(true)} endIcon={<Iconify icon="eva:checkmark-fill" />}>
+                Finalizar proposta
+              </Button>
+            ) : (
+              <Button variant="contained" onClick={() => setEdit(true)} endIcon={<Iconify icon="eva:edit-fill" />}>
+                Editar proposta
               </Button>
             )}
           </Box>
         </Stack>
-        {edit ? (
-          <FormEditProposta setEdit={setEdit} />
-        ) : (
-          <Paper sx={{ padding: 4 }}>
-            <Grid container flexDirection="row" justifyContent="space-between">
-              <Box>
-                <Typography variant="h6">Total: R${order?.total}</Typography>
-                <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
-                  {order?.local === 'L' ? 'Laboratório B&F' : 'Local'}
-                </Typography>
-                <Typography variant="subtitle1" fontWeight="500">
-                  Forma de pagamento: {formaPagamento[order?.condicao_de_pagamento]}
-                </Typography>
-                <Typography variant="subtitle1" fontWeight="500">
-                  Transporte: {CFL(order?.transporte)}
-                </Typography>
-                <Typography variant="subtitle1" fontWeight="500">
-                  Endereço de entrega: {order?.endereco_de_entrega}
-                </Typography>
-              </Box>
-              <Box display="flex" flexDirection="column" gap={1}>
-                <Chip
-                  label={aprovacaoProposta[order?.aprovacao]}
-                  color={colorAprovacaoProposta[order?.aprovacao]}
-                  variant="outlined"
-                />
-                {order?.status === "F" && <Chip label="Proposta finalizada" color="error" variant="contained" />}
-              </Box>
-            </Grid>
-            <Typography variant="h6" my={2}>
-              Instrumentos
-            </Typography>
-            <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
-            {order?.instrumentos?.map(
+
+        {!!data && <FormEditProposta open={edit} data={data} handleClose={() => setEdit(false)} />}
+        <Paper sx={{ padding: 4 }}>
+          <Grid container flexDirection="row" justifyContent="space-between">
+            <Box>
+              <Typography variant="h6">Total: R${data?.total}</Typography>
+              <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
+                Local calibração: {data?.local === 'L' ? 'Laboratório B&F' : 'Cliente'}
+              </Typography>
+              <Typography variant="subtitle1" fontWeight="500">
+                Forma de pagamento: {formaPagamento[data?.condicao_de_pagamento]}
+              </Typography>
+              <Typography variant="subtitle1" fontWeight="500">
+                Transporte: {CFL(data?.transporte)}
+              </Typography>
+              <Typography variant="subtitle1" fontWeight="500">
+                Endereço de entrega: {data?.endereco_de_entrega?.logradouro} {data?.endereco_de_entrega?.numero}{' '}
+                {data?.endereco_de_entrega?.bairro}
+              </Typography>
+            </Box>
+            <Box display="flex" flexDirection="column" gap={1}>
+              <Chip
+                label={aprovacaoProposta[data?.aprovacao]}
+                color={colorAprovacaoProposta[data?.aprovacao]}
+                variant="outlined"
+              />
+            </Box>
+          </Grid>
+          <Typography variant="h6" my={2}>
+            Instrumentos
+          </Typography>
+          <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
+            {data?.instrumentos?.map(
               (
                 {
                   tag,
@@ -110,8 +111,9 @@ function DetalhesPedidoPageAdmin() {
                     minimo,
                     unidade,
                     capacidade_de_medicao: { valor, unidade: unidadeMedicao },
-                    tipo_de_instrumento: {descricao}
+                    tipo_de_instrumento: { descricao },
                   },
+                  id,
                 },
                 index
               ) => (
@@ -121,47 +123,36 @@ function DetalhesPedidoPageAdmin() {
                     numero_de_serie: numeroDeSerie,
                     data_ultima_calibracao: dataUltimaCalibracao,
                     status: nome,
-                    informacoes_adicionais: order.informacoes_adicionais,
-                    local: order.local,
+                    informacoes_adicionais: data.informacoes_adicionais,
+                    local: data.local,
                     maximo,
                     minimo,
                     unidade,
                     valor,
                     unidadeMedicao,
                     posicao,
-                    descricao
+                    descricao,
+                    id
                   }}
                   key={index}
-                  specialCases={{ numero_de_serie: 'Número de série', data_ultima_calibracao: 'Última Calibração' }}
-                  titles={[
-                    'tag',
-                    'numero_de_serie',
-                    'data_ultima_calibracao',
-                    'status',
-                    'informacoes_adicionais',
-                  ]}
+                  specialCases={{ numero_de_serie: 'Número de série', data_ultima_calibracao: 'Última Calibração', informacoes_adicionais: 'Informações adicionais' }}
+                  titles={['tag', 'numero_de_serie', 'data_ultima_calibracao', 'status', 'informacoes_adicionais']}
+                  proposta={data}
                 />
               )
             )}
           </Box>
-            <Typography my={2} variant="h6">
-              Informações Adicionais
-            </Typography>
-            <Card sx={{ padding: 2, my: 2, backgroundColor: theme.palette.background.neutral }}>
-              <Typography>{order?.informacoes_adicionais}</Typography>
-            </Card>
-            <Box display="flex" sx={{ justifyContent: 'flex-end' }} width="100%">
-              <Button
-                variant="contained"
-                sx={{ my: 2 }}
-                onClick={finalizar}
-                startIcon={<Iconify icon="eva:checkmark-fill" />}
-              >
-                Finalizar proposta
-              </Button>
-            </Box>
-          </Paper>
-        )}
+          {!!data?.informacoes_adicionais && (
+            <>
+              <Typography my={2} variant="h6">
+                Informações Adicionais
+              </Typography>
+              <Card sx={{ padding: 2, my: 2, backgroundColor: theme.palette.background.neutral }}>
+                <Typography>{data?.informacoes_adicionais}</Typography>
+              </Card>
+            </>
+          )}
+        </Paper>
       </Container>
     </>
   );

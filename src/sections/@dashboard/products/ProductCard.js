@@ -11,13 +11,6 @@ const posicaoInstrumento = {
   F: 'Fora de uso',
 };
 
-const colorPosicaoInstrumento = {
-  U: 'succes',
-  E: 'secondary',
-  I: 'info',
-  F: 'warnig',
-};
-
 // ----------------------------------------------------------------------
 
 ShopProductCard.propTypes = {
@@ -44,7 +37,7 @@ export default function ShopProductCard({ product }) {
           </Typography>
         </Stack>
         <Box sx={{ pr: 5, pb: 5, display: 'flex', justifyContent: 'flex-end' }}>
-          <Chip label={posicaoInstrumento[product?.posicao]} color={colorPosicaoInstrumento[product?.posicao]} />
+          <Chip label={posicaoInstrumento[product?.posicao]}/>
         </Box>
       </Link>
     </Card>

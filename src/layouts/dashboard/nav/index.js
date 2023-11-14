@@ -40,9 +40,7 @@ Nav.propTypes = {
 export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
   const { user } = useAuth()
-
   const isDesktop = useResponsive('up', 'lg');
-
   useEffect(() => {
     if (openNav) {
       onCloseNav();
@@ -73,7 +71,7 @@ export default function Nav({ openNav, onCloseNav }) {
 
               <Box sx={{ ml: 2 }}>
                 <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                  {user?.nome}
+                  {user.nome} 
                 </Typography>
 
                 {/* <Typography variant="body2" sx={{ color: 'text.secondary' }}>

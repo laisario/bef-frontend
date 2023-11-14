@@ -1,15 +1,24 @@
+/* eslint-disable camelcase */
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import axios from '../api';
+import { formatData } from '../utils/formatTime';
+import useClients from './useClients';
 
 const useOrders = (id) => {
-  const [order, setOrder] = useState();
-  const navigate = useNavigate()
-  const { data, error, isLoading, refetch } = useQuery(['propostas'], async () => {
+  const navigate = useNavigate();
+
+  const { data, error, isLoading, refetch } = useQuery(['propostas', id], async () => {
+    if (id) {
+      const response = await axios.get(`/propostas/${id}`, { params: { page_size: 9999 } });
+      return response?.data;
+    }
     const response = await axios.get('/propostas', { params: { page_size: 9999 } });
     return response?.data;
   });
+
+  const { clientes: cliente } = useClients(data?.cliente?.id);
 
   const aprovacaoProposta = {
     null: 'Proposta em análise',
@@ -17,49 +26,96 @@ const useOrders = (id) => {
     true: 'Proposta aprovada',
   };
 
-  
   const colorAprovacaoProposta = {
     null: 'info',
     false: 'error',
     true: 'success',
   };
 
-  const getOrder = async () => {
-    const response = await axios.get(`/propostas/${id}`);
-    return response?.data;
-  };
-
   const deleteOrder = async () => {
     await axios.delete(`/propostas/${id}`);
-    // await refetch();
-    navigate('/dashboard/pedidos')
+    navigate('/dashboard/pedidos');
   };
-
   const edit = async (form) => {
-    await axios.patch(`/propostas/${id}/`, form);
-    // await refetch();
-    navigate('/admin/pedidos')
+    const {
+      form: {
+        local,
+        total,
+        prazo_de_entrega,
+        forma_de_pagamento,
+        transporte,
+        numero,
+        validade,
+        data_aprovacao,
+        certificado: anexo,
+      },
+      numero: numeroCasa,
+      CEP,
+      rua,
+      bairro,
+      cidade,
+      estado,
+      enderecoEntrega,
+      aprovado,
+    } = form;
+    const formData = new FormData();
+    formData.append('anexo', anexo);
+    try {
+      if (anexo && anexo instanceof File) {
+        await axios({
+          method: 'patch',
+          url: `/propostas/${id}/anexar/`,
+          data: formData,
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
+      if (enderecoEntrega === 'enderecoCadastrado') {
+        await axios.patch(`/propostas/${id}/atualizar/`, {
+          local: local || null,
+          total: total || 0,
+          prazo_de_entrega: formatData(prazo_de_entrega) || null,
+          forma_de_pagamento: forma_de_pagamento || null,
+          transporte: transporte || null,
+          numero: numero || 0,
+          endereco_de_entrega: cliente.endereco || null,
+          validade: formatData(validade) || null,
+          data_aprovacao: data_aprovacao ? formatData(data_aprovacao) : null,
+          aprovado: aprovado || null,
+        });
+      } else {
+        await axios.patch(`/propostas/${id}/atualizar/`, {
+          local: local || null,
+          total: total || 0,
+          prazo_de_entrega: formatData(prazo_de_entrega) || null,
+          forma_de_pagamento: forma_de_pagamento || null,
+          transporte: transporte || null,
+          numero: numero || 0,
+          endereco_de_entrega_add:
+            {
+              cep: CEP || null,
+              numero: numeroCasa || null,
+              logradouro: rua || null,
+              bairro: bairro || null,
+              cidade: cidade || null,
+              estado: estado || null,
+            } || null,
+          validade: formatData(validade) || null,
+          data_aprovacao: data_aprovacao ? formatData(data_aprovacao) : null,
+          aprovado: aprovado || null,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const aprovar = async () => {
     try {
       await axios.post(`/propostas/${id}/aprovar/`);
-      // await refetch();
-      navigate('/dashboard/pedidos')
+      navigate('/dashboard/pedidos');
       return { error: false };
     } catch (err) {
       console.log(err);
-      return { error: true };
-    }
-  };
-
-  const finalizar = async () => {
-    try {
-      await axios.post(`/propostas/${id}/finalizar/`);
-      // await refetch();
-      navigate('/dashboard/pedidos')
-      return { error: false };
-    } catch (err) {
       return { error: true };
     }
   };
@@ -67,38 +123,30 @@ const useOrders = (id) => {
   const recusar = async () => {
     try {
       await axios.post(`/propostas/${id}/reprovar/`);
-      // await refetch();
-      navigate('/dashboard/pedidos')
+      navigate('/dashboard/pedidos');
       return { error: false };
     } catch (err) {
       console.log(err);
       return { error: true };
     }
   };
-  const pedidosEmAnalise =  useMemo(() => data?.filter(pedido => pedido.status === 'A' ), [data])
-
-  useEffect(() => {
-    (async () => {
-      const response = await getOrder(id);
-      setOrder(response);
-    })();
-  }, []);
+  const pedidosEmAnalise = useMemo(
+    () => (Array.isArray(data) ? data?.filter((pedido) => pedido.status === 'A') : null),
+    [data]
+  );
 
   return {
-    todasPropostas: data,
+    data,
     error,
     isLoading,
-    getOrder,
     deleteOrder,
     refetch,
     aprovar,
     recusar,
-    order,
-    finalizar,
     aprovacaoProposta,
     colorAprovacaoProposta,
     pedidosEmAnalise,
-    edit
+    edit,
   };
 };
 

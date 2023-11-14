@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
 import { Container, Typography } from '@mui/material';
+import { useParams } from 'react-router-dom';
 // components
 import { ProductList } from '../sections/@dashboard/products';
 // mock
@@ -20,18 +21,6 @@ export default function ProductsPage() {
         <Typography variant="h4" sx={{ mb: 5 }}>
           Meus Instrumentos
         </Typography>
-
-        {/* Feature filters */}
-        {/* <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 5 }}>
-          <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
-            <ProductFilterSidebar
-              openFilter={openFilter}
-              onOpenFilter={handleOpenFilter}
-              onCloseFilter={handleCloseFilter}
-            />
-            <ProductSort />
-          </Stack>
-        </Stack> */}
 
         <ProductList products={todosInstrumentos} />
       </Container>

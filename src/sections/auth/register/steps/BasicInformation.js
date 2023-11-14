@@ -39,7 +39,6 @@ export default function BasicInformation() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(tipo === 'E');
     await registerBasics({
       nome,
       telefone,
@@ -47,7 +46,7 @@ export default function BasicInformation() {
       empresa: tipo === 'E',
       razaoSocial: razaoSocialFromApi || razaoSocial,
       cnpj: cnpjFormatado || CNPJ,
-      ie: inscricaoEstadual || IE,
+      ie: inscricaoEstadual || IE || null,
     });
     navigate('/register/location')
   };

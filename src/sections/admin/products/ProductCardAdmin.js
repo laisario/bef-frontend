@@ -2,7 +2,6 @@ import { Box, Card, Chip, Divider, Link, Stack, Typography } from '@mui/material
 import React from 'react';
 
 function ProductCardAdmin({ product }) {
-  console.log(product);
   return (
     <Card>
       <Box

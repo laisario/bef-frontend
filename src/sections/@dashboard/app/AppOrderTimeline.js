@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types';
 import { Box, Button, Card, Divider, Typography, CardHeader, CardContent } from '@mui/material';
 import { Timeline, TimelineDot, TimelineItem, TimelineContent, TimelineSeparator, TimelineConnector } from '@mui/lab';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 // utils
 import { fDateTime } from '../../../utils/formatTime';
 import Iconify from '../../../components/iconify';
@@ -16,7 +16,17 @@ AppOrderTimeline.propTypes = {
 };
 
 export default function AppOrderTimeline({ title, subheader, list, ...other }) {
-  const navigate = useNavigate()
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const redirect = () => {
+    if (pathname.includes('/admin')) {
+      navigate('/admin/pedidos');
+    } else {
+      navigate('/dashboard/pedidos');
+    }
+  };
+
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
@@ -29,19 +39,23 @@ export default function AppOrderTimeline({ title, subheader, list, ...other }) {
           py: 2,
         }}
       >
-        <Timeline sx={{p: 0}}>
+        <Timeline sx={{ p: 0 }}>
           {list?.map((item, index) => (
             <OrderItem key={item.id} item={item} isLast={index === list.length - 1} />
           ))}
         </Timeline>
-
       </CardContent>
-        <Divider />
-        <Box sx={{ p: 2, textAlign: 'right' }}>
-          <Button size="small" color="inherit" onClick={() => navigate('/dashboard/pedidos')} endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>
-            Ver todos
-          </Button>
-        </Box>
+      <Divider />
+      <Box sx={{ p: 2, textAlign: 'right' }}>
+        <Button
+          size="small"
+          color="inherit"
+          onClick={redirect}
+          endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}
+        >
+          Ver todos
+        </Button>
+      </Box>
     </Card>
   );
 }
@@ -63,8 +77,8 @@ function OrderItem({ item, isLast }) {
     <TimelineItem>
       <TimelineSeparator>
         <TimelineDot
-          variant={status === "F" ? "filled" : "outlined"}
-          color={status === "F" ? "primary" : "secondary"}
+          variant={status === 'F' ? 'filled' : 'outlined'}
+          color={status === 'F' ? 'primary' : 'secondary'}
         />
         {isLast ? null : <TimelineConnector />}
       </TimelineSeparator>

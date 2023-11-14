@@ -1,18 +1,19 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 // @mui
-import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox } from '@mui/material';
+import { Link, Box, Stack, IconButton, InputAdornment, TextField, Checkbox, Typography, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
-import Iconify from '../../../components/iconify';
-
-import { useAuth } from '../../../context/Auth';
+import Iconify from '../../../../components/iconify';
+import { useAuth } from '../../../../context/Auth';
+import PasswordStrengthMeter from './components/PasswordStrengthMeter';
 
 // ----------------------------------------------------------------------
 
-export default function LoginForm() {
+export default function AuthInformation() {
   const navigate = useNavigate();
-  const { login, loading } = useAuth()
+  const { registerAuth, loading } = useAuth()
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null)
@@ -20,20 +21,16 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const { error } = await login(email, password);
-    if (error) {
-      setError(error)
-      return null
-    };
-    return navigate('/dashboard', { replace: true });
+    await registerAuth({ email, password })
+    navigate('/login');
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <Stack spacing={3}>
         <TextField error={!!error} name="email" label="Email" value={email} onChange={(e) => { if (error) { setError(null) } setEmail(e.target.value) }} />
-
         <TextField
+          fullWidth
           error={!!error}
           helperText={!!error && error}
           name="password"
@@ -50,12 +47,15 @@ export default function LoginForm() {
               </InputAdornment>
             ),
           }}
+          sx={{ marginBottom: 0 }}
         />
+        <PasswordStrengthMeter password={password} />
       </Stack>
 
-      <LoadingButton disabled={!email || !password} loading={loading} sx={{ mt: 4 }} type="submit" fullWidth size="large" variant="contained" onClick={handleSubmit}>
-        Entrar
-      </LoadingButton>
+      <Box display="flex" alignItems="center" justifyContent="space-between" mt={4}>
+        <Button variant="text" component={RouterLink} to="/register2" startIcon={<Iconify icon={'eva:arrow-ios-back-fill'} />}>Voltar</Button>
+        <LoadingButton loading={loading} variant="contained" size="large" sx={{minWidth: '45%'}} onClick={handleSubmit} endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>Continuar</LoadingButton>
+      </Box>
     </form>
   );
 }

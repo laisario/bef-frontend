@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Box, Button, Chip, Container, Grid, Paper, Stack, TextField, Typography } from '@mui/material';
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import { Box, Button, Chip, Container, Grid, Link, Paper, Stack, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { Helmet } from 'react-helmet-async';
 
@@ -32,9 +33,8 @@ const colorAprovacaoProposta = {
 
 function OrderDetails() {
   const { id } = useParams();
-  const { order, deleteOrder, aprovar, recusar } = useOrders(id);
+  const { data, aprovar, recusar } = useOrders(id);
   const theme = useTheme();
-  console.log(order);
   return (
     <>
       <Helmet>
@@ -44,20 +44,14 @@ function OrderDetails() {
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Box direction="column">
             <Typography variant="h4" gutterBottom>
-              Pedido número: {order?.numero}
+              Pedido número: {data?.numero}
             </Typography>
             <Typography variant="h6" gutterBottom>
-              {fDateTime(order?.data_criacao)}
+              {fDateTime(data?.data_criacao)}
             </Typography>
           </Box>
           <Box>
-            <Button onClick={deleteOrder} color="info">
-              <Iconify icon="eva:trash-2-fill" />
-            </Button>
-            {/* <Button color="info">
-              <Iconify icon="eva:edit-2-fill" />
-            </Button> */}
-            {order?.aprovacao === null && (
+            {data?.status === "F" && (
               <>
                 <Button
                   variant="contained"
@@ -73,7 +67,7 @@ function OrderDetails() {
                   onClick={() => recusar()}
                   startIcon={<Iconify icon="ph:x-bold" />}
                 >
-                  Recusar pedido
+                  Reprovar pedido
                 </Button>
               </>
             )}
@@ -82,31 +76,38 @@ function OrderDetails() {
         <Paper sx={{ padding: 4 }}>
           <Grid container flexDirection="row" justifyContent="space-between">
             <Box>
-              <Typography variant="h6">Total: R${order?.total}</Typography>
+              <Typography variant="h6">Total: R${data?.total}</Typography>
               <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
-                {order?.local === 'L' ? 'Laboratório B&F' : 'Local'}
+                Local calibração: {data?.local === 'L' ? 'Laboratório B&F' : 'Local'}
               </Typography>
               <Typography variant="subtitle1" fontWeight="500">
-                Forma de pagamento: {formaPagamento[order?.condicao_de_pagamento]}
+                Forma de pagamento: {formaPagamento[data?.condicao_de_pagamento]}
               </Typography>
               <Typography variant="subtitle1" fontWeight="500">
-                Transporte: {CFL(order?.transporte)}
+                Transporte: {CFL(data?.transporte)}
               </Typography>
               <Typography variant="subtitle1" fontWeight="500">
-                Endereço de entrega: {order?.endereco_de_entrega}
+                Endereço de entrega: {data?.endereco_de_entrega?.logradouro} {data?.endereco_de_entrega?.numero} {data?.endereco_de_entrega?.bairro}
               </Typography>
             </Box>
-            <Chip
-              label={aprovacaoProposta[order?.aprovacao]}
-              color={colorAprovacaoProposta[order?.aprovacao]}
-              variant="outlined"
-            />
+            <Box display="flex" gap={1} flexDirection="column">
+              <Chip
+                label={aprovacaoProposta[data?.aprovacao]}
+                color={colorAprovacaoProposta[data?.aprovacao]}
+                variant="outlined"
+              />
+              <Button startIcon={<ReceiptLongIcon />}>
+                <Link href={data?.anexo}>
+                  Certificado
+                </Link>
+              </Button>
+            </Box>
           </Grid>
           <Typography variant="h6" my={2}>
             Instrumentos
           </Typography>
           <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
-            {order?.instrumentos?.map(
+            {data?.instrumentos?.map(
               (
                 {
                   tag,
@@ -119,7 +120,7 @@ function OrderDetails() {
                     minimo,
                     unidade,
                     capacidade_de_medicao: { valor, unidade: unidadeMedicao },
-                    tipo_de_instrumento: {descricao}
+                    tipo_de_instrumento: { descricao },
                   },
                 },
                 index
@@ -127,28 +128,26 @@ function OrderDetails() {
                 <CardInformation
                   instrumento={{
                     tag,
-                    numero_de_serie: numeroDeSerie,
-                    data_ultima_calibracao: dataUltimaCalibracao,
+                    numeroDeSerie,
+                    dataUltimaCalibracao,
                     status: nome,
-                    informacoes_adicionais: order.informacoes_adicionais,
-                    local: order.local,
+                    informacoesAdicionais: data.informacoes_adicionais,
+                    local: data.local,
                     maximo,
                     minimo,
                     unidade,
                     valor,
                     unidadeMedicao,
                     posicao,
-                    descricao
+                    descricao,
                   }}
                   key={index}
-                  specialCases={{ numero_de_serie: 'Número de série', data_ultima_calibracao: 'Última Calibração' }}
-                  titles={[
-                    'tag',
-                    'numero_de_serie',
-                    'data_ultima_calibracao',
-                    'status',
-                    'informacoes_adicionais',
-                  ]}
+                  specialCases={{
+                    numero_de_serie: 'Número de série',
+                    data_ultima_calibracao: 'Última Calibração',
+                    informacoesAdicionais: 'Informações adicionais',
+                  }}
+                  titles={['tag', 'numero_de_serie', 'data_ultima_calibracao', 'status', 'informacoesAdicionais']}
                 />
               )
             )}
@@ -157,7 +156,7 @@ function OrderDetails() {
             Informações Adicionais
           </Typography>
           <Card sx={{ padding: 2, my: 2, backgroundColor: theme.palette.background.neutral }}>
-            <Typography>{order?.informacoes_adicionais}</Typography>
+            <Typography>{data?.informacoes_adicionais}</Typography>
           </Card>
         </Paper>
       </Container>

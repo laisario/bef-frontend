@@ -1,8 +1,12 @@
 /* eslint-disable react/prop-types */
 import { useTheme } from '@emotion/react';
-import { Box, Card, Chip, Grid, Typography } from '@mui/material';
+import { Box, Button, Card, Chip, Grid, Link, Typography } from '@mui/material';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import { useLocation } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import React from 'react';
 import titleCase from '../../utils/formatTitle';
+import axios from '../../api';
 
 const posicaoInstrumento = {
   U: 'Em uso',
@@ -11,12 +15,12 @@ const posicaoInstrumento = {
   F: 'Fora de uso',
 };
 
-function CardInformation({ instrumento, titles, specialCases }) {
+function CardInformation({ instrumento, titles, specialCases, proposta }) {
+  const { pathname } = useLocation();
+
   const theme = useTheme();
   return (
-    <Card
-      sx={{ padding: 2, backgroundColor: theme.palette.background.neutral, minWidth: 400}}
-    >
+    <Card sx={{ padding: 2, backgroundColor: theme.palette.background.neutral, minWidth: 400 }}>
       <Box display="flex" justifyContent="space-between" gap={2} mb={1}>
         <Typography fontWeight="900" color={'grey'} variant="body1">
           {instrumento?.descricao}
@@ -40,7 +44,7 @@ function CardInformation({ instrumento, titles, specialCases }) {
           Local
         </Typography>
         <Typography fontWeight="400" color={'grey'} variant="body1">
-          {instrumento?.local === 'L'? 'Laboratório' : 'No cliente'}
+          {instrumento?.local === 'L' ? 'Laboratório' : 'No cliente'}
         </Typography>
       </Box>
       <Box display="flex" justifyContent="space-between">
@@ -59,7 +63,12 @@ function CardInformation({ instrumento, titles, specialCases }) {
           {instrumento?.valor} {instrumento?.unidadeMedicao}
         </Typography>
       </Box>
-      <Box display="flex" justifyContent="flex-end">
+      <Box display="flex" justifyContent="space-between" mt={2}>
+        {pathname.includes('/admin') && proposta.status === 'F' && (
+          <Button variant="outlined" size="small" startIcon={<ReceiptLongIcon />}>
+            <Link target="_blank" href={`http://localhost:8000/propostas-files/${proposta.id}?instrumento=${instrumento.id}`}>Ver proposta</Link>
+          </Button>
+        )}
         <Typography fontWeight="900" color={'black'} variant="body1">
           {instrumento?.instrumento?.tipo_de_servico === 'A' ? 'Acreditado' : 'Não acreditado'}
         </Typography>

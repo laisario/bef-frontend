@@ -30,6 +30,7 @@ import { UserListHead } from '../../sections/@dashboard/user';
 import USERLIST from '../../_mock/user';
 
 import { fDateTime } from '../../utils/formatTime';
+import FormCreateOrder from '../../components/admin/FormCreateOrder';
 
 // ----------------------------------------------------------------------
 
@@ -57,7 +58,7 @@ function PedidosPageAdmin() {
   const [open, setOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
-  const { todasPropostas } = useOrders();
+  const { data } = useOrders();
   const { vertical, horizontal, propostaEnviada } = alert;
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
@@ -102,7 +103,7 @@ function PedidosPageAdmin() {
               <Table>
                 <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
                 <TableBody>
-                  {todasPropostas?.map((row, index) => {
+                  {data?.map((row, index) => {
                     const { id, total, data_criacao: dataCriacao, aprovacao: status, cliente } = row;
                     const data = new Date(dataCriacao);
                     return (
@@ -118,7 +119,7 @@ function PedidosPageAdmin() {
 
                         <TableCell align="left">{fDateTime(data)}</TableCell>
 
-                        <TableCell align="left">{cliente}</TableCell>
+                        <TableCell align="left">{cliente.empresa || cliente.nome}</TableCell>
 
                         <TableCell align="left">
                           <Label color={colorStatusProposta[status]}>{statusProposta[status]}</Label>
@@ -138,7 +139,7 @@ function PedidosPageAdmin() {
           aria-describedby="modal-modal-description"
         >
           <FormBox>
-            {/* Colocar formulario para criar nova proposta */}
+            <FormCreateOrder setOpen={setOpen} setAlert={setAlert}/>
           </FormBox>
         </Modal>
 

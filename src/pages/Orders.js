@@ -59,7 +59,7 @@ export default function UserPage() {
   const [open, setOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
-  const { todasPropostas } = useOrders();
+  const { data } = useOrders();
   const { vertical, horizontal, propostaEnviada } = alert;
 
   const handleCloseAlert = (event, reason) => {
@@ -105,7 +105,7 @@ export default function UserPage() {
               <Table>
                 <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
                 <TableBody>
-                  {todasPropostas?.map((row, index) => {
+                  {data?.map((row, index) => {
                     const { id, total, data_criacao: dataCriacao, aprovacao: status } = row;
                     const data = new Date(dataCriacao);
                     return (

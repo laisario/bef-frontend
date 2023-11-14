@@ -19,7 +19,7 @@ export default function RegisterLocationPage() {
         </Typography>
 
         <Typography variant="body2" sx={{ mb: 5 }}>
-          Fala pra gente onde voce se encontra
+          Fala pra gente onde você se encontra
         </Typography>
 
         <AddressInformation />
