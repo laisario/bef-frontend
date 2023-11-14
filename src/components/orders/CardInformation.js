@@ -66,7 +66,7 @@ function CardInformation({ instrumento, titles, specialCases, proposta }) {
       <Box display="flex" justifyContent="space-between" mt={2}>
         {pathname.includes('/admin') && proposta.status === 'F' && (
           <Button variant="outlined" size="small" startIcon={<ReceiptLongIcon />}>
-            <Link target="_blank" href={`http://localhost:8000/propostas-files/${proposta.id}?instrumento=${instrumento.id}`}>Ver proposta</Link>
+            <Link target="_blank" href={`https://rkp2023.pythonanywhere.com/propostas-files/${proposta.id}?instrumento=${instrumento.id}`}>Ver proposta</Link>
           </Button>
         )}
         <Typography fontWeight="900" color={'black'} variant="body1">
