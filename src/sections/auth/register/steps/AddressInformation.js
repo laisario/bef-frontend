@@ -1,19 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-// @mui
-import { Link, Box, Button, IconButton, InputLabel, TextField, Select, MenuItem } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-// components
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
-
 import Iconify from '../../../../components/iconify';
 import { useAuth } from '../../../../context/Auth';
-import useCNPJ, { validarCNPJ, formatCNPJ } from '../../../../hooks/useCNPJ';
-import { validarCPF, formatCPF } from '../../../../hooks/useCPF';
 import useCEP from '../../../../hooks/useCEP';
 import FormAdress from '../../../../components/adress/FormAdress';
 
@@ -27,6 +17,7 @@ export default function AddressInformation() {
   const [bairro, setBairro] = useState('');
   const [cidade, setCidade] = useState('');
   const [estado, setEstado] = useState('');
+  const [complemento, setComplemento] = useState('');
   const { registerLocation, loading } = useAuth();
 
   const { isValid, ...cepInfo } = useCEP(CEP);
@@ -40,6 +31,7 @@ export default function AddressInformation() {
       logradouro: cepInfo?.rua || rua,
       numero,
       cep: cepInfo?.cep || CEP,
+      complemento,
     });
     navigate('/register/auth');
   };
@@ -61,14 +53,15 @@ export default function AddressInformation() {
           setBairro,
           setCidade,
           setEstado,
+          complemento,
+          setComplemento,
         }}
         cepInfo={cepInfo}
       />
       <Box display="flex" alignItems="center" justifyContent="space-between" mt={4}>
         <Button
           variant="text"
-          component={RouterLink}
-          to="/register/basics"
+          onClick={() => navigate(-1)}
           startIcon={<Iconify icon={'eva:arrow-ios-back-fill'} />}
         >
           Voltar

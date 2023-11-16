@@ -1,9 +1,8 @@
 /* eslint-disable camelcase */
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import axios from '../api';
-import { formatData } from '../utils/formatTime';
 import useClients from './useClients';
 
 const useOrders = (id) => {
@@ -36,7 +35,7 @@ const useOrders = (id) => {
     await axios.delete(`/propostas/${id}`);
     navigate('/dashboard/pedidos');
   };
-  const edit = async (form) => {
+  const edit = async (form, setErr, setOpen) => {
     const {
       form: {
         local,
@@ -57,6 +56,7 @@ const useOrders = (id) => {
       estado,
       enderecoEntrega,
       aprovado,
+      complemento,
     } = form;
     const formData = new FormData();
     formData.append('anexo', anexo);
@@ -73,21 +73,21 @@ const useOrders = (id) => {
         await axios.patch(`/propostas/${id}/atualizar/`, {
           local: local || null,
           total: total || 0,
-          prazo_de_entrega: formatData(prazo_de_entrega) || null,
-          forma_de_pagamento: forma_de_pagamento || null,
+          prazo_de_entrega: prazo_de_entrega || null,
+          condicao_de_pagamento: forma_de_pagamento || null,
           transporte: transporte || null,
           numero: numero || 0,
           endereco_de_entrega: cliente.endereco || null,
-          validade: formatData(validade) || null,
-          data_aprovacao: data_aprovacao ? formatData(data_aprovacao) : null,
+          validade: validade || null,
+          data_aprovacao:  data_aprovacao || null,
           aprovado: aprovado || null,
         });
       } else {
         await axios.patch(`/propostas/${id}/atualizar/`, {
           local: local || null,
           total: total || 0,
-          prazo_de_entrega: formatData(prazo_de_entrega) || null,
-          forma_de_pagamento: forma_de_pagamento || null,
+          prazo_de_entrega: prazo_de_entrega || null,
+          condicao_de_pagamento: forma_de_pagamento || null,
           transporte: transporte || null,
           numero: numero || 0,
           endereco_de_entrega_add:
@@ -98,13 +98,16 @@ const useOrders = (id) => {
               bairro: bairro || null,
               cidade: cidade || null,
               estado: estado || null,
+              complemento: complemento || null,
             } || null,
-          validade: formatData(validade) || null,
-          data_aprovacao: data_aprovacao ? formatData(data_aprovacao) : null,
+          validade: validade || null,
+          data_aprovacao:  data_aprovacao || null,
           aprovado: aprovado || null,
         });
       }
     } catch (error) {
+      setErr(error)
+      setOpen(true)
       console.log(error);
     }
   };

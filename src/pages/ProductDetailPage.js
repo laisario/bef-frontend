@@ -87,11 +87,6 @@ function ProductDetailPage() {
                 variant="outlined"
               />
               <Chip
-                label={instrument?.status?.nome}
-                color={instrument?.status?.cor}
-                variant="outlined"
-              />
-              <Chip
                 label={instrument?.instrumento?.tipo_de_servico === 'A' ? 'Acreditado' : 'Não acreditado'}
                 variant="outlined"
                 color={instrument?.instrumento?.tipo_de_servico === 'A' ? 'info' : 'primary'}

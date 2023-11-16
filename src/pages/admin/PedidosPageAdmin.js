@@ -104,7 +104,7 @@ function PedidosPageAdmin() {
                 <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
                 <TableBody>
                   {data?.map((row, index) => {
-                    const { id, total, data_criacao: dataCriacao, aprovacao: status, cliente } = row;
+                    const { id, total, data_criacao: dataCriacao, status, cliente } = row;
                     const data = new Date(dataCriacao);
                     return (
                       <TableRow
@@ -112,7 +112,7 @@ function PedidosPageAdmin() {
                         key={id}
                         tabIndex={-1}
                         component={Link}
-                        href={`/admin/pedido/${id}`}
+                        href={`#/admin/pedido/${id}`}
                         underline="none"
                       >
                         <TableCell align="left">{index + 1}</TableCell>
@@ -122,7 +122,7 @@ function PedidosPageAdmin() {
                         <TableCell align="left">{cliente.empresa || cliente.nome}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={colorStatusProposta[status]}>{statusProposta[status]}</Label>
+                          <Label color={status === 'F' ? 'primary' : 'info'}>{status === 'F' ? 'Finalizada' : 'Em análise'}</Label>
                         </TableCell>
                       </TableRow>
                     );

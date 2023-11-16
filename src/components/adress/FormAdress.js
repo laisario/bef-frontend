@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import React, { useState } from 'react';
-import useCEP from '../../hooks/useCEP';
+
 
 const estados = [
   'AC',
@@ -34,7 +34,22 @@ const estados = [
 ];
 
 function FormAdress({ form, valid, cepInfo }) {
-  const { CEP, rua, numero, bairro, cidade, estado, setCEP, setRua, setNumero, setBairro, setCidade, setEstado } = form;
+  const {
+    CEP,
+    rua,
+    numero,
+    bairro,
+    cidade,
+    estado,
+    setCEP,
+    setRua,
+    setNumero,
+    setBairro,
+    setCidade,
+    setEstado,
+    complemento,
+    setComplemento,
+  } = form;
   const [error, setError] = useState(null);
 
   return (
@@ -69,6 +84,18 @@ function FormAdress({ form, valid, cepInfo }) {
                 setRua(e.target.value);
               }}
             />
+            <TextField
+              fullWidth
+              name="complemento"
+              label="complemento"
+              value={complemento}
+              onChange={(e) => {
+                if (error) {
+                  setError(null);
+                }
+                setComplemento(e.target.value);
+              }}
+            />
             <FormControl sx={{ minWidth: 120 }}>
               <TextField
                 fullWidth
@@ -84,20 +111,20 @@ function FormAdress({ form, valid, cepInfo }) {
               />
             </FormControl>
           </Box>
-          <TextField
-            fullWidth
-            name="bairro"
-            label="Bairro"
-            disabled={!!cepInfo?.bairro}
-            value={cepInfo?.bairro || bairro}
-            onChange={(e) => {
-              if (error) {
-                setError(null);
-              }
-              setBairro(e.target.value);
-            }}
-          />
           <Box display="flex" gap={2}>
+            <TextField
+              fullWidth
+              name="bairro"
+              label="Bairro"
+              disabled={!!cepInfo?.bairro}
+              value={cepInfo?.bairro || bairro}
+              onChange={(e) => {
+                if (error) {
+                  setError(null);
+                }
+                setBairro(e.target.value);
+              }}
+            />
             <TextField
               fullWidth
               name="cidade"

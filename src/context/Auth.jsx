@@ -20,17 +20,16 @@ const AuthProvider = ({ children }) => {
       setUser({ token, nome: decoded?.nome, admin: decoded?.admin });
     }
   }, []);
-
   const redirectUsers = (user) => {
     const adminRoutes = ['/admin'];
     const authenticatedRoutes = ['/dashboard', '/admin'];
-    if (!user && authenticatedRoutes.some((route) => window.location.pathname.startsWith(route))) {
+    if (!user && authenticatedRoutes.some((route) => window.location.pathname.includes(route))) {
       return navigate('/login');
     }
-    if (user?.admin === true && !adminRoutes.some((route) => window.location.pathname.startsWith(route))) {
+    if (user?.admin === true && !adminRoutes.some((route) => window.location.pathname.includes(route))) {
       return navigate('/admin');
     }
-    if (user?.admin === false && adminRoutes.some((route) => window.location.pathname.startsWith(route))) {
+    if (user?.admin === false && adminRoutes.some((route) => window.location.pathname.includes(route))) {
       return navigate('/dashboard');
     }
    

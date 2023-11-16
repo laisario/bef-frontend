@@ -20,7 +20,7 @@ const formaPagamento = {
 };
 
 const aprovacaoProposta = {
-  null: 'Proposta em análise',
+  null: 'Aguardando análise',
   false: 'Proposta negada',
   true: 'Proposta aprovada',
 };
@@ -114,7 +114,6 @@ function OrderDetails() {
                   numero_de_serie: numeroDeSerie,
                   posicao,
                   data_ultima_calibracao: dataUltimaCalibracao,
-                  status: { nome },
                   instrumento: {
                     maximo,
                     minimo,
@@ -130,7 +129,6 @@ function OrderDetails() {
                     tag,
                     numeroDeSerie,
                     dataUltimaCalibracao,
-                    status: nome,
                     informacoesAdicionais: data.informacoes_adicionais,
                     local: data.local,
                     maximo,

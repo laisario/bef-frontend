@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Box, Button, Chip, Container, Grid, Link, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Chip, Container, Grid, IconButton, Link, Paper, Stack, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { Helmet } from 'react-helmet-async';
-
+import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@emotion/react';
 import useOrders from '../../hooks/useOrders';
 import CardInformation from '../../components/orders/CardInformation';
@@ -33,8 +33,10 @@ const colorAprovacaoProposta = {
 
 function DetalhesPedidoPageAdmin() {
   const [edit, setEdit] = useState(false);
+  const [open, setOpen] = useState(false)
+  const [error, setErr] = useState('');
   const { id } = useParams();
-  const { data, deleteOrder} = useOrders(id);
+  const { data, deleteOrder } = useOrders(id);
   const theme = useTheme();
   return (
     <>
@@ -66,8 +68,28 @@ function DetalhesPedidoPageAdmin() {
             )}
           </Box>
         </Stack>
-
-        {!!data && <FormEditProposta open={edit} data={data} handleClose={() => setEdit(false)} />}
+        {open && (
+          <Alert
+            action={
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            }
+            severity="error"
+          >
+            {error.response.status === 400 ? 'Endereço do cliente é obrigatório.' : error.message}
+          </Alert>
+        )}
+        {!!data && (
+          <FormEditProposta open={edit} data={data} handleClose={() => setEdit(false)} setErr={setErr} setOpen={setOpen} errMsg={error} />
+        )}
         <Paper sx={{ padding: 4 }}>
           <Grid container flexDirection="row" justifyContent="space-between">
             <Box>
@@ -82,8 +104,8 @@ function DetalhesPedidoPageAdmin() {
                 Transporte: {CFL(data?.transporte)}
               </Typography>
               <Typography variant="subtitle1" fontWeight="500">
-                Endereço de entrega: {data?.endereco_de_entrega?.logradouro} {data?.endereco_de_entrega?.numero}{' '}
-                {data?.endereco_de_entrega?.bairro}
+                Endereço de entrega: {data?.endereco_de_entrega?.logradouro}, {data?.endereco_de_entrega?.numero}{' - '}
+                {!!(data?.endereco_de_entrega?.complemento) && data?.endereco_de_entrega?.complemento} - {data?.endereco_de_entrega?.bairro} - {data?.endereco_de_entrega?.cep}
               </Typography>
             </Box>
             <Box display="flex" flexDirection="column" gap={1}>
@@ -105,7 +127,6 @@ function DetalhesPedidoPageAdmin() {
                   numero_de_serie: numeroDeSerie,
                   posicao,
                   data_ultima_calibracao: dataUltimaCalibracao,
-                  status: { nome },
                   instrumento: {
                     maximo,
                     minimo,
@@ -122,7 +143,6 @@ function DetalhesPedidoPageAdmin() {
                     tag,
                     numero_de_serie: numeroDeSerie,
                     data_ultima_calibracao: dataUltimaCalibracao,
-                    status: nome,
                     informacoes_adicionais: data.informacoes_adicionais,
                     local: data.local,
                     maximo,
@@ -132,10 +152,14 @@ function DetalhesPedidoPageAdmin() {
                     unidadeMedicao,
                     posicao,
                     descricao,
-                    id
+                    id,
                   }}
                   key={index}
-                  specialCases={{ numero_de_serie: 'Número de série', data_ultima_calibracao: 'Última Calibração', informacoes_adicionais: 'Informações adicionais' }}
+                  specialCases={{
+                    numero_de_serie: 'Número de série',
+                    data_ultima_calibracao: 'Última Calibração',
+                    informacoes_adicionais: 'Informações adicionais',
+                  }}
                   titles={['tag', 'numero_de_serie', 'data_ultima_calibracao', 'status', 'informacoes_adicionais']}
                   proposta={data}
                 />

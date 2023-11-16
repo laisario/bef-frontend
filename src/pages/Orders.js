@@ -66,22 +66,21 @@ export default function UserPage() {
     if (reason === 'clickaway') {
       return;
     }
-    setAlert((prevAlert) => ({...prevAlert, propostaEnviada: false}));
+    setAlert((prevAlert) => ({ ...prevAlert, propostaEnviada: false }));
   };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const statusProposta = {
-    null: 'Proposta em análise',
-    false: 'Proposta negada',
-    true: 'Proposta aprovada',
+
+  const colorAprovacaoProposta = {
+    false: 'error',
+    true: 'success',
   };
 
   const colorStatusProposta = {
-    null: 'info',
-    false: 'error',
-    true: 'success',
+    A: 'info',
+    F: 'secondary',
   };
   return (
     <>
@@ -106,7 +105,7 @@ export default function UserPage() {
                 <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
                 <TableBody>
                   {data?.map((row, index) => {
-                    const { id, total, data_criacao: dataCriacao, aprovacao: status } = row;
+                    const { id, total, data_criacao: dataCriacao, status, aprovacao } = row;
                     const data = new Date(dataCriacao);
                     return (
                       <TableRow
@@ -114,7 +113,7 @@ export default function UserPage() {
                         key={id}
                         tabIndex={-1}
                         component={Link}
-                        href={`/dashboard/pedido/${id}`}
+                        href={`#/dashboard/pedido/${id}`}
                         underline="none"
                       >
                         <TableCell align="left">{index + 1}</TableCell>
@@ -124,7 +123,15 @@ export default function UserPage() {
                         <TableCell align="left">R$ {total}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={colorStatusProposta[status]}>{statusProposta[status]}</Label>
+                          {aprovacao !== null ? (
+                            <Label color={colorAprovacaoProposta[aprovacao]}>
+                              {aprovacao ? 'Pedido aprovado' : 'Pedido reprovado'}
+                            </Label>
+                          ) : (
+                            <Label color={colorStatusProposta[status]}>
+                              {status === 'F' ? 'Esperando sua análise' : 'Em análise B&f'}
+                            </Label>
+                          )}
                         </TableCell>
                       </TableRow>
                     );
@@ -152,11 +159,7 @@ export default function UserPage() {
             key={vertical + horizontal}
             onClose={handleCloseAlert}
           >
-            <Alert
-              onClose={handleCloseAlert}
-              severity="success"
-              sx={{ width: '100%' }}
-            >
+            <Alert onClose={handleCloseAlert} severity="success" sx={{ width: '100%' }}>
               Sua proposta foi enviada com sucesso!
             </Alert>
           </Snackbar>
