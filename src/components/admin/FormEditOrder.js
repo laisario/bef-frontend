@@ -13,9 +13,12 @@ import {
   FormControlLabel,
   Typography,
   Alert,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import dayjs from 'dayjs';
+import 'dayjs/locale/pt-br';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -36,18 +39,18 @@ function FormEditProposta({ data, open, handleClose, setErr, setOpen }) {
     numero: data?.numero || 0,
     certificado: data?.anexo || null,
   });
-  const [CEP, setCEP] = useState('');
-  const [rua, setRua] = useState('');
-  const [numero, setNumero] = useState('');
-  const [bairro, setBairro] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [estado, setEstado] = useState('');
-  const [complemento, setComplemento] = useState('');
-  const [aprovado, setAprovado] = useState(null);
-  const [enderecoEntrega, setEnderecoEntrega] = useState(null);
-  const [prazoDeEntrega, setPrazoDeEntrega] = useState(dayjs(data?.prazo_de_entrega) || '');
-  const [validade, setValidade] = useState(dayjs(data.validade) || '');
-  const [dataAprovacao, setDataAprovacao] = useState(dayjs(data?.data_aprovacao) || '');
+  const [CEP, setCEP] = useState(data?.endereco_de_entrega?.cep || "");
+  const [rua, setRua] = useState(data?.endereco_de_entrega?.logradouro || "");
+  const [numero, setNumero] = useState(data?.endereco_de_entrega?.numero || "");
+  const [bairro, setBairro] = useState(data?.endereco_de_entrega?.bairro?.nome || "");
+  const [cidade, setCidade] = useState(data?.endereco_de_entrega?.bairro?.cidade || "");
+  const [estado, setEstado] = useState(data?.endereco_de_entrega?.estado || "");
+  const [complemento, setComplemento] = useState(data?.endereco_de_entrega?.complemento || "");
+  const [aprovado, setAprovado] = useState(data?.aprovacao?.toString());
+  const [enderecoEntrega, setEnderecoEntrega] = useState(data?.endereco_de_entrega ? "novoEndereco" : null);
+  const [prazoDeEntrega, setPrazoDeEntrega] = useState(data?.prazo_de_entrega ? dayjs(data?.prazo_de_entrega).format('DD/MM/YYYY') : '');
+  const [validade, setValidade] = useState(data?.validade ? dayjs(data?.validade).format('DD/MM/YYYY') : '');
+  const [dataAprovacao, setDataAprovacao] = useState(data?.data_aprovacao ? dayjs(data?.data_aprovacao).format('DD/MM/YYYY') : '');
   const { isValid: cepValido, ...cepInfo } = useCEP(CEP);
   const { id } = useParams();
   const { edit, isLoading } = useOrders(id);
@@ -62,7 +65,7 @@ function FormEditProposta({ data, open, handleClose, setErr, setOpen }) {
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
       <Modal open={open} onClose={handleClose}>
         <Box
           sx={{
@@ -304,6 +307,8 @@ function FormEditProposta({ data, open, handleClose, setErr, setOpen }) {
                     complemento,
                     enderecoEntrega,
                     aprovado,
+                    validade,
+                    prazo_de_entrega: prazoDeEntrega,
                   },
                   setErr,
                   setOpen

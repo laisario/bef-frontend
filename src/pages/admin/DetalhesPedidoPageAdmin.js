@@ -84,7 +84,7 @@ function DetalhesPedidoPageAdmin() {
             }
             severity="error"
           >
-            {error.response.status === 400 ? 'Endereço do cliente é obrigatório.' : error.message}
+            {error?.response?.status === 400 ? 'Endereço do cliente é obrigatório.' : error?.message}
           </Alert>
         )}
         {!!data && (
@@ -105,7 +105,7 @@ function DetalhesPedidoPageAdmin() {
               </Typography>
               <Typography variant="subtitle1" fontWeight="500">
                 Endereço de entrega: {data?.endereco_de_entrega?.logradouro}, {data?.endereco_de_entrega?.numero}{' - '}
-                {!!(data?.endereco_de_entrega?.complemento) && data?.endereco_de_entrega?.complemento} - {data?.endereco_de_entrega?.bairro} - {data?.endereco_de_entrega?.cep}
+                {!!(data?.endereco_de_entrega?.complemento) && data?.endereco_de_entrega?.complemento} - {data?.endereco_de_entrega?.bairro?.nome} - {data?.endereco_de_entrega?.cep}
               </Typography>
             </Box>
             <Box display="flex" flexDirection="column" gap={1}>

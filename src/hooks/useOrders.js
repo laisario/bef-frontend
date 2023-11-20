@@ -37,17 +37,7 @@ const useOrders = (id) => {
   };
   const edit = async (form, setErr, setOpen) => {
     const {
-      form: {
-        local,
-        total,
-        prazo_de_entrega,
-        forma_de_pagamento,
-        transporte,
-        numero,
-        validade,
-        data_aprovacao,
-        certificado: anexo,
-      },
+      form: { local, total, forma_de_pagamento, transporte, numero, data_aprovacao, certificado: anexo },
       numero: numeroCasa,
       CEP,
       rua,
@@ -57,6 +47,8 @@ const useOrders = (id) => {
       enderecoEntrega,
       aprovado,
       complemento,
+      validade,
+      prazo_de_entrega,
     } = form;
     const formData = new FormData();
     formData.append('anexo', anexo);
@@ -73,20 +65,20 @@ const useOrders = (id) => {
         await axios.patch(`/propostas/${id}/atualizar/`, {
           local: local || null,
           total: total || 0,
-          prazo_de_entrega: prazo_de_entrega || null,
+          prazo_de_entrega: prazo_de_entrega ? prazo_de_entrega?.format('YYYY-MM-DD') : null,
           condicao_de_pagamento: forma_de_pagamento || null,
           transporte: transporte || null,
           numero: numero || 0,
           endereco_de_entrega: cliente.endereco || null,
-          validade: validade || null,
-          data_aprovacao:  data_aprovacao || null,
-          aprovado: aprovado || null,
+          validade: validade ? validade?.format('YYYY-MM-DD') : null,
+          data_aprovacao: data_aprovacao || null,
+          aprovacao: aprovado === 'true',
         });
       } else {
         await axios.patch(`/propostas/${id}/atualizar/`, {
           local: local || null,
           total: total || 0,
-          prazo_de_entrega: prazo_de_entrega || null,
+          prazo_de_entrega: prazo_de_entrega ? prazo_de_entrega?.format('YYYY-MM-DD') : null,
           condicao_de_pagamento: forma_de_pagamento || null,
           transporte: transporte || null,
           numero: numero || 0,
@@ -100,14 +92,14 @@ const useOrders = (id) => {
               estado: estado || null,
               complemento: complemento || null,
             } || null,
-          validade: validade || null,
-          data_aprovacao:  data_aprovacao || null,
-          aprovado: aprovado || null,
+          validade: validade ? validade?.format('YYYY-MM-DD') : null,
+          data_aprovacao: data_aprovacao || null,
+          aprovacao: aprovado === 'true',
         });
       }
     } catch (error) {
-      setErr(error)
-      setOpen(true)
+      setErr(error);
+      setOpen(true);
       console.log(error);
     }
   };
