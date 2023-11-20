@@ -51,7 +51,7 @@ function OrderDetails() {
             </Typography>
           </Box>
           <Box>
-            {data?.status === "F" && (
+            {data?.status === 'F' && (
               <>
                 <Button
                   variant="contained"
@@ -87,7 +87,12 @@ function OrderDetails() {
                 Transporte: {CFL(data?.transporte)}
               </Typography>
               <Typography variant="subtitle1" fontWeight="500">
-                Endereço de entrega: {data?.endereco_de_entrega?.logradouro} {data?.endereco_de_entrega?.numero} {data?.endereco_de_entrega?.bairro}
+                <Typography variant="subtitle1" fontWeight="500">
+                  Endereço de entrega: {data?.endereco_de_entrega?.logradouro}, {data?.endereco_de_entrega?.numero}
+                  {' - '}
+                  {!!data?.endereco_de_entrega?.complemento && data?.endereco_de_entrega?.complemento} -{' '}
+                  {data?.endereco_de_entrega?.bairro?.nome} - {data?.endereco_de_entrega?.cep}
+                </Typography>
               </Typography>
             </Box>
             <Box display="flex" gap={1} flexDirection="column">
@@ -97,9 +102,7 @@ function OrderDetails() {
                 variant="outlined"
               />
               <Button startIcon={<ReceiptLongIcon />}>
-                <Link href={data?.anexo}>
-                  Certificado
-                </Link>
+                <Link href={data?.anexo}>Certificado</Link>
               </Button>
             </Box>
           </Grid>
