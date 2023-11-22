@@ -48,13 +48,13 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
   const [complemento, setComplemento] = useState(data?.endereco_de_entrega?.complemento || "");
   const [aprovado, setAprovado] = useState(data?.aprovacao?.toString());
   const [enderecoEntrega, setEnderecoEntrega] = useState(data?.endereco_de_entrega ? "novoEndereco" : null);
-  const [prazoDeEntrega, setPrazoDeEntrega] = useState(data?.prazo_de_entrega ? dayjs(data?.prazo_de_entrega).format('DD/MM/YYYY') : null);
-  const [validade, setValidade] = useState(data?.validade ? dayjs(data?.validade).format('DD/MM/YYYY') : null);
-  const [dataAprovacao, setDataAprovacao] = useState(data?.data_aprovacao ? dayjs(data?.data_aprovacao).format('DD/MM/YYYY') : null);
+  const [prazoDeEntrega, setPrazoDeEntrega] = useState(dayjs.isDayjs(data?.prazo_de_entrega) ? dayjs(data?.prazo_de_entrega).format('DD/MM/YYYY') : null);
+  const [validade, setValidade] = useState(dayjs.isDayjs(data?.validade) ? dayjs(data?.validade).format('DD/MM/YYYY') : null);
+  const [dataAprovacao, setDataAprovacao] = useState( dayjs.isDayjs(data?.data_aprovacao) ? dayjs(data?.data_aprovacao).format('DD/MM/YYYY') : null);
   const { isValid: cepValido, ...cepInfo } = useCEP(CEP);
   const { id } = useParams();
   const { edit, isLoading } = useOrders(id);
-  console.log(prazoDeEntrega, validade, dataAprovacao)
+  
   const handleChange = (event) => {
     const { name, value, files } = event.target;
     if (name === 'certificado') {

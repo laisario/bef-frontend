@@ -71,8 +71,8 @@ const useOrders = (id) => {
           transporte: transporte || null,
           numero: numero || 0,
           endereco_de_entrega: cliente.endereco || null,
-          validade: dayjs.isDayjs (validade) ? validade?.format('YYYY-MM-DD') : null,
-          data_aprovacao: dayjs.isDayjs (data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
+          validade: dayjs.isDayjs(validade) ? validade?.format('YYYY-MM-DD') : null,
+          data_aprovacao: dayjs.isDayjs(data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
           aprovacao: aprovado === 'true',
         });
         setResponseStatus(response)
@@ -80,7 +80,7 @@ const useOrders = (id) => {
           const response = await axios.patch(`/propostas/${id}/atualizar/`, {
           local: local || null,
           total: total || 0,
-          prazo_de_entrega: dayjs.isDayjs (prazo_de_entrega) ? prazo_de_entrega?.format('YYYY-MM-DD') : null,
+          prazo_de_entrega: dayjs.isDayjs(prazo_de_entrega) ? prazo_de_entrega?.format('YYYY-MM-DD') : null,
           condicao_de_pagamento: forma_de_pagamento || null,
           transporte: transporte || null,
           numero: numero || 0,
@@ -94,8 +94,8 @@ const useOrders = (id) => {
               estado: estado || null,
               complemento: complemento || null,
             } || null,
-          validade: dayjs.isDayjs (validade) ? validade?.format('YYYY-MM-DD') : null,
-          data_aprovacao: dayjs.isDayjs (data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
+          validade: dayjs.isDayjs(validade) ? validade?.format('YYYY-MM-DD') : null,
+          data_aprovacao: dayjs.isDayjs(data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
           aprovacao: aprovado === 'true',
         });
         setResponseStatus(response);
