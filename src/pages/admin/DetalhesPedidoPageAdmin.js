@@ -52,7 +52,6 @@ function DetalhesPedidoPageAdmin() {
   const { id } = useParams();
   const { data, deleteOrder } = useOrders(id);
   const theme = useTheme();
-  console.log(response);
   const responseMesages = {
     200: 'Pedido editado com sucesso',
     400: 'Endereço é obrigatório',

@@ -98,7 +98,6 @@ const useOrders = (id) => {
           data_aprovacao: dayjs.isDayjs (data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
           aprovacao: aprovado === 'true',
         });
-        console.log(response)
         setResponseStatus(response);
       }
     } catch (error) {
