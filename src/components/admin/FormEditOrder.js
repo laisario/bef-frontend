@@ -30,7 +30,7 @@ import Iconify from '../iconify';
 import FormAdress from '../adress/FormAdress';
 import useCEP from '../../hooks/useCEP';
 
-function FormEditProposta({ data, open, handleClose, setErr, setOpen }) {
+function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen }) {
   const [form, setForm] = useState({
     local: data?.local || '',
     total: data?.total || '',
@@ -48,13 +48,13 @@ function FormEditProposta({ data, open, handleClose, setErr, setOpen }) {
   const [complemento, setComplemento] = useState(data?.endereco_de_entrega?.complemento || "");
   const [aprovado, setAprovado] = useState(data?.aprovacao?.toString());
   const [enderecoEntrega, setEnderecoEntrega] = useState(data?.endereco_de_entrega ? "novoEndereco" : null);
-  const [prazoDeEntrega, setPrazoDeEntrega] = useState(data?.prazo_de_entrega ? dayjs(data?.prazo_de_entrega).format('DD/MM/YYYY') : '');
-  const [validade, setValidade] = useState(data?.validade ? dayjs(data?.validade).format('DD/MM/YYYY') : '');
-  const [dataAprovacao, setDataAprovacao] = useState(data?.data_aprovacao ? dayjs(data?.data_aprovacao).format('DD/MM/YYYY') : '');
+  const [prazoDeEntrega, setPrazoDeEntrega] = useState(data?.prazo_de_entrega ? dayjs(data?.prazo_de_entrega).format('DD/MM/YYYY') : null);
+  const [validade, setValidade] = useState(data?.validade ? dayjs(data?.validade).format('DD/MM/YYYY') : null);
+  const [dataAprovacao, setDataAprovacao] = useState(data?.data_aprovacao ? dayjs(data?.data_aprovacao).format('DD/MM/YYYY') : null);
   const { isValid: cepValido, ...cepInfo } = useCEP(CEP);
   const { id } = useParams();
   const { edit, isLoading } = useOrders(id);
-
+  console.log(prazoDeEntrega, validade, dataAprovacao)
   const handleChange = (event) => {
     const { name, value, files } = event.target;
     if (name === 'certificado') {
@@ -310,7 +310,7 @@ function FormEditProposta({ data, open, handleClose, setErr, setOpen }) {
                     validade,
                     prazo_de_entrega: prazoDeEntrega,
                   },
-                  setErr,
+                  setResponseStatus,
                   setOpen
                 );
                 handleClose();

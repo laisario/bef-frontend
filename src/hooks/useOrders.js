@@ -2,6 +2,7 @@
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
+import dayjs from 'dayjs';
 import axios from '../api';
 import useClients from './useClients';
 
@@ -35,7 +36,7 @@ const useOrders = (id) => {
     await axios.delete(`/propostas/${id}`);
     navigate('/dashboard/pedidos');
   };
-  const edit = async (form, setErr, setOpen) => {
+  const edit = async (form, setResponseStatus, setOpen) => {
     const {
       form: { local, total, forma_de_pagamento, transporte, numero, data_aprovacao, certificado: anexo },
       numero: numeroCasa,
@@ -62,23 +63,24 @@ const useOrders = (id) => {
         });
       }
       if (enderecoEntrega === 'enderecoCadastrado') {
-        await axios.patch(`/propostas/${id}/atualizar/`, {
+        const response = await axios.patch(`/propostas/${id}/atualizar/`, {
           local: local || null,
           total: total || 0,
-          prazo_de_entrega: prazo_de_entrega ? prazo_de_entrega?.format('YYYY-MM-DD') : null,
+          prazo_de_entrega: dayjs.isDayjs (prazo_de_entrega) ? prazo_de_entrega?.format('YYYY-MM-DD') : null,
           condicao_de_pagamento: forma_de_pagamento || null,
           transporte: transporte || null,
           numero: numero || 0,
           endereco_de_entrega: cliente.endereco || null,
-          validade: validade ? validade?.format('YYYY-MM-DD') : null,
-          data_aprovacao: data_aprovacao || null,
+          validade: dayjs.isDayjs (validade) ? validade?.format('YYYY-MM-DD') : null,
+          data_aprovacao: dayjs.isDayjs (data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
           aprovacao: aprovado === 'true',
         });
+        setResponseStatus(response)
       } else {
-        await axios.patch(`/propostas/${id}/atualizar/`, {
+          const response = await axios.patch(`/propostas/${id}/atualizar/`, {
           local: local || null,
           total: total || 0,
-          prazo_de_entrega: prazo_de_entrega ? prazo_de_entrega?.format('YYYY-MM-DD') : null,
+          prazo_de_entrega: dayjs.isDayjs (prazo_de_entrega) ? prazo_de_entrega?.format('YYYY-MM-DD') : null,
           condicao_de_pagamento: forma_de_pagamento || null,
           transporte: transporte || null,
           numero: numero || 0,
@@ -92,13 +94,16 @@ const useOrders = (id) => {
               estado: estado || null,
               complemento: complemento || null,
             } || null,
-          validade: validade ? validade?.format('YYYY-MM-DD') : null,
-          data_aprovacao: data_aprovacao || null,
+          validade: dayjs.isDayjs (validade) ? validade?.format('YYYY-MM-DD') : null,
+          data_aprovacao: dayjs.isDayjs (data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
           aprovacao: aprovado === 'true',
         });
+        console.log(response)
+        setResponseStatus(response);
       }
     } catch (error) {
-      setErr(error);
+      setResponseStatus
+         (error.response);
       setOpen(true);
       console.log(error);
     }

@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Alert, Box, Button, Chip, Container, Grid, IconButton, Link, Paper, Stack, TextField, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  Container,
+  Grid,
+  IconButton,
+  Link,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import Card from '@mui/material/Card';
 import { Helmet } from 'react-helmet-async';
 import CloseIcon from '@mui/icons-material/Close';
@@ -31,13 +44,20 @@ const colorAprovacaoProposta = {
   true: 'success',
 };
 
+
 function DetalhesPedidoPageAdmin() {
   const [edit, setEdit] = useState(false);
-  const [open, setOpen] = useState(false)
-  const [error, setErr] = useState('');
+  const [open, setOpen] = useState(false);
+  const [response, setResponse] = useState(null);
   const { id } = useParams();
   const { data, deleteOrder } = useOrders(id);
   const theme = useTheme();
+  console.log(response);
+  const responseMesages = {
+    200: 'Pedido editado com sucesso',
+    400: 'Endereço é obrigatório',
+    500: 'Aconteceu um erro no servidor.',
+  };
   return (
     <>
       <Helmet>
@@ -82,13 +102,19 @@ function DetalhesPedidoPageAdmin() {
                 <CloseIcon fontSize="inherit" />
               </IconButton>
             }
-            severity="error"
+            severity={ response.status === 200 ? "success" :"error"}
           >
-            {error?.response?.status === 400 ? 'Endereço do cliente é obrigatório.' : error?.message}
+            {responseMesages[response?.status] || response.statusText}
           </Alert>
         )}
         {!!data && (
-          <FormEditProposta open={edit} data={data} handleClose={() => setEdit(false)} setErr={setErr} setOpen={setOpen} errMsg={error} />
+          <FormEditProposta
+            open={edit}
+            data={data}
+            handleClose={() => setEdit(false)}
+            setResponseStatus={setResponse}
+            setOpen={setOpen}
+          />
         )}
         <Paper sx={{ padding: 4 }}>
           <Grid container flexDirection="row" justifyContent="space-between">
@@ -104,8 +130,10 @@ function DetalhesPedidoPageAdmin() {
                 Transporte: {CFL(data?.transporte)}
               </Typography>
               <Typography variant="subtitle1" fontWeight="500">
-                Endereço de entrega: {data?.endereco_de_entrega?.logradouro}, {data?.endereco_de_entrega?.numero}{' - '}
-                {!!(data?.endereco_de_entrega?.complemento) && data?.endereco_de_entrega?.complemento} - {data?.endereco_de_entrega?.bairro?.nome} - {data?.endereco_de_entrega?.cep}
+                Endereço de entrega: {data?.endereco_de_entrega?.logradouro}, {data?.endereco_de_entrega?.numero}
+                {' - '}
+                {!!data?.endereco_de_entrega?.complemento && data?.endereco_de_entrega?.complemento} -{' '}
+                {data?.endereco_de_entrega?.bairro?.nome} - {data?.endereco_de_entrega?.cep}
               </Typography>
             </Box>
             <Box display="flex" flexDirection="column" gap={1}>
