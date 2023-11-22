@@ -1,40 +1,21 @@
-## Minimal [(Free version)](https://minimal-kit-react.vercel.app/)
+# Frontend - B&F Laboratório de Metrologia
 
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
+Este diretório contém o código-fonte do frontend para o site de gestão de instrumentos pela empresa B&F Laboratório de Metrologia.
 
-> Free React Admin Dashboard made with Material-UI components and React.
+## Descrição
 
-![preview](public/assets/preview.jpg)
+O projeto foi desenvolvido utilizando como base o template `minimal-kit-react.vercel.app` do Material UI, sendo personalizado para atender às necessidades específicas do cliente. Utilizou-se React, React Query, Axios e Material UI para o desenvolvimento.
 
-| [Minimal Free](https://minimal-kit-react.vercel.app/) | [Minimal](https://material-ui.com/store/items/minimal-dashboard/) |
-| ----------------------------------------------------- | :---------------------------------------------------------------- |
-| **6** Demo pages                                      | **50+** demo pages                                                |
-| -                                                     | ✓ Multi-language                                                  |
-| -                                                     | ✓ Dark/Light Mode 🌓                                              |
-| -                                                     | ✓ [More components](https://minimals.cc/components)               |
-| -                                                     | ✓ Next.js version                                                 |
-| -                                                     | ✓ TypeScript version                                              |
-| -                                                     | ✓ Design files (Figma & Sketch)                                   |
+### Funcionalidades Principais
 
-## Page demo
+- Permite que os usuários façam pedidos de calibração para os instrumentos cadastrados.
+- Envio automatizado de notas de pedido por e-mail aos usuários.
+- Visualização das informações de calibração após a conclusão.
 
-- [Dashboard](https://minimal-kit-react.vercel.app/dashboard/app)
-- [Users](https://minimal-kit-react.vercel.app/dashboard/user)
-- [Product](https://minimal-kit-react.vercel.app/dashboard/products)
-- [Blog](https://minimal-kit-react.vercel.app/dashboard/blog)
-- [Login](https://minimal-kit-react.vercel.app/login)
-- [Not Found](https://minimal-kit-react.vercel.app/404)
+## Principais Tecnologias Utilizadas
 
-## Getting started
+- React
+- Material UI
+- JWT
+- Axios
 
-- Recommended `node js 16.x` and `npm 6+`. (suggestion v16.15.0)
-- Install dependencies: `npm install` / `yarn install`
-- Start the project: `npm run start` / `yarn start`
-
-## License
-
-Distributed under the MIT License. See [LICENSE](https://github.com/minimal-ui-kit/minimal.free/blob/main/LICENSE.md) for more information.
-
-## Contact us
-
-Email Us: support@minimals.cc
