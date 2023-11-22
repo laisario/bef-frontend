@@ -60,7 +60,7 @@ function DetalhesPedidoPageAdmin() {
   return (
     <>
       <Helmet>
-        <title> Pedido | B&F </title>
+        <title>Pedido | B&F</title>
       </Helmet>
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
