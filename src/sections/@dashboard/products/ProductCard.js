@@ -25,14 +25,14 @@ export default function ShopProductCard({ product }) {
           <Typography color="white" border="solid" px={5} mx={1} py={2} borderRadius={4} variant='subtitle1'>{product.tag}</Typography>
         </Box>
         <Divider />
-        <Stack sx={{ p: 3 }}>
-          <Typography variant="subtitle1" noWrap>
+        <Stack sx={{ p: 3 }} gap={1}>
+          <Typography variant="subtitle1">
             {product?.instrumento?.tipo_de_instrumento.descricao}
           </Typography>
-          <Typography variant="subtitle2" noWrap>
+          <Typography variant="subtitle2" fontWeight={300}>
             {product?.instrumento.tipo_de_instrumento.modelo}
           </Typography>
-          <Typography variant="caption text" noWrap>
+          <Typography variant="caption text">
             {product?.instrumento.tipo_de_instrumento.fabricante}
           </Typography>
         </Stack>

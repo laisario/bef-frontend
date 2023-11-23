@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Stack } from '@mui/material';
@@ -8,6 +8,7 @@ import { Box, Link, Button, Drawer, Typography, Stack } from '@mui/material';
 import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
+import useClients from '../../../hooks/useClients';
 // components
 import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
@@ -39,7 +40,10 @@ Nav.propTypes = {
 
 export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
-  const { user } = useAuth()
+  const { id } = useParams();
+  const { user } = useAuth();
+  const { clientes } = useClients(id);
+
   const isDesktop = useResponsive('up', 'lg');
   useEffect(() => {
     if (openNav) {
@@ -71,12 +75,8 @@ export default function Nav({ openNav, onCloseNav }) {
 
               <Box sx={{ ml: 2 }}>
                 <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                  {user.nome} 
+                  {user?.nome || ''} 
                 </Typography>
-
-                {/* <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Pessoa Juridica
-                </Typography> */}
               </Box>
             </StyledAccount>
           </Link>
@@ -104,7 +104,7 @@ export default function Nav({ openNav, onCloseNav }) {
             </Typography>
           </Box>
 
-          <Button href="/dashboard/pedidos" startIcon={<Iconify icon="eva:plus-fill" />} target="_blank" variant="contained">
+          <Button href="#/dashboard/pedidos" startIcon={<Iconify icon="eva:plus-fill" />} variant="contained">
             Novo pedido
           </Button>
         </Stack>

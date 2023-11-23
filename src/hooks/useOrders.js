@@ -34,7 +34,7 @@ const useOrders = (id) => {
 
   const deleteOrder = async () => {
     await axios.delete(`/propostas/${id}`);
-    navigate('/dashboard/pedidos');
+    navigate('/admin/pedidos');
   };
   const edit = async (form, setResponseStatus, setOpen) => {
     const {
@@ -73,7 +73,7 @@ const useOrders = (id) => {
           endereco_de_entrega: cliente.endereco || null,
           validade: dayjs.isDayjs(validade) ? validade?.format('YYYY-MM-DD') : null,
           data_aprovacao: dayjs.isDayjs(data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
-          aprovacao: aprovado === 'true',
+          aprovacao: aprovado || null,
         });
         setResponseStatus(response)
       } else {
@@ -96,7 +96,7 @@ const useOrders = (id) => {
             } || null,
           validade: dayjs.isDayjs(validade) ? validade?.format('YYYY-MM-DD') : null,
           data_aprovacao: dayjs.isDayjs(data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
-          aprovacao: aprovado === 'true',
+          aprovacao: aprovado || null,
         });
         setResponseStatus(response);
       }

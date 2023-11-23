@@ -20,7 +20,7 @@ const formaPagamento = {
 };
 
 const aprovacaoProposta = {
-  null: 'Aguardando análise',
+  null: 'Aguardando sua análise',
   false: 'Proposta negada',
   true: 'Proposta aprovada',
 };
@@ -51,7 +51,7 @@ function OrderDetails() {
             </Typography>
           </Box>
           <Box>
-            {data?.status === 'F' && (
+            {data?.aprovacao === null && (
               <>
                 <Button
                   variant="contained"
@@ -84,26 +84,39 @@ function OrderDetails() {
                 Forma de pagamento: {formaPagamento[data?.condicao_de_pagamento]}
               </Typography>
               <Typography variant="subtitle1" fontWeight="500">
-                Transporte: {CFL(data?.transporte)}
+                Transporte: {CFL(data?.transporte) || ''}
               </Typography>
               <Typography variant="subtitle1" fontWeight="500">
                 <Typography variant="subtitle1" fontWeight="500">
-                  Endereço de entrega: {data?.endereco_de_entrega?.logradouro}, {data?.endereco_de_entrega?.numero}
-                  {' - '}
-                  {!!data?.endereco_de_entrega?.complemento && data?.endereco_de_entrega?.complemento} -{' '}
-                  {data?.endereco_de_entrega?.bairro?.nome} - {data?.endereco_de_entrega?.cep}
+                  Endereço de entrega: {data?.endereco_de_entrega?.logradouro || ''}{' '}
+                  {!!data?.endereco_de_entrega?.numero && ', '} {data?.endereco_de_entrega?.numero || ''}
+                  {!!data?.endereco_de_entrega?.complemento && ' - '}
+                  {!data?.endereco_de_entrega?.complemento ? data?.endereco_de_entrega?.complemento : ''}{' '}
+                  {!!data?.endereco_de_entrega?.bairro?.nome && ' - '}
+                  {data?.endereco_de_entrega?.bairro?.nome || ''}
+                  {!!data?.endereco_de_entrega?.cep && ' - '} {data?.endereco_de_entrega?.cep || ''}
                 </Typography>
               </Typography>
             </Box>
             <Box display="flex" gap={1} flexDirection="column">
-              <Chip
-                label={aprovacaoProposta[data?.aprovacao]}
-                color={colorAprovacaoProposta[data?.aprovacao]}
-                variant="outlined"
-              />
-              <Button startIcon={<ReceiptLongIcon />}>
-                <Link href={data?.anexo}>Certificado</Link>
-              </Button>
+              {data?.status === 'A' ? (
+                <Chip
+                  label="Aguardando resposta"
+                  color={colorAprovacaoProposta[data?.aprovacao]}
+                  variant="outlined"
+                />
+              ) : (
+                <Chip
+                  label={aprovacaoProposta[data?.aprovacao]}
+                  color={colorAprovacaoProposta[data?.aprovacao]}
+                  variant="outlined"
+                />
+              )}
+              {!!data?.anexo && (
+                <Button startIcon={<ReceiptLongIcon />}>
+                  <Link href={data?.anexo}>Certificado</Link>
+                </Button>
+              )}
             </Box>
           </Grid>
           <Typography variant="h6" my={2}>
@@ -148,17 +161,21 @@ function OrderDetails() {
                     data_ultima_calibracao: 'Última Calibração',
                     informacoesAdicionais: 'Informações adicionais',
                   }}
-                  titles={['tag', 'numero_de_serie', 'data_ultima_calibracao', 'status', 'informacoesAdicionais']}
+                  titles={['tag', 'numero_de_serie', 'data_ultima_calibracao', 'informacoesAdicionais']}
                 />
               )
             )}
           </Box>
-          <Typography my={2} variant="h6">
-            Informações Adicionais
-          </Typography>
-          <Card sx={{ padding: 2, my: 2, backgroundColor: theme.palette.background.neutral }}>
-            <Typography>{data?.informacoes_adicionais}</Typography>
-          </Card>
+          {!!data?.informacoes_adicionais && (
+            <>
+              <Typography my={2} variant="h6">
+                Informações Adicionais
+              </Typography>
+              <Card sx={{ padding: 2, my: 2, backgroundColor: theme.palette.background.neutral }}>
+                <Typography>{data?.informacoes_adicionais}</Typography>
+              </Card>
+            </>
+          )}
         </Paper>
       </Container>
     </>

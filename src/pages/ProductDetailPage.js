@@ -54,8 +54,7 @@ function ProductDetailPage() {
             <Box>
               <Typography variant="h6">{instrument?.instrumento.tipo_de_instrumento.descricao}</Typography>
               <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
-                Faixa de medição: {instrument?.instrumento.minimo} -{' '}
-                {instrument?.instrumento.maximo}
+                Faixa de medição: {instrument?.instrumento.minimo} - {instrument?.instrumento.maximo}
                 {instrument?.instrumento.unidade}
               </Typography>
               <Typography variant="subtitle1" fontWeight="500">
@@ -93,70 +92,78 @@ function ProductDetailPage() {
               />
             </Box>
           </Grid>
-          <Typography variant="h6" my={2}>
-            Calibrações
-          </Typography>
-          <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
-            {instrument?.calibracoes?.map(
-              (
-                {
-                  certificado,
-                  criterio_de_aceitacao: criterioDeAceitacao,
-                  incerteza,
-                  local,
-                  maior_erro: maiorErro,
-                  numero_do_certificado: numeroDoCertificado,
-                  observacoes,
-                  orde_de_servico: ordemDeServico,
-                  referencia_do_criterio: referenciaDoCriterio,
-                  status,
-                  data
-                },
-                index
-              ) => (
-                <CalibracaoCard
-                  calibracao={{
-                    certificado,
-                    criterioDeAceitacao,
-                    incerteza,
-                    local,
-                    maiorErro,
-                    numeroDoCertificado,
-                    observacoes,
-                    ordemDeServico,
-                    referenciaDoCriterio,
-                    status,
-                    data
-                  }}
-                  key={index}
-                  specialCases={{
-                    criterioDeAceitacao: 'Critério de aceitação',
-                    maiorErro: 'Maior Erro',
-                    numeroDoCertificado: 'Número do certificado',
-                    observacoes: 'Observações',
-                    ordemDeServico: 'Ordem de serviço',
-                    referenciaDoCriterio: 'Referência do critério',
-                  }}
-                  titles={[
-                    'criterioDeAceitacao',
-                    'referenciaDoCriterio',
-                    'incerteza',
-                    'maiorErro',
-                    'ordemDeServico',
-                    'local',
-                    'observacoes',
-                    'numeroDoCertificado',
-                  ]}
-                />
-              )
-            )}
-          </Box>
-          <Typography my={2} variant="h6">
-            Observação
-          </Typography>
-          <Card sx={{ padding: 2, my: 2, backgroundColor: theme.palette.background.neutral }}>
-            <Typography>{instrument?.observacoes}</Typography>
-          </Card>
+          {!!instrument?.calibracoes?.length && (
+            <>
+              <Typography variant="h6" my={2}>
+                Calibrações
+              </Typography>
+              <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
+                {instrument?.calibracoes?.map(
+                  (
+                    {
+                      certificado,
+                      criterio_de_aceitacao: criterioDeAceitacao,
+                      incerteza,
+                      local,
+                      maior_erro: maiorErro,
+                      numero_do_certificado: numeroDoCertificado,
+                      observacoes,
+                      orde_de_servico: ordemDeServico,
+                      referencia_do_criterio: referenciaDoCriterio,
+                      status,
+                      data,
+                    },
+                    index
+                  ) => (
+                    <CalibracaoCard
+                      calibracao={{
+                        certificado,
+                        criterioDeAceitacao,
+                        incerteza,
+                        local,
+                        maiorErro,
+                        numeroDoCertificado,
+                        observacoes,
+                        ordemDeServico,
+                        referenciaDoCriterio,
+                        status,
+                        data,
+                      }}
+                      key={index}
+                      specialCases={{
+                        criterioDeAceitacao: 'Critério de aceitação',
+                        maiorErro: 'Maior Erro',
+                        numeroDoCertificado: 'Número do certificado',
+                        observacoes: 'Observações',
+                        ordemDeServico: 'Ordem de serviço',
+                        referenciaDoCriterio: 'Referência do critério',
+                      }}
+                      titles={[
+                        'criterioDeAceitacao',
+                        'referenciaDoCriterio',
+                        'incerteza',
+                        'maiorErro',
+                        'ordemDeServico',
+                        'local',
+                        'observacoes',
+                        'numeroDoCertificado',
+                      ]}
+                    />
+                  )
+                )}
+              </Box>
+            </>
+          )}
+          {!!instrument?.observacoes && (
+            <>
+              <Typography my={2} variant="h6">
+                Observação
+              </Typography>
+              <Card sx={{ padding: 2, my: 2, backgroundColor: theme.palette.background.neutral }}>
+                <Typography>{instrument?.observacoes}</Typography>
+              </Card>
+            </>
+          )}
         </Paper>
       </Container>
     </>

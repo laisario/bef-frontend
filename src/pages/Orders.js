@@ -61,7 +61,6 @@ export default function UserPage() {
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
   const { data } = useOrders();
   const { vertical, horizontal, propostaEnviada } = alert;
-
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -123,13 +122,13 @@ export default function UserPage() {
                         <TableCell align="left">R$ {total}</TableCell>
 
                         <TableCell align="left">
-                          {aprovacao !== null ? (
+                          {status === 'F' && aprovacao !== null ? (
                             <Label color={colorAprovacaoProposta[aprovacao]}>
                               {aprovacao ? 'Pedido aprovado' : 'Pedido reprovado'}
                             </Label>
                           ) : (
                             <Label color={colorStatusProposta[status]}>
-                              {status === 'F' ? 'Esperando sua análise' : 'Em análise B&f'}
+                              {aprovacao === null && status === 'F' ? 'Esperando sua análise' : 'Em análise B&f'}
                             </Label>
                           )}
                         </TableCell>

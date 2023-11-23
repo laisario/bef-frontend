@@ -14,7 +14,7 @@ function ProductCardAdmin({ product }) {
         }}
       >
         <Typography variant="subtitle1">{product?.tipo_de_instrumento.descricao}</Typography>
-        <Typography variant="subtitle2">{product?.tipo_de_instrumento.modelo}</Typography>
+        <Typography variant="body1" fontWeight={100}>{product?.tipo_de_instrumento.modelo}</Typography>
         <Typography variant="body2">{product?.tipo_de_instrumento.fabricante}</Typography>
       </Box>
       <Divider />
