@@ -40,7 +40,7 @@ function ProductCardAdmin({ product }) {
         >
           <Typography variant="body2">Capacidade de medição:</Typography>
           <Typography variant="body2">
-            {product?.capacidade_de_medicao.valor} {product?.capacidade_de_medicao.unidade}
+            {product?.capacidade_de_medicao?.valor} {product?.capacidade_de_medicao?.unidade}
           </Typography>
         </Box>
         <Box
@@ -51,7 +51,7 @@ function ProductCardAdmin({ product }) {
           }}
         >
           <Typography variant="body2">Procedimento relacionado:</Typography>
-          <Typography variant="body2">{product?.procedimento_relacionado.procedimento}</Typography>
+          <Typography variant="body2">{product?.procedimento_relacionado?.procedimento}</Typography>
         </Box>
       </Stack>
       <Divider />
@@ -81,8 +81,8 @@ function ProductCardAdmin({ product }) {
           <Typography variant="body2">R${product?.preco_calibracao_no_laboratorio}</Typography>
         </Box>
         <Chip
-          label={product.tipo_de_servico === 'A' ? 'Acreditado' : 'Não acreditado'}
-          color={product.tipo_de_servico === 'A' ? 'primary' : 'warning'}
+          label={product?.tipo_de_servico === 'A' ? 'Acreditado' : 'Não acreditado'}
+          color={product?.tipo_de_servico === 'A' ? 'primary' : 'warning'}
           variant="outlined"
           mb={2}
         />
