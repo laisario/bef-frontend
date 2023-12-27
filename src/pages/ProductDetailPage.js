@@ -44,7 +44,7 @@ function ProductDetailPage() {
             </Typography>
           </Box>
           <Box>
-            <Button color="info" onClick={() => deleteInstrument()}>
+            <Button onClick={() => deleteInstrument()}>
               <Iconify icon="eva:trash-2-fill" />
             </Button>
           </Box>
@@ -53,31 +53,31 @@ function ProductDetailPage() {
           <Grid container flexDirection="row" justifyContent="space-between">
             <Box>
               <Typography variant="h6">{instrument?.instrumento.tipo_de_instrumento.descricao}</Typography>
-              <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
-                Faixa de medição: {instrument?.instrumento.minimo} - {instrument?.instrumento.maximo}
+              {(instrument?.instrumento?.minimo || instrument?.instrumento?.maximo) && <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
+                Faixa de medição: {instrument?.instrumento?.minimo}  / {instrument?.instrumento?.maximo}
                 {instrument?.instrumento.unidade}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
+              </Typography>}
+              {instrument?.data_ultima_calibracao && <Typography variant="subtitle1" fontWeight="500">
                 Última calibração: {fDateTime(instrument?.data_ultima_calibracao)}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
-                Modelo: {instrument?.instrumento.tipo_de_instrumento.modelo}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
-                Fabricante: {instrument?.instrumento.tipo_de_instrumento.fabricante}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
-                Frequência: {instrument?.instrumento.tipo_de_instrumento.frequencia} dias
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
-                Resolução: {instrument?.instrumento.tipo_de_instrumento.resolução}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
+              </Typography>}
+              {instrument?.instrumento?.tipo_de_instrumento?.modelo && <Typography variant="subtitle1" fontWeight="500">
+                Modelo: {instrument?.instrumento?.tipo_de_instrumento?.modelo}
+              </Typography>}
+              {instrument?.instrumento?.tipo_de_instrumento?.fabricante && <Typography variant="subtitle1" fontWeight="500">
+                Fabricante: {instrument?.instrumento?.tipo_de_instrumento?.fabricante}
+              </Typography>}
+              {instrument?.instrumento.tipo_de_instrumento?.frequencia && <Typography variant="subtitle1" fontWeight="500">
+                Frequência: {instrument?.instrumento.tipo_de_instrumento?.frequencia} {+(instrument?.instrumento.tipo_de_instrumento?.frequencia) > 1 ? 'dias' : 'dia'}
+              </Typography>}
+              {instrument?.instrumento?.tipo_de_instrumento?.resolução && <Typography variant="subtitle1" fontWeight="500">
+                Resolução: {instrument?.instrumento?.tipo_de_instrumento?.resolução}
+              </Typography>}
+              {instrument?.laboratorio && <Typography variant="subtitle1" fontWeight="500">
                 Laboratório: {instrument?.laboratorio}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
-                Procedimento relacionado: {instrument?.instrumento.procedimento_relacionado.procedimento}
-              </Typography>
+              </Typography>}
+              {instrument?.instrumento?.procedimento_relacionado?.procedimento && <Typography variant="subtitle1" fontWeight="500">
+                Procedimento relacionado: {instrument?.instrumento?.procedimento_relacionado?.procedimento}
+              </Typography>}
             </Box>
             <Box display="flex" gap={1} flexDirection="column">
               <Chip

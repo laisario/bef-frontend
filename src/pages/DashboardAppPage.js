@@ -6,7 +6,6 @@ import useOrders from '../hooks/useOrders';
 // sections
 import { AppNewsUpdate, AppOrderTimeline, AppWidgetSummary } from '../sections/@dashboard/app';
 import { isExpired } from '../utils/formatTime';
-import { useAuth } from '../context/Auth';
 
 // ----------------------------------------------------------------------
 
@@ -66,20 +65,20 @@ export default function DashboardAppPage() {
             <Grid item xs={12} md={7} lg={8}>
               <AppNewsUpdate
                 title="Instrumentos"
-                list={todosInstrumentos?.slice(0, 5)?.map((instrumento, index) => ({
+                list={todosInstrumentos?.slice(0, 5)?.map((instrumento) => ({
                   isExpired: isExpired(
-                    instrumento.data_ultima_calibracao,
-                    instrumento.instrumento.tipo_de_instrumento.frequencia
+                    instrumento?.data_ultima_calibracao,
+                    instrumento?.instrumento?.tipo_de_instrumento?.frequencia
                   ),
                   tag: instrumento?.tag,
-                  fabricante: instrumento?.instrumento.tipo_de_instrumento.fabricante,
-                  modelo: instrumento?.instrumento.tipo_de_instrumento.modelo,
-                  faixaNominalMin: instrumento?.instrumento.minimo,
-                  faixaNominalMax: instrumento?.instrumento.maximo,
-                  unidade: instrumento?.instrumento.unidade,
+                  fabricante: instrumento?.instrumento.tipo_de_instrumento?.fabricante,
+                  modelo: instrumento?.instrumento?.tipo_de_instrumento?.modelo,
+                  faixaNominalMin: instrumento?.instrumento?.minimo,
+                  faixaNominalMax: instrumento?.instrumento?.maximo,
+                  unidade: instrumento?.instrumento?.unidade,
                   data: isExpired(
-                    instrumento.data_ultima_calibracao,
-                    instrumento.instrumento.tipo_de_instrumento.frequencia
+                    instrumento?.data_ultima_calibracao,
+                    instrumento?.instrumento?.tipo_de_instrumento?.frequencia
                   )
                     ? instrumento?.data_ultima_calibracao
                     : instrumento?.data_proxima_calibracao,
@@ -90,7 +89,7 @@ export default function DashboardAppPage() {
             <Grid item xs={12} md={5} lg={4}>
               <AppOrderTimeline
                 title="Pedidos"
-                list={data?.slice(0, 5)?.map((proposta, index) => ({
+                list={data?.slice(0, 5)?.map((proposta) => ({
                   id: proposta?.id,
                   title: `Pedido ${proposta?.id}`,
                   status: proposta?.status,
