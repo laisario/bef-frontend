@@ -1,6 +1,9 @@
 // component
+import DescriptionIcon from '@mui/icons-material/Description';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import HomeIcon from '@mui/icons-material/Home';
+import ScaleIcon from '@mui/icons-material/Scale';
 import SvgColor from '../../../components/scrollbar/svg-color';
-
 
 // ----------------------------------------------------------------------
 
@@ -10,17 +13,22 @@ const navConfig = [
   {
     title: 'pagina inicial',
     path: '/admin/home',
-    icon: icon('ic_analytics'),
+    icon: <HomeIcon/>,
   },
   {
     title: 'Instrumentos',
     path: '/admin/produtos',
-    icon: icon('ic_user'),
+    icon: <ScaleIcon/>,
   },
   {
     title: 'Pedidos',
     path: '/admin/pedidos',
-    icon: icon('ic_cart'),
+    icon: <ShoppingCartIcon/>,
+  },
+  {
+    title: 'Documentos',
+    path: '/admin/documentos',
+    icon: <DescriptionIcon/>
   },
 ];
 

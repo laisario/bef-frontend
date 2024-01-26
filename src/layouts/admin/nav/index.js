@@ -75,10 +75,6 @@ export default function Nav({ openNav, onCloseNav }) {
                 <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
                   {user?.nome}
                 </Typography>
-
-                {/* <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Pessoa Juridica
-                </Typography> */}
               </Box>
             </StyledAccount>
           </Link>
@@ -86,31 +82,6 @@ export default function Nav({ openNav, onCloseNav }) {
 
         <NavSection data={navConfig} />
       </Box>
-
-      {/* <Box>
-        <Stack alignItems="center" spacing={3} px={2}>
-          <Box
-            component="img"
-            src="/assets/illustrations/illustration_avatar.png"
-            sx={{ width: 100 }}
-          />
-
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography gutterBottom variant="h6">
-              Precisando
-               de uma calibração ai?
-            </Typography>
-
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Calibre seus instrumentos a partir de R$ 99,90
-            </Typography>
-          </Box>
-
-          <Button href="/dashboard/pedidos" startIcon={<Iconify icon="eva:plus-fill" />} target="_blank" variant="contained">
-            Novo pedido
-          </Button>
-        </Stack>
-      </Box> */}
     </Scrollbar>
   );
 

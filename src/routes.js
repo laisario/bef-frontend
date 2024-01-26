@@ -5,6 +5,7 @@ import AdminLayout from './layouts/admin';
 import SimpleLayout from './layouts/simple';
 import AuthLayout from './layouts/auth';
 //
+import DocumentosPage from './pages/admin/DocumentosPage';
 import BlogPage from './pages/BlogPage';
 import PedidosPage from './pages/Orders';
 import LoginPage from './pages/LoginPage';
@@ -77,7 +78,7 @@ export default function Router() {
         { path: 'pedidos', element: <PedidosPageAdmin /> },
         { path: 'pedido/:id', element: <DetalhesPedidoPageAdmin /> },
         { path: 'produtos', element: <ProductsPageAdmin/> },
-        // { path: 'blog', element: <BlogPage /> },
+        { path: 'documentos', element: <DocumentosPage /> },
       ],
     },
   ]);

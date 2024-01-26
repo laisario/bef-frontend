@@ -58,7 +58,6 @@ const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const { user, setUser, loading, setLoading, clienteId, setClienteId } = useContext(AuthContext);
-
   const login = async (email, password) => {
     setLoading(true);
     try {
