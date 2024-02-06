@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { isExpired } from '../utils/formatTime';
-import axios from '../api';
+import {axios} from '../api';
 
 const useInstrumentos = (id) => {
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const useInstrumentos = (id) => {
       return response?.data;
     }
     const response = await axios.get('/instrumentos', { params: { page_size: 9999 } });
-    return response?.data;
+    return response?.data?.results;
   });
 
   const {
@@ -22,7 +22,7 @@ const useInstrumentos = (id) => {
     isLoading: isLoadingInstrumentosEmpresa,
   } = useQuery(['instrumentos-empresa'], async () => {
     const response = await axios.get('/instrumentos-empresa', { params: { page_size: 9999 } });
-    return response?.data;
+    return response?.data?.results;
   });
 
   const instrumentosVencidos = useMemo(() => {

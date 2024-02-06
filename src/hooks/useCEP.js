@@ -29,7 +29,7 @@ export function formatCEP(value = '') {
 const useCEP = (cep) => {
     const isValid = useMemo(() =>  validarCEP(cep), [cep])
 
-    const { data, error, isLoading } = useQuery(['cep', cep], async () => {
+    const { data } = useQuery(['cep', cep], async () => {
         const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`, { withCredentials: false })
         return response?.data
     }, {

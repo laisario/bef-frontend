@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
-import axios from '../api';
+import {axios, axiosForFiles} from '../api';
 import useClients from './useClients';
 
 const useOrders = (id) => {
@@ -15,7 +15,7 @@ const useOrders = (id) => {
       return response?.data;
     }
     const response = await axios.get('/propostas', { params: { page_size: 9999 } });
-    return response?.data;
+    return response?.data?.results;
   });
 
   const { clientes: cliente } = useClients(data?.cliente?.id);
@@ -49,28 +49,23 @@ const useOrders = (id) => {
       aprovado,
       complemento,
       validade,
-      prazo_de_entrega,
+      prazoDeEntrega,
     } = form;
-    const formData = new FormData();
-    formData.append('anexo', anexo);
     try {
       if (anexo && anexo instanceof File) {
-        await axios({
-          method: 'patch',
-          url: `/propostas/${id}/anexar/`,
-          data: formData,
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        const formData = new FormData();
+        formData.append('anexo', anexo);
+        await axiosForFiles.patch(`/propostas/${id}/anexar/`, formData)
       }
       if (enderecoEntrega === 'enderecoCadastrado') {
         const response = await axios.patch(`/propostas/${id}/atualizar/`, {
           local: local || null,
           total: total || 0,
-          prazo_de_entrega: dayjs.isDayjs (prazo_de_entrega) ? prazo_de_entrega?.format('YYYY-MM-DD') : null,
-          condicao_de_pagamento: forma_de_pagamento || null,
+          prazoDeEntrega: dayjs.isDayjs (prazoDeEntrega) ? prazoDeEntrega?.format('YYYY-MM-DD') : null,
+          condicaoDePagamento: forma_de_pagamento || null,
           transporte: transporte || null,
           numero: numero || 0,
-          endereco_de_entrega: cliente.endereco || null,
+          enderedoDeEntrega: cliente.endereco || null,
           validade: dayjs.isDayjs(validade) ? validade?.format('YYYY-MM-DD') : null,
           data_aprovacao: dayjs.isDayjs(data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
           aprovacao: aprovado || null,
@@ -80,11 +75,11 @@ const useOrders = (id) => {
           const response = await axios.patch(`/propostas/${id}/atualizar/`, {
           local: local || null,
           total: total || 0,
-          prazo_de_entrega: dayjs.isDayjs(prazo_de_entrega) ? prazo_de_entrega?.format('YYYY-MM-DD') : null,
-          condicao_de_pagamento: forma_de_pagamento || null,
+          prazoDeEntrega: dayjs.isDayjs(prazoDeEntrega) ? prazoDeEntrega?.format('YYYY-MM-DD') : null,
+          condicaoDePagamento: forma_de_pagamento || null,
           transporte: transporte || null,
           numero: numero || 0,
-          endereco_de_entrega_add:
+          enderecoDeEntregaAdd:
             {
               cep: CEP || null,
               numero: numeroCasa || null,
@@ -95,7 +90,7 @@ const useOrders = (id) => {
               complemento: complemento || null,
             } || null,
           validade: dayjs.isDayjs(validade) ? validade?.format('YYYY-MM-DD') : null,
-          data_aprovacao: dayjs.isDayjs(data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
+          dataAprovacao: dayjs.isDayjs(data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
           aprovacao: aprovado || null,
         });
         setResponseStatus(response);

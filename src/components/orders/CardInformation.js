@@ -3,10 +3,8 @@ import { useTheme } from '@emotion/react';
 import { Box, Button, Card, Chip, Grid, Link, Typography } from '@mui/material';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { useLocation } from 'react-router-dom';
-import { useQuery } from 'react-query';
 import React from 'react';
 import titleCase from '../../utils/formatTitle';
-import axios from '../../api';
 
 const posicaoInstrumento = {
   U: 'Em uso',

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
 
-import axios from '../api';
+import {axios} from '../api';
 
 const AuthContext = createContext();
 
@@ -96,7 +96,7 @@ export const useAuth = () => {
   const registerBasics = async ({ nome, telefone, cpf, empresa, razaoSocial, cnpj, ie }) => {
     setLoading(true);
     try {
-      const payload = !empresa ? { nome, telefone, cpf } : { empresa, razao_social: razaoSocial, cnpj, ie };
+      const payload = !empresa ? { nome, telefone, cpf } : { empresa, razaoSocial, cnpj, ie };
       const response = await axios.post('/register/basics/', payload);
       setClienteId(response?.data);
       window.localStorage.setItem('clienteId', response?.data);
@@ -112,7 +112,7 @@ export const useAuth = () => {
   const registerLocation = async ({ uf, cidade, bairro, logradouro, numero, cep }) => {
     setLoading(true);
     try {
-      const payload = { cliente_id: clienteId, uf, cidade, bairro, logradouro, numero, cep };
+      const payload = { clienteId, uf, cidade, bairro, logradouro, numero, cep };
       const response = await axios.post('/register/location/', payload);
       return response?.data;
     } catch (err) {
@@ -126,7 +126,7 @@ export const useAuth = () => {
   const registerAuth = async ({ email, password }) => {
     setLoading(true);
     try {
-      const payload = { cliente_id: clienteId, email, password };
+      const payload = { clienteId, email, password };
       const response = await axios.post('/register/auth/', payload);
       return response?.data;
     } catch (err) {

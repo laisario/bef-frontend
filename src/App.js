@@ -12,8 +12,6 @@ import AuthProvider from './context/Auth';
 import { StyledChart } from './components/chart';
 import ScrollToTop from './components/scroll-to-top';
 
-// ----------------------------------------------------------------------
-
 const queryClient = new QueryClient();
 
 export default function App() {

@@ -21,6 +21,7 @@ import DetalhesPedidoPageAdmin from './pages/admin/DetalhesPedidoPageAdmin';
 import HomePageAdmin from './pages/admin/HomePageAdmin';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ProductsPageAdmin from './pages/admin/ProductsPageAdmin';
+import DetalhesDocumentoPage from './pages/admin/DetalhesDocumentoPage';
 
 // ----------------------------------------------------------------------
 
@@ -79,6 +80,7 @@ export default function Router() {
         { path: 'pedido/:id', element: <DetalhesPedidoPageAdmin /> },
         { path: 'produtos', element: <ProductsPageAdmin/> },
         { path: 'documentos', element: <DocumentosPage /> },
+        { path: 'documento/:id', element: <DetalhesDocumentoPage /> },
       ],
     },
   ]);

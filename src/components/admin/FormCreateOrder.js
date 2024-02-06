@@ -16,7 +16,7 @@ import {
 import SquareFootIcon from '@mui/icons-material/SquareFoot';
 import Chip from '@mui/material/Chip';
 import { useState } from 'react';
-import axios from '../../api';
+import {axios} from '../../api';
 import useInstrumentos from '../../hooks/useInstrumentos';
 import useOrders from '../../hooks/useOrders';
 import useClients from '../../hooks/useClients';
@@ -25,7 +25,7 @@ function FormCreateOrder({ setOpen, setAlert }) {
   const [form, setForm] = useState({
     cliente: '',
     informacoesAdicionais: '',
-    instrumentosSelecionados: [],
+    instrumentos: [],
   });
   const [errMsg, setErrMsg] = useState('');
   const [loading, setIsLoading] = useState(false);
@@ -47,11 +47,7 @@ function FormCreateOrder({ setOpen, setAlert }) {
 
     try {
       setIsLoading(true);
-      await axios.post('/propostas/', {
-        instrumentos: form.instrumentosSelecionados,
-        informacoes_adicionais: form.informacoesAdicionais,
-        cliente: form.cliente,
-      });
+      await axios.post('/propostas/', form);
       setIsLoading(false);
       setAlert((prevAlert) => ({ ...prevAlert, propostaEnviada: true }));
       setOpen(false);
@@ -105,8 +101,8 @@ function FormCreateOrder({ setOpen, setAlert }) {
               labelId="demo-multiple-chip-label"
               id="demo-multiple-chip"
               multiple
-              name="instrumentosSelecionados"
-              value={form.instrumentosSelecionados}
+              name="instrumentos"
+              value={form.instrumentos}
               onChange={handleChange}
               input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
               renderValue={(selected) => (

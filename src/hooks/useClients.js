@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import axios from '../api';
+import {axios} from '../api';
 
 function useClients(id) {
   const { data: clientes, error, isLoading, refetch } = useQuery(['clientes', id], async () => {
@@ -8,7 +8,7 @@ function useClients(id) {
       return response?.data;
     }
     const response = await axios.get('/clientes', { params: { page_size: 9999 } });
-    return response?.data;
+    return response?.data?.results;
   });
   return {
     clientes, 

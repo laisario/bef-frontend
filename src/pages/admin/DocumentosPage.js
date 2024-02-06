@@ -12,91 +12,39 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import { useNavigate } from "react-router-dom";
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import CircularProgress from '@mui/material/CircularProgress';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import { visuallyHidden } from '@mui/utils';
 import { Container, Stack } from '@mui/system';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@mui/material';
+import FormCreateDocument from '../../components/admin/FormCreateDocument';
 import Iconify from '../../components/iconify/Iconify';
-
-function createData(id, name, calories, fat, carbs, protein) {
-    return {
-        id,
-        name,
-        calories,
-        fat,
-        carbs,
-        protein,
-    };
-}
-
-const rows = [
-    createData(1, 'Cupcake', 305, 3.7, 67, 4.3),
-    createData(2, 'Donut', 452, 25.0, 51, 4.9),
-    createData(3, 'Eclair', 262, 16.0, 24, 6.0),
-    createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData(5, 'Gingerbread', 356, 16.0, 49, 3.9),
-    createData(6, 'Honeycomb', 408, 3.2, 87, 6.5),
-    createData(7, 'Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0),
-    createData(9, 'KitKat', 518, 26.0, 65, 7.0),
-    createData(10, 'Lollipop', 392, 0.2, 98, 0.0),
-    createData(11, 'Marshmallow', 318, 0, 81, 2.0),
-    createData(12, 'Nougat', 360, 19.0, 9, 37.0),
-    createData(13, 'Oreo', 437, 18.0, 63, 4.0),
-];
-
-function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
-
-function getComparator(order, orderBy) {
-    return order === 'desc'
-        ? (a, b) => descendingComparator(a, b, orderBy)
-        : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
-function stableSort(array, comparator) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-        const order = comparator(a[0], b[0]);
-        if (order !== 0) {
-            return order;
-        }
-        return a[1] - b[1];
-    });
-    return stabilizedThis.map((el) => el[0]);
-}
+import useDocumentos from '../../hooks/useDocumentos';
+import titleCase from '../../utils/formatTitle';
+import { fDate } from '../../utils/formatTime';
 
 const headCells = [
     {
         id: 'codigo',
         numeric: false,
         disablePadding: true,
-        label: 'Codigo',
+        label: 'Código',
     },
     {
         id: 'titulo',
         numeric: false,
         disablePadding: false,
-        label: 'Titulo',
+        label: 'Título',
     },
     {
         id: 'status',
@@ -108,7 +56,7 @@ const headCells = [
         id: 'revisao',
         numeric: false,
         disablePadding: false,
-        label: 'Data Revisao',
+        label: 'Data Revisão',
     },
     {
         id: 'validade',
@@ -120,13 +68,7 @@ const headCells = [
         id: 'analise_critica',
         numeric: true,
         disablePadding: false,
-        label: 'Analise Critica (dias)',
-    },
-    {
-        id: 'revisoes',
-        numeric: true,
-        disablePadding: false,
-        label: 'Revisoes',
+        label: 'Análise Critica',
     },
 ];
 
@@ -140,7 +82,7 @@ function EnhancedTableHead(props) {
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox"  sx={{background: (theme) => `${theme.palette.grey[200]}`}}>
+                <TableCell padding="checkbox" sx={{ background: (theme) => `${theme.palette.grey[200]}` }}>
                     <Checkbox
                         color="primary"
                         indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -153,7 +95,7 @@ function EnhancedTableHead(props) {
                 </TableCell>
                 {headCells.map((headCell) => (
                     <TableCell
-                        sx={{background: (theme) => `${theme.palette.grey[200]}`}}
+                        sx={{ background: (theme) => `${theme.palette.grey[200]}` }}
                         key={headCell.id}
                         align={headCell.numeric ? 'right' : 'left'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
@@ -188,8 +130,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-    const { numSelected } = props;
-
+    const { numSelected, deleteDocuments, isDeleting } = props;
     return (
         <Toolbar
             sx={{
@@ -210,7 +151,7 @@ function EnhancedTableToolbar(props) {
                     variant="subtitle1"
                     component="div"
                 >
-                    {numSelected} selected
+                    {numSelected} selecionados
                 </Typography>
             ) : (
                 <Typography
@@ -223,11 +164,17 @@ function EnhancedTableToolbar(props) {
                 </Typography>
             )}
 
+            {numSelected === 1 && <Tooltip title="Revisar">
+                <IconButton>
+                    <RateReviewIcon />
+                </IconButton>
+            </Tooltip>}
+
             {numSelected > 0 ? (
-                <Tooltip title="Delete">
-                    <IconButton>
+                <Tooltip title="Deletar">
+                    {isDeleting ? <CircularProgress /> : <IconButton onClick={deleteDocuments}>
                         <DeleteIcon />
-                    </IconButton>
+                    </IconButton>}
                 </Tooltip>
             ) : (
                 <Tooltip title="Filter list">
@@ -236,6 +183,7 @@ function EnhancedTableToolbar(props) {
                     </IconButton>
                 </Tooltip>
             )}
+
         </Toolbar>
     );
 }
@@ -245,12 +193,20 @@ EnhancedTableToolbar.propTypes = {
 };
 
 export default function DocumentosPage() {
+    const [open, setOpen] = React.useState(false);
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
-    const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [selectedDocuments, setSelectedDocuments] = React.useState([]);
+    const { data, status, deleteDocumento, isDeleting } = useDocumentos(null, { page, rowsPerPage });
+    const navigate = useNavigate()
+
+
+    const handleOpenForm = () => {
+        setOpen(true);
+    };
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -260,30 +216,16 @@ export default function DocumentosPage() {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = rows.map((n) => n.id);
-            setSelected(newSelected);
+            const newSelected = data?.results?.map((n) => n.id);
+            setSelectedDocuments(newSelected);
             return;
         }
-        setSelected([]);
+        setSelectedDocuments([]);
     };
 
     const handleClick = (event, id) => {
-        const selectedIndex = selected.indexOf(id);
-        let newSelected = [];
-
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, id);
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selected.slice(1));
-        } else if (selectedIndex === selected.length - 1) {
-            newSelected = newSelected.concat(selected.slice(0, -1));
-        } else if (selectedIndex > 0) {
-            newSelected = newSelected.concat(
-                selected.slice(0, selectedIndex),
-                selected.slice(selectedIndex + 1),
-            );
-        }
-        setSelected(newSelected);
+        event?.stopPropagation()
+        setSelectedDocuments(selectedDocuments?.includes(id) ? selectedDocuments?.filter(documentId => documentId !== id) : [...selectedDocuments, id]);
     };
 
     const handleChangePage = (event, newPage) => {
@@ -299,20 +241,7 @@ export default function DocumentosPage() {
         setDense(event.target.checked);
     };
 
-    const isSelected = (id) => selected.indexOf(id) !== -1;
-
-    // Avoid a layout jump when reaching the last page with empty rows.
-    const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-    const visibleRows = React.useMemo(
-        () =>
-            stableSort(rows, getComparator(order, orderBy)).slice(
-                page * rowsPerPage,
-                page * rowsPerPage + rowsPerPage,
-            ),
-        [order, orderBy, page, rowsPerPage],
-    );
+    const isSelected = (id) => selectedDocuments.indexOf(id) !== -1;
 
     return (
         <>
@@ -324,48 +253,48 @@ export default function DocumentosPage() {
                     <Typography variant="h4" gutterBottom>
                         Documentos
                     </Typography>
-                    <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+                    <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenForm}>
                         Novo documento
                     </Button>
                 </Stack>
 
+                <FormCreateDocument open={open} setOpen={setOpen} />
 
-                <Box sx={{ width: '100%',  borderRadius: '12px' }}>
-                    <Paper sx={{ width: '100%', mb: 2, boxShadow: '0 0 2px 0 rgba(145, 158, 171, 0.2),0 12px 24px -4px rgba(145, 158, 171, 0.12)', borderRadius: "12px"}}>
-                        <EnhancedTableToolbar numSelected={selected.length} />
+                <Box sx={{ width: '100%', borderRadius: '12px' }}>
+                    <Paper sx={{ width: '100%', mb: 2, boxShadow: '0 0 2px 0 rgba(145, 158, 171, 0.2),0 12px 24px -4px rgba(145, 158, 171, 0.12)', borderRadius: "12px" }}>
+                        <EnhancedTableToolbar numSelected={selectedDocuments.length} deleteDocuments={() => { deleteDocumento(selectedDocuments); setSelectedDocuments([]) }} isDeleting={isDeleting} />
                         <TableContainer>
                             <Table
-                                // sx={{ minWidth: 800, borderRadius: 12}}
                                 aria-labelledby="tableTitle"
                                 size={dense ? 'small' : 'medium'}
                             >
                                 <EnhancedTableHead
-                                    numSelected={selected.length}
+                                    numSelected={selectedDocuments.length}
                                     order={order}
                                     orderBy={orderBy}
                                     onSelectAllClick={handleSelectAllClick}
                                     onRequestSort={handleRequestSort}
-                                    rowCount={rows.length}
+                                    rowCount={data?.results?.length}
                                 />
                                 <TableBody>
-                                    {visibleRows.map((row, index) => {
+                                    {data?.results?.map((row, index) => {
                                         const isItemSelected = isSelected(row.id);
                                         const labelId = `enhanced-table-checkbox-${index}`;
 
                                         return (
                                             <TableRow
                                                 hover
-                                                onClick={(event) => handleClick(event, row.id)}
                                                 role="checkbox"
                                                 aria-checked={isItemSelected}
                                                 tabIndex={-1}
                                                 key={row.id}
-                                                selected={isItemSelected}
+                                                onClick={() => { navigate(`/admin/documento/${row?.id}`) }}
                                                 sx={{ cursor: 'pointer' }}
-                                            >
+                                                >
                                                 <TableCell padding="checkbox">
                                                     <Checkbox
                                                         color="primary"
+                                                        onClick={(event) => handleClick(event, row.id)}
                                                         checked={isItemSelected}
                                                         inputProps={{
                                                             'aria-labelledby': labelId,
@@ -378,40 +307,33 @@ export default function DocumentosPage() {
                                                     scope="row"
                                                     padding="none"
                                                 >
-                                                    {row.name}
+                                                    {row?.codigo.codigo.toUpperCase()}
                                                 </TableCell>
-                                                <TableCell align="right">{row.calories}</TableCell>
-                                                <TableCell align="right">{row.fat}</TableCell>
-                                                <TableCell align="right">{row.carbs}</TableCell>
-                                                <TableCell align="right">{row.protein}</TableCell>
+                                                <TableCell>{titleCase(row?.titulo)}</TableCell>
+                                                <TableCell>{status[row?.status]}</TableCell>
+                                                <TableCell>{fDate(row?.data_revisao)}</TableCell>
+                                                <TableCell>{fDate(row?.data_validade)}</TableCell>
+                                                <TableCell align="right">{row?.analise_critica} dias</TableCell>
                                             </TableRow>
                                         );
                                     })}
-                                    {emptyRows > 0 && (
-                                        <TableRow
-                                            style={{
-                                                height: (dense ? 33 : 53) * emptyRows,
-                                            }}
-                                        >
-                                            <TableCell colSpan={6} />
-                                        </TableRow>
-                                    )}
                                 </TableBody>
                             </Table>
                         </TableContainer>
                         <TablePagination
-                            rowsPerPageOptions={[5, 10, 25]}
+                            rowsPerPageOptions={[5, 10, 25, 50, 100]}
                             component="div"
-                            count={rows.length}
+                            count={data?.count}
                             rowsPerPage={rowsPerPage}
                             page={page}
                             onPageChange={handleChangePage}
                             onRowsPerPageChange={handleChangeRowsPerPage}
+                            labelRowsPerPage="Linhas por páginas"
                         />
                     </Paper>
                     <FormControlLabel
                         control={<Switch checked={dense} onChange={handleChangeDense} />}
-                        label="Dense padding"
+                        label="Ampliado/Compacto"
                     />
                 </Box>
             </Container>
