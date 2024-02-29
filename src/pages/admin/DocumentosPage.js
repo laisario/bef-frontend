@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -26,12 +26,13 @@ import RateReviewIcon from '@mui/icons-material/RateReview';
 import { visuallyHidden } from '@mui/utils';
 import { Container, Stack } from '@mui/system';
 import { Helmet } from 'react-helmet-async';
-import { Button } from '@mui/material';
+import { Button, InputAdornment, TextField } from '@mui/material';
+import { Search } from '@mui/icons-material';
 import FormCreateDocument from '../../components/admin/FormCreateDocument';
 import Iconify from '../../components/iconify/Iconify';
-import useDocumentos from '../../hooks/useDocumentos';
 import titleCase from '../../utils/formatTitle';
 import { fDate } from '../../utils/formatTime';
+import useDocumentos from '../../hooks/useDocumentos';
 
 const headCells = [
     {
@@ -130,7 +131,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-    const { numSelected, deleteDocuments, isDeleting } = props;
+    const { numSelected, deleteDocuments, isDeleting, isSearching, setIsSearching, search, setSearch } = props;
     return (
         <Toolbar
             sx={{
@@ -142,11 +143,13 @@ function EnhancedTableToolbar(props) {
                     bgcolor: (theme) =>
                         alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
                 }),
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
             }}
         >
             {numSelected > 0 ? (
                 <Typography
-                    sx={{ flex: '1 1 100%' }}
                     color="inherit"
                     variant="subtitle1"
                     component="div"
@@ -155,7 +158,6 @@ function EnhancedTableToolbar(props) {
                 </Typography>
             ) : (
                 <Typography
-                    sx={{ flex: '1 1 100%' }}
                     variant="h6"
                     id="tableTitle"
                     component="div"
@@ -163,12 +165,31 @@ function EnhancedTableToolbar(props) {
                     Lista Mestra
                 </Typography>
             )}
+            {numSelected === 0 &&
+                <TextField
+                    label='Procure um documento'
+                    id='search-bar'
+                    value={search}
+                    sx={{ width: '60%'}}
+                    onChange={(e) => setSearch(e.target.value)}
+                    size="small"
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <Search />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            }
 
             {numSelected === 1 && <Tooltip title="Revisar">
                 <IconButton>
                     <RateReviewIcon />
                 </IconButton>
             </Tooltip>}
+
+
 
             {numSelected > 0 ? (
                 <Tooltip title="Deletar">
@@ -183,7 +204,6 @@ function EnhancedTableToolbar(props) {
                     </IconButton>
                 </Tooltip>
             )}
-
         </Toolbar>
     );
 }
@@ -193,16 +213,15 @@ EnhancedTableToolbar.propTypes = {
 };
 
 export default function DocumentosPage() {
-    const [open, setOpen] = React.useState(false);
-    const [order, setOrder] = React.useState('asc');
-    const [orderBy, setOrderBy] = React.useState('calories');
-    const [page, setPage] = React.useState(0);
-    const [dense, setDense] = React.useState(false);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const [selectedDocuments, setSelectedDocuments] = React.useState([]);
-    const { data, status, deleteDocumento, isDeleting } = useDocumentos(null, { page, rowsPerPage });
+    const [open, setOpen] = useState(false);
+    const [order, setOrder] = useState('asc');
+    const [orderBy, setOrderBy] = useState('calories');
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [selectedDocuments, setSelectedDocuments] = useState([]);
+    const { data, status, deleteDocumento, isDeleting, search, setSearch, documentos } = useDocumentos(null, { page, rowsPerPage });
+    const [isSearching, setIsSearching] = useState(false)
     const navigate = useNavigate()
-
 
     const handleOpenForm = () => {
         setOpen(true);
@@ -237,10 +256,6 @@ export default function DocumentosPage() {
         setPage(0);
     };
 
-    const handleChangeDense = (event) => {
-        setDense(event.target.checked);
-    };
-
     const isSelected = (id) => selectedDocuments.indexOf(id) !== -1;
 
     return (
@@ -262,11 +277,17 @@ export default function DocumentosPage() {
 
                 <Box sx={{ width: '100%', borderRadius: '12px' }}>
                     <Paper sx={{ width: '100%', mb: 2, boxShadow: '0 0 2px 0 rgba(145, 158, 171, 0.2),0 12px 24px -4px rgba(145, 158, 171, 0.12)', borderRadius: "12px" }}>
-                        <EnhancedTableToolbar numSelected={selectedDocuments.length} deleteDocuments={() => { deleteDocumento(selectedDocuments); setSelectedDocuments([]) }} isDeleting={isDeleting} />
+                        <EnhancedTableToolbar
+                            numSelected={selectedDocuments.length}
+                            deleteDocuments={() => { deleteDocumento(selectedDocuments); setSelectedDocuments([]) }}
+                            isDeleting={isDeleting}
+                            isSearching={isSearching}
+                            setIsSearching={setIsSearching}
+                            search={search}
+                            setSearch={setSearch} />
                         <TableContainer>
                             <Table
                                 aria-labelledby="tableTitle"
-                                size={dense ? 'small' : 'medium'}
                             >
                                 <EnhancedTableHead
                                     numSelected={selectedDocuments.length}
@@ -277,7 +298,7 @@ export default function DocumentosPage() {
                                     rowCount={data?.results?.length}
                                 />
                                 <TableBody>
-                                    {data?.results?.map((row, index) => {
+                                    {documentos?.map((row, index) => {
                                         const isItemSelected = isSelected(row.id);
                                         const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -290,7 +311,7 @@ export default function DocumentosPage() {
                                                 key={row.id}
                                                 onClick={() => { navigate(`/admin/documento/${row?.id}`) }}
                                                 sx={{ cursor: 'pointer' }}
-                                                >
+                                            >
                                                 <TableCell padding="checkbox">
                                                     <Checkbox
                                                         color="primary"
@@ -331,10 +352,6 @@ export default function DocumentosPage() {
                             labelRowsPerPage="Linhas por páginas"
                         />
                     </Paper>
-                    <FormControlLabel
-                        control={<Switch checked={dense} onChange={handleChangeDense} />}
-                        label="Ampliado/Compacto"
-                    />
                 </Box>
             </Container>
         </>

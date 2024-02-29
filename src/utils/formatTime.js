@@ -32,8 +32,3 @@ export function isExpired(date, frequency) {
   return date ? isPast(addDays(new Date(date), frequency)) : false;
 }
 
-export function formatData(inputDate) {
-  const partes = inputDate.split('/');
-  const novoFormato = [partes[2], partes[1], partes[0]];
-  return novoFormato.join('-');
-}

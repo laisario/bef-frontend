@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useTheme } from '@emotion/react';
-import { Box, Button, Card, Chip, Grid, Link, Typography } from '@mui/material';
+import { Box, Button, Card, Chip, Link, Typography } from '@mui/material';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { useLocation } from 'react-router-dom';
 import React from 'react';
