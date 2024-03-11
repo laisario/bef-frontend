@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Box, Button, Card, CardActions, CardContent, Chip, Container, Grid, Typography } from '@mui/material';
+import { Box, Button, Container, Grid, Typography } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import FileViewer from 'react-file-viewer'
 import './styles.css'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useDocumentos from '../../hooks/useDocumentos';
 import ExcelViewer from '../../components/drivers/ExcelViewer';
 import FormCreateRevision from '../../components/admin/FormCreateRevision';
@@ -12,10 +12,10 @@ import RevisionCard from '../../components/admin/RevisionCard';
 
 function DetalhesDocumentoPage() {
   const { id } = useParams();
-  const { data, status, statusColor } = useDocumentos(id);
-  const [openFormRevision, setOpenFormRevision] = useState(false);
+  const { data, status, statusColor, openFormRevision, setOpenFormRevision } = useDocumentos(id);
   const fileType = data?.arquivo?.split('.')[1];
   const revisoes = data?.revisoes;
+  const navigate = useNavigate();
   return (
     <>
       <Helmet>
@@ -33,10 +33,13 @@ function DetalhesDocumentoPage() {
             <DocInformationCard data={data} status={status} statusColor={statusColor} setOpenFormRevision={setOpenFormRevision} />
             {!!revisoes?.length &&
               <Box>
-                <Typography variant="h5" margin={2}>
-                  Revisões
-                </Typography>
-                {revisoes?.map((revisao) => <RevisionCard revisao={revisao} />)}
+                <Box display="flex" flexDirection="row" justifyContent="space-between">
+                  <Typography variant="h5" margin={2}>
+                    Última revisão
+                  </Typography>
+                  <Button size='small' onClick={() => navigate(`/admin/documento/${id}/revisoes`)}>Ver todas</Button>
+                </Box>
+                <RevisionCard revisao={revisoes[revisoes.length - 1]} />
               </Box>
             }
           </Grid>

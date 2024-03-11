@@ -8,17 +8,79 @@ function ProductCardAdmin({ product }) {
         sx={{
           p: 2,
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
           backgroundColor: '#FF9E75',
         }}
       >
-        <Typography variant="subtitle1">{product?.tipo_de_instrumento.descricao}</Typography>
-        <Typography variant="body1" fontWeight={100}>{product?.tipo_de_instrumento.modelo}</Typography>
-        <Typography variant="body2">{product?.tipo_de_instrumento.fabricante}</Typography>
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+        }}>
+          {!!product?.tipo_de_instrumento.descricao &&
+            <Typography variant="subtitle1">{product?.tipo_de_instrumento.descricao}</Typography>
+          }
+          {!!product?.tipo_de_instrumento.modelo &&
+            <Typography variant="body1" fontWeight={100}>{product?.tipo_de_instrumento.modelo}</Typography>
+          }
+          {!!product?.tipo_de_instrumento.fabricante &&
+            <Typography variant="body2">{product?.tipo_de_instrumento.fabricante}</Typography>
+          }
+        </Box>
+        <Box>
+          <Chip
+            label={product?.tipo_de_servico === 'A' ? 'Acreditado' : 'Não acreditado'}
+            color={product?.tipo_de_servico === 'A' ? 'default' : 'warning'}
+            variant="filled"
+            mb={2}
+          />
+        </Box>
       </Box>
       <Divider />
       <Stack sx={{ p: 2 }}>
+        {(!!product?.maximo || !!product?.minimo) &&
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Typography variant="body2"><strong>Faixa de medição:</strong></Typography>
+            <Typography variant="body2">
+              {product?.minimo} {!!product?.maximo && ` - ${product?.maximo}`}
+            </Typography>
+          </Box>
+        }
+        {!!product?.unidades?.length &&
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <Typography variant="body2"><strong>{product?.unidades?.length > 1 ? 'Unidades atendidas:' : 'Unidade atendida:'}</strong></Typography>
+            <Typography>
+              {product?.unidades?.map(({ unidade }) => `${unidade} `)}
+            </Typography>
+          </Box>
+        }
+        {!!product?.capacidade_de_medicao?.valor &&
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Typography variant="body2"><strong>Capacidade de medição:</strong></Typography>
+            <Typography variant="body2">
+              {product?.capacidade_de_medicao?.valor} {product?.capacidade_de_medicao?.unidade}
+            </Typography>
+          </Box>
+        }
+        {!!product?.procedimento}
         <Box
           sx={{
             display: 'flex',
@@ -26,38 +88,14 @@ function ProductCardAdmin({ product }) {
             justifyContent: 'space-between',
           }}
         >
-          <Typography variant="body2">Faixa de medição:</Typography>
-          <Typography variant="body2">
-            {product?.minimo} - {product?.maximo} {product?.unidade}
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Typography variant="body2">Capacidade de medição:</Typography>
-          <Typography variant="body2">
-            {product?.capacidade_de_medicao?.valor} {product?.capacidade_de_medicao?.unidade}
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Typography variant="body2">Procedimento relacionado:</Typography>
-          <Typography variant="body2">{product?.procedimento_relacionado?.procedimento}</Typography>
+          <Typography variant="body2"><strong>Procedimento relacionado:</strong></Typography>
+          <Typography variant="body2">{product?.procedimento_relacionado?.codigo}</Typography>
         </Box>
       </Stack>
       <Divider />
       <Stack sx={{ p: 2 }}>
         <Typography pb={1} variant="subtitle2">
-          Preço calibração
+          <strong>Preço calibração</strong>
         </Typography>
         <Box
           sx={{
@@ -80,12 +118,6 @@ function ProductCardAdmin({ product }) {
           <Typography variant="body2">No laboratorio:</Typography>
           <Typography variant="body2">R${product?.preco_calibracao_no_laboratorio}</Typography>
         </Box>
-        <Chip
-          label={product?.tipo_de_servico === 'A' ? 'Acreditado' : 'Não acreditado'}
-          color={product?.tipo_de_servico === 'A' ? 'primary' : 'warning'}
-          variant="outlined"
-          mb={2}
-        />
       </Stack>
     </Card>
   );

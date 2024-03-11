@@ -5,7 +5,7 @@ import useInstrumentos from '../../hooks/useInstrumentos';
 import ProductsCompanyList from '../../sections/admin/products/ProductsCompanyList';
 
 function ProductsPageAdmin() {
-  const { instrumentosEmpresa } = useInstrumentos()
+  const { instrumentosEmpresa } = useInstrumentos();
   return (
     <>
       <Helmet>

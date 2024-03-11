@@ -30,6 +30,7 @@ const formaPagamento = {
   CC: 'Crédito',
   P: 'Pix',
   D: 'Dinheiro',
+  B: 'Boleto',
 };
 
 const aprovacaoProposta = {
@@ -65,12 +66,16 @@ function DetalhesPedidoPageAdmin() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Box direction="column">
-            <Typography variant="h4" gutterBottom>
-              Pedido número: {data?.numero}
-            </Typography>
-            <Typography variant="h6" gutterBottom>
-              {fDateTime(data?.data_criacao)}
-            </Typography>
+            {!!data?.numero &&
+              <Typography variant="h4" gutterBottom>
+                Pedido número: {data?.numero}
+              </Typography>
+            }
+            {!!data?.data_criacao &&
+              <Typography variant="h6" gutterBottom>
+                {fDateTime(data?.data_criacao)}
+              </Typography>
+            }
           </Box>
           <Box display="flex" gap={2}>
             <Button onClick={deleteOrder} color="secondary">
@@ -101,7 +106,7 @@ function DetalhesPedidoPageAdmin() {
                 <CloseIcon fontSize="inherit" />
               </IconButton>
             }
-            severity={ response.status === 200 ? "success" :"error"}
+            severity={response.status === 200 ? "success" : "error"}
           >
             {responseMesages[response?.status] || response.statusText}
           </Alert>
@@ -118,22 +123,32 @@ function DetalhesPedidoPageAdmin() {
         <Paper sx={{ padding: 4 }}>
           <Grid container flexDirection="row" justifyContent="space-between">
             <Box>
-              <Typography variant="h6">Total: R${data?.total}</Typography>
-              <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
-                Local calibração: {data?.local === 'L' ? 'Laboratório B&F' : 'Cliente'}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
-                Forma de pagamento: {formaPagamento[data?.condicao_de_pagamento]}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
-                Transporte: {CFL(data?.transporte)}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
-                Endereço de entrega: {data?.endereco_de_entrega?.logradouro}, {data?.endereco_de_entrega?.numero}
-                {' - '}
-                {!!data?.endereco_de_entrega?.complemento && data?.endereco_de_entrega?.complemento} -{' '}
-                {data?.endereco_de_entrega?.bairro?.nome} - {data?.endereco_de_entrega?.cep}
-              </Typography>
+              {+(data?.total) > 0 &&
+                <Typography variant="h6">Total: R${data?.total}</Typography>
+              }
+              {!!data?.local &&
+                <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
+                  Local calibração: {data?.local === 'L' ? 'Laboratório B&F' : 'Cliente'}
+                </Typography>
+              }
+              {!!data?.condicao_de_pagamento &&
+                <Typography variant="subtitle1" fontWeight="500">
+                  Forma de pagamento: {formaPagamento[data?.condicao_de_pagamento]}
+                </Typography>
+              }
+              {!!data?.transporte &&
+                <Typography variant="subtitle1" fontWeight="500">
+                  Transporte: {CFL(data?.transporte)}
+                </Typography>
+              }
+              {!!data?.endereco_de_entrega &&
+                <Typography variant="subtitle1" fontWeight="500">
+                  Endereço de entrega: {data?.endereco_de_entrega?.logradouro}, {data?.endereco_de_entrega?.numero}
+                  {' - '}
+                  {!!data?.endereco_de_entrega?.complemento && data?.endereco_de_entrega?.complemento} -{' '}
+                  {data?.endereco_de_entrega?.bairro?.nome} - {data?.endereco_de_entrega?.cep}
+                </Typography>
+              }
             </Box>
             <Box display="flex" flexDirection="column" gap={1}>
               <Chip
@@ -144,7 +159,7 @@ function DetalhesPedidoPageAdmin() {
             </Box>
           </Grid>
           <Typography variant="h6" my={2}>
-            Instrumentos
+            {data?.instrumentos.length > 1 ? "Instrumentos" : "Instrumento"}
           </Typography>
           <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
             {data?.instrumentos?.map(

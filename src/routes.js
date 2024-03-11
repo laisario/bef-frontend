@@ -22,6 +22,7 @@ import HomePageAdmin from './pages/admin/HomePageAdmin';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ProductsPageAdmin from './pages/admin/ProductsPageAdmin';
 import DetalhesDocumentoPage from './pages/admin/DetalhesDocumentoPage';
+import RevisionsDocumentPage from './pages/admin/RevisionsDocumentPage';
 
 // ----------------------------------------------------------------------
 
@@ -81,6 +82,7 @@ export default function Router() {
         { path: 'produtos', element: <ProductsPageAdmin/> },
         { path: 'documentos', element: <DocumentosPage /> },
         { path: 'documento/:id', element: <DetalhesDocumentoPage /> },
+        { path: 'documento/:id/revisoes', element: <RevisionsDocumentPage />}
       ],
     },
   ]);

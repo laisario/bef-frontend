@@ -8,7 +8,6 @@ import { Box, Link, Button, Drawer, Typography, Stack } from '@mui/material';
 import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
-import useClients from '../../../hooks/useClients';
 // components
 import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
@@ -42,7 +41,6 @@ export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
   const { id } = useParams();
   const { user } = useAuth();
-  const { clientes } = useClients(id);
 
   const isDesktop = useResponsive('up', 'lg');
   useEffect(() => {

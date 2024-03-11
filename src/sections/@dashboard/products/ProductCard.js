@@ -20,25 +20,35 @@ ShopProductCard.propTypes = {
 export default function ShopProductCard({ product }) {
   return (
     <Card>
-      <Link href={`#/dashboard/produto/${product.id}`} color="inherit" underline="hover">
+      <Link href={`#/dashboard/produto/${product.id}`} color="inherit" underline="none">
         <Box sx={{ p: 5, display: 'flex', justifyContent: 'center', backgroundColor: '#FF9E75' }}>
-          <Typography color="white" border="solid" px={5} mx={1} py={2} borderRadius={4} variant='subtitle1'>{product.tag}</Typography>
+          {!!product?.tag &&
+            <Typography color="white" border="solid" px={5} mx={1} py={2} borderRadius={4} variant='subtitle1'>{product.tag}</Typography>
+          }
         </Box>
         <Divider />
         <Stack sx={{ p: 3 }} gap={1}>
-          <Typography variant="subtitle1">
-            {product?.instrumento?.tipo_de_instrumento.descricao}
-          </Typography>
-          <Typography variant="subtitle2" fontWeight={300}>
-            {product?.instrumento.tipo_de_instrumento.modelo}
-          </Typography>
-          <Typography variant="caption text">
-            {product?.instrumento.tipo_de_instrumento.fabricante}
-          </Typography>
+          {!!product?.instrumento?.tipo_de_instrumento.descricao &&
+            <Typography variant="subtitle1">
+              {product?.instrumento?.tipo_de_instrumento.descricao}
+            </Typography>
+          }
+          {!!product?.instrumento.tipo_de_instrumento.modelo &&
+            <Typography variant="subtitle2" fontWeight={300}>
+              {product?.instrumento.tipo_de_instrumento.modelo}
+            </Typography>
+          }
+          {!!product?.instrumento.tipo_de_instrumento.fabricante &&
+            <Typography variant="caption text">
+              {product?.instrumento.tipo_de_instrumento.fabricante}
+            </Typography>
+          }
         </Stack>
-        <Box sx={{ pr: 5, pb: 5, display: 'flex', justifyContent: 'flex-end' }}>
-          <Chip label={posicaoInstrumento[product?.posicao]}/>
-        </Box>
+        {!!product?.posicao &&
+          <Box sx={{ pr: 5, pb: 5, display: 'flex', justifyContent: 'flex-end' }}>
+            <Chip label={posicaoInstrumento[product?.posicao]} />
+          </Box>
+        }
       </Link>
     </Card>
   );

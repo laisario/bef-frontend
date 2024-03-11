@@ -119,7 +119,7 @@ export default function UserPage() {
 
                         <TableCell align="left">{fDateTime(data)}</TableCell>
 
-                        <TableCell align="left">R$ {total}</TableCell>
+                        <TableCell align="left">{+total > 0 ? `R$ ${total}` : "Aguardando resposta"}</TableCell>
 
                         <TableCell align="left">
                           {status === 'F' && aprovacao !== null ? (

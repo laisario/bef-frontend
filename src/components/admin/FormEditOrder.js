@@ -51,7 +51,6 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
   const { isValid: cepValido, ...cepInfo } = useCEP(CEP);
   const { id } = useParams();
   const { edit, isLoading } = useOrders(id);
-  
   const handleChange = (event) => {
     const { name, value, files } = event.target;
     if (name === 'certificado') {
@@ -88,7 +87,7 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
               value={form.numero}
               onChange={handleChange}
               variant="outlined"
-              type="number"
+              type="text"
               sx={{ width: '50%' }}
             />
             <TextField
@@ -153,6 +152,7 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
                 <MenuItem value="CC">Cartão crédito</MenuItem>
                 <MenuItem value="P">Pix</MenuItem>
                 <MenuItem value="D">Dinheiro</MenuItem>
+                <MenuItem value="B">Boleto</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -305,7 +305,7 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
                     enderecoEntrega,
                     aprovado,
                     validade,
-                    prazo_de_entrega: prazoDeEntrega,
+                    prazoDeEntrega,
                   },
                   setResponseStatus,
                   setOpen

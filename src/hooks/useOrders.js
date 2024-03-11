@@ -17,7 +17,6 @@ const useOrders = (id) => {
     const response = await axios.get('/propostas', { params: { page_size: 9999 } });
     return response?.data?.results;
   });
-
   const { clientes: cliente } = useClients(data?.cliente?.id);
 
   const aprovacaoProposta = {

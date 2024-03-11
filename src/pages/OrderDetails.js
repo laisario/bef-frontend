@@ -4,7 +4,6 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { Box, Button, Chip, Container, Grid, Link, Paper, Stack, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { Helmet } from 'react-helmet-async';
-
 import { useTheme } from '@emotion/react';
 import useOrders from '../hooks/useOrders';
 import CardInformation from '../components/orders/CardInformation';
@@ -43,15 +42,19 @@ function OrderDetails() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Box direction="column">
-            <Typography variant="h4" gutterBottom>
-              Pedido número: {data?.numero}
-            </Typography>
-            <Typography variant="h6" gutterBottom>
-              {fDateTime(data?.data_criacao)}
-            </Typography>
+            {!!data?.numero &&
+              <Typography variant="h4" gutterBottom>
+                Pedido número: {data?.numero}
+              </Typography>
+            }
+            {!!data?.data_criacao &&
+              <Typography variant="h6" gutterBottom>
+                {fDateTime(data?.data_criacao)}
+              </Typography>
+            }
           </Box>
           <Box>
-            {data?.aprovacao === null && (
+            {data?.status === "F" && data?.aprovacao === null && (
               <>
                 <Button
                   variant="contained"
@@ -76,17 +79,25 @@ function OrderDetails() {
         <Paper sx={{ padding: 4 }}>
           <Grid container flexDirection="row" justifyContent="space-between">
             <Box>
-              <Typography variant="h6">Total: R${data?.total}</Typography>
-              <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
-                Local calibração: {data?.local === 'L' ? 'Laboratório B&F' : 'Local'}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
-                Forma de pagamento: {formaPagamento[data?.condicao_de_pagamento]}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
-                Transporte: {CFL(data?.transporte) || ''}
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="500">
+              {!!data?.total && +(data?.total) > 0 &&
+                <Typography variant="h6">Total: R${data?.total}</Typography>
+              }
+              {!!data?.local &&
+                <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
+                  Local calibração: {data?.local === 'L' ? 'Laboratório B&F' : 'Local'}
+                </Typography>
+              }
+              {!!data?.condicao_de_pagamento &&
+                <Typography variant="subtitle1" fontWeight="500">
+                  Forma de pagamento: {formaPagamento[data?.condicao_de_pagamento]}
+                </Typography>
+              }
+              {!!data?.transporte &&
+                <Typography variant="subtitle1" fontWeight="500">
+                  Transporte: {CFL(data?.transporte)}
+                </Typography>
+              }
+              {!!data?.endereco_de_entrega &&
                 <Typography variant="subtitle1" fontWeight="500">
                   Endereço de entrega: {data?.endereco_de_entrega?.logradouro || ''}{' '}
                   {!!data?.endereco_de_entrega?.numero && ', '} {data?.endereco_de_entrega?.numero || ''}
@@ -96,7 +107,7 @@ function OrderDetails() {
                   {data?.endereco_de_entrega?.bairro?.nome || ''}
                   {!!data?.endereco_de_entrega?.cep && ' - '} {data?.endereco_de_entrega?.cep || ''}
                 </Typography>
-              </Typography>
+              }
             </Box>
             <Box display="flex" gap={1} flexDirection="column">
               {data?.status === 'A' ? (
@@ -114,58 +125,59 @@ function OrderDetails() {
               )}
               {!!data?.anexo && (
                 <Button startIcon={<ReceiptLongIcon />}>
-                  <Link href={data?.anexo}>Certificado</Link>
+                  <Link href={data?.anexo}>Anexo</Link>
                 </Button>
               )}
             </Box>
           </Grid>
-          <Typography variant="h6" my={2}>
-            Instrumentos
-          </Typography>
-          <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
-            {data?.instrumentos?.map(
-              (
-                {
-                  tag,
-                  numero_de_serie: numeroDeSerie,
-                  posicao,
-                  data_ultima_calibracao: dataUltimaCalibracao,
-                  instrumento: {
-                    maximo,
-                    minimo,
-                    unidade,
-                    capacidade_de_medicao: { valor, unidade: unidadeMedicao },
-                    tipo_de_instrumento: { descricao },
-                  },
-                },
-                index
-              ) => (
-                <CardInformation
-                  instrumento={{
-                    tag,
-                    numeroDeSerie,
-                    dataUltimaCalibracao,
-                    informacoesAdicionais: data.informacoes_adicionais,
-                    local: data.local,
-                    maximo,
-                    minimo,
-                    unidade,
-                    valor,
-                    unidadeMedicao,
-                    posicao,
-                    descricao,
-                  }}
-                  key={index}
-                  specialCases={{
-                    numero_de_serie: 'Número de série',
-                    data_ultima_calibracao: 'Última Calibração',
-                    informacoesAdicionais: 'Informações adicionais',
-                  }}
-                  titles={['tag', 'numero_de_serie', 'data_ultima_calibracao', 'informacoesAdicionais']}
-                />
-              )
-            )}
-          </Box>
+          {!!data?.instrumentos.length && (
+            <>
+              <Typography variant="h6" my={2}>
+                Instrumentos
+              </Typography>
+              <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
+                {data?.instrumentos?.map(
+                  (
+                    {
+                      tag,
+                      numero_de_serie: numeroDeSerie,
+                      posicao,
+                      data_ultima_calibracao: dataUltimaCalibracao,
+                      instrumento: {
+                        maximo,
+                        minimo,
+                        unidade,
+                        capacidade_de_medicao: { valor, unidade: unidadeMedicao },
+                        tipo_de_instrumento: { descricao },
+                        tipo_de_servico: tipoDeServico
+                      },
+                    },
+                    index
+                  ) => (
+                    <CardInformation
+                      instrumento={{
+                        tag,
+                        numeroDeSerie,
+                        dataUltimaCalibracao,
+                        informacoesAdicionais: data.informacoes_adicionais,
+                        local: data.local,
+                        maximo,
+                        minimo,
+                        unidade,
+                        valor,
+                        unidadeMedicao,
+                        posicao,
+                        descricao,
+                        tipoDeServico
+                      }}
+                      proposta={data}
+                      key={index}
+                    />
+                  )
+                )}
+              </Box>
+            </>
+          )}
           {!!data?.informacoes_adicionais && (
             <>
               <Typography my={2} variant="h6">

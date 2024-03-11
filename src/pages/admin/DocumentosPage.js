@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -17,9 +17,7 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import CircularProgress from '@mui/material/CircularProgress';
-import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import RateReviewIcon from '@mui/icons-material/RateReview';
@@ -216,13 +214,11 @@ export default function DocumentosPage() {
     const [open, setOpen] = useState(false);
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+
     const [selectedDocuments, setSelectedDocuments] = useState([]);
-    const { data, status, deleteDocumento, isDeleting, search, setSearch, documentos } = useDocumentos(null, { page, rowsPerPage });
+    const { data, status, deleteDocumento, isDeleting, search, setSearch, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage} = useDocumentos(null);
     const [isSearching, setIsSearching] = useState(false)
     const navigate = useNavigate()
-
     const handleOpenForm = () => {
         setOpen(true);
     };
@@ -245,15 +241,6 @@ export default function DocumentosPage() {
     const handleClick = (event, id) => {
         event?.stopPropagation()
         setSelectedDocuments(selectedDocuments?.includes(id) ? selectedDocuments?.filter(documentId => documentId !== id) : [...selectedDocuments, id]);
-    };
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
     };
 
     const isSelected = (id) => selectedDocuments.indexOf(id) !== -1;
@@ -284,7 +271,8 @@ export default function DocumentosPage() {
                             isSearching={isSearching}
                             setIsSearching={setIsSearching}
                             search={search}
-                            setSearch={setSearch} />
+                            setSearch={setSearch}
+                        />
                         <TableContainer>
                             <Table
                                 aria-labelledby="tableTitle"
@@ -298,7 +286,7 @@ export default function DocumentosPage() {
                                     rowCount={data?.results?.length}
                                 />
                                 <TableBody>
-                                    {documentos?.map((row, index) => {
+                                    {data?.results?.map((row, index) => {
                                         const isItemSelected = isSelected(row.id);
                                         const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -328,7 +316,7 @@ export default function DocumentosPage() {
                                                     scope="row"
                                                     padding="none"
                                                 >
-                                                    {row?.codigo.codigo.toUpperCase()}
+                                                    {row?.codigo?.toUpperCase()}
                                                 </TableCell>
                                                 <TableCell>{titleCase(row?.titulo)}</TableCell>
                                                 <TableCell>{status[row?.status]}</TableCell>

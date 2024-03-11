@@ -96,9 +96,9 @@ function FormCreateOrder({ setOpen, setAlert }) {
             </Select>
           </FormControl>
           <FormControl fullWidth>
-            <InputLabel id="demo-multiple-chip-label">Instrumentos</InputLabel>
+            <InputLabel id="instrumental-select-input">Instrumentos</InputLabel>
             <Select
-              labelId="demo-multiple-chip-label"
+              labelId="instrumental-select-input"
               id="demo-multiple-chip"
               multiple
               name="instrumentos"

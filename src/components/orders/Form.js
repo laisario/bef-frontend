@@ -26,7 +26,8 @@ function Form({ setOpen, setAlert}) {
   const [loading, setIsLoading] = useState(false);
   const [instrumentos, setInstrumentos] = useState([]);
   const { todosInstrumentos } = useInstrumentos();
-  const { refetch } = useOrders()
+  const { refetch } = useOrders();
+
   const handleChange = (event) => {
     const {
       target: { value },
@@ -94,8 +95,8 @@ function Form({ setOpen, setAlert}) {
               {todosInstrumentos?.map((instrumento) => (
                 <MenuItem key={instrumento.id} value={instrumento.id}>
                   {instrumento.tag} - {instrumento.numero_de_serie} -{' '}
-                  {instrumento.instrumento.tipo_de_instrumento.descricao} {instrumento.instrumento.minimo}{' '}
-                  {instrumento.instrumento.maximo} {instrumento.instrumento.unidade} -
+                  {instrumento.instrumento.tipo_de_instrumento.descricao} {instrumento.instrumento.minimo}{' - '}
+                  {instrumento.instrumento.maximo} {instrumento.instrumento.unidades.map((u) => `${u.unidade} `)}
                 </MenuItem>
               ))}
             </Select>
