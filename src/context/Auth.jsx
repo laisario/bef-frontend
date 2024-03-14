@@ -20,16 +20,17 @@ const AuthProvider = ({ children }) => {
       setUser({ token, nome: decoded?.nome, admin: decoded?.admin });
     }
   }, []);
+
   const redirectUsers = (user) => {
     const adminRoutes = ['/admin'];
     const authenticatedRoutes = ['/dashboard', '/admin'];
-    if (!user && authenticatedRoutes.some((route) => window.location.pathname.includes(route))) {
-      return navigate('/login');
+    if (!user && authenticatedRoutes.some((route) => window.location.hash.includes(route))) {
+      return navigate('/login', { state: { redirect: window.location.hash.slice(1) } });
     }
-    if (user?.admin === true && !adminRoutes.some((route) => window.location.pathname.includes(route))) {
+    if (user?.admin === true && !adminRoutes.some((route) => window.location.hash.includes(route))) {
       return navigate('/admin');
     }
-    if (user?.admin === false && adminRoutes.some((route) => window.location.pathname.includes(route))) {
+    if (user?.admin === false && adminRoutes.some((route) => window.location.hash.includes(route))) {
       return navigate('/dashboard');
     }
    
@@ -38,7 +39,7 @@ const AuthProvider = ({ children }) => {
   
   useEffect(() => {
     redirectUsers(user)
-  }, [user]);
+  }, [user, window.location.hash]);
 
   return (
     <AuthContext.Provider

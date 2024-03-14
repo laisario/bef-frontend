@@ -9,7 +9,7 @@ import useOrders from '../hooks/useOrders';
 import CardInformation from '../components/orders/CardInformation';
 import Iconify from '../components/iconify';
 import { capitalizeFirstLetter as CFL } from '../utils/formatString';
-import { fDateTime } from '../utils/formatTime';
+import { fDate, fDateTime } from '../utils/formatTime';
 
 const formaPagamento = {
   CD: 'Débito',
@@ -97,6 +97,11 @@ function OrderDetails() {
                   Transporte: {CFL(data?.transporte)}
                 </Typography>
               }
+              {!!data?.prazo_de_entrega &&
+                <Typography variant="subtitle1" fontWeight="500">
+                  Prazo de entrega: {fDate(data?.prazo_de_entrega)}
+                </Typography>
+              }
               {!!data?.endereco_de_entrega &&
                 <Typography variant="subtitle1" fontWeight="500">
                   Endereço de entrega: {data?.endereco_de_entrega?.logradouro || ''}{' '}
@@ -133,7 +138,7 @@ function OrderDetails() {
           {!!data?.instrumentos.length && (
             <>
               <Typography variant="h6" my={2}>
-                Instrumentos
+                {data?.instrumentos.length > 1 ? "Instrumentos" : "Instrumento"}
               </Typography>
               <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
                 {data?.instrumentos?.map(

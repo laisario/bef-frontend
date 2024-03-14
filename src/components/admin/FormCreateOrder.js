@@ -16,7 +16,7 @@ import {
 import SquareFootIcon from '@mui/icons-material/SquareFoot';
 import Chip from '@mui/material/Chip';
 import { useState } from 'react';
-import {axios} from '../../api';
+import { axios } from '../../api';
 import useInstrumentos from '../../hooks/useInstrumentos';
 import useOrders from '../../hooks/useOrders';
 import useClients from '../../hooks/useClients';
@@ -137,8 +137,8 @@ function FormCreateOrder({ setOpen, setAlert }) {
           <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} color="primary">
             Enviar proposta
           </Button>
+          {loading && <CircularProgress />}
         </Box>
-        {loading && <CircularProgress />}
       </Grid>
     </Paper>
   );

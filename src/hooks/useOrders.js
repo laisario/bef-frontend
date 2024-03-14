@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import {axios, axiosForFiles} from '../api';
-import useClients from './useClients';
 
 const useOrders = (id) => {
   const navigate = useNavigate();
@@ -17,7 +16,6 @@ const useOrders = (id) => {
     const response = await axios.get('/propostas', { params: { page_size: 9999 } });
     return response?.data?.results;
   });
-  const { clientes: cliente } = useClients(data?.cliente?.id);
 
   const aprovacaoProposta = {
     null: 'Proposta em análise',
@@ -64,7 +62,7 @@ const useOrders = (id) => {
           condicaoDePagamento: forma_de_pagamento || null,
           transporte: transporte || null,
           numero: numero || 0,
-          enderedoDeEntrega: cliente.endereco || null,
+          endereco_de_entrega: data?.cliente?.endereco || null,
           validade: dayjs.isDayjs(validade) ? validade?.format('YYYY-MM-DD') : null,
           data_aprovacao: dayjs.isDayjs(data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
           aprovacao: aprovado || null,
@@ -94,6 +92,7 @@ const useOrders = (id) => {
         });
         setResponseStatus(response);
       }
+      refetch()
     } catch (error) {
       setResponseStatus
          (error.response);

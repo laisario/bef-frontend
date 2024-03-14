@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 // @mui
 import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
@@ -12,6 +12,7 @@ import { useAuth } from '../../../context/Auth';
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation()
   const { login, loading } = useAuth()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,6 +26,9 @@ export default function LoginForm() {
       setError(error)
       return null
     };
+    if (location?.state?.redirect) {
+      return navigate(location?.state?.redirect, { replace: true });
+    }
     return navigate('/dashboard', { replace: true });
   };
 

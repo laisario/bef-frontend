@@ -8,10 +8,8 @@ import {
   Container,
   Grid,
   IconButton,
-  Link,
   Paper,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material';
 import Card from '@mui/material/Card';
@@ -22,7 +20,7 @@ import useOrders from '../../hooks/useOrders';
 import CardInformation from '../../components/orders/CardInformation';
 import Iconify from '../../components/iconify';
 import { capitalizeFirstLetter as CFL } from '../../utils/formatString';
-import { fDateTime } from '../../utils/formatTime';
+import { fDate, fDateTime } from '../../utils/formatTime';
 import FormEditProposta from '../../components/admin/FormEditOrder';
 
 const formaPagamento = {
@@ -139,6 +137,11 @@ function DetalhesPedidoPageAdmin() {
               {!!data?.transporte &&
                 <Typography variant="subtitle1" fontWeight="500">
                   Transporte: {CFL(data?.transporte)}
+                </Typography>
+              }
+              {!!data?.prazo_de_entrega &&
+                <Typography variant="subtitle1" fontWeight="500">
+                  Prazo de entrega: {fDate(data?.prazo_de_entrega)}
                 </Typography>
               }
               {!!data?.endereco_de_entrega &&
