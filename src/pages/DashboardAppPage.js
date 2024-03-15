@@ -4,7 +4,7 @@ import { Grid, Container, CircularProgress } from '@mui/material';
 import useInstrumentos from '../hooks/useInstrumentos';
 import useOrders from '../hooks/useOrders';
 // sections
-import { AppNewsUpdate, AppOrderTimeline, AppWidgetSummary } from '../sections/@dashboard/app';
+import { AppNewsOrders, AppOrderTimeline, AppWidgetSummary } from '../sections/@dashboard/app';
 import { isExpired } from '../utils/formatTime';
 
 // ----------------------------------------------------------------------
@@ -63,7 +63,7 @@ export default function DashboardAppPage() {
             </Grid>
 
             <Grid item xs={12} md={7} lg={8}>
-              <AppNewsUpdate
+              <AppNewsOrders
                 title="Instrumentos"
                 list={todosInstrumentos?.slice(0, 5)?.map((instrumento) => ({
                   isExpired: isExpired(
@@ -89,7 +89,7 @@ export default function DashboardAppPage() {
             <Grid item xs={12} md={5} lg={4}>
               <AppOrderTimeline
                 title="Pedidos"
-                list={data?.slice(0, 5)?.map((proposta) => ({
+                list={data?.results?.slice(0, 5)?.map((proposta) => ({
                   id: proposta?.id,
                   title: `Pedido ${proposta?.id}`,
                   status: proposta?.status,

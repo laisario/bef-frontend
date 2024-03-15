@@ -130,7 +130,7 @@ function OrderDetails() {
               )}
               {!!data?.anexo && (
                 <Button startIcon={<ReceiptLongIcon />}>
-                  <Link href={data?.anexo}>Anexo</Link>
+                  <Link href={data?.anexo} target="_blank">Anexo</Link>
                 </Button>
               )}
             </Box>

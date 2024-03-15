@@ -17,6 +17,8 @@ import {
   Link,
   Alert,
   Snackbar,
+  TablePagination,
+  Dialog,
 } from '@mui/material';
 import { styled } from '@mui/system';
 import useOrders from '../../hooks/useOrders'
@@ -58,13 +60,14 @@ function PedidosPageAdmin() {
   const [open, setOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
-  const { data } = useOrders();
+  const { data, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = useOrders();
   const { vertical, horizontal, propostaEnviada } = alert;
+  console.log(data)
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
-    setAlert((prevAlert) => ({...prevAlert, propostaEnviada: false}));
+    setAlert((prevAlert) => ({ ...prevAlert, propostaEnviada: false }));
   };
 
   const handleOpen = () => setOpen(true);
@@ -103,7 +106,7 @@ function PedidosPageAdmin() {
               <Table>
                 <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
                 <TableBody>
-                  {data?.map((row, index) => {
+                  {data?.results?.map((row, index) => {
                     const { id, total, data_criacao: dataCriacao, status, cliente } = row;
                     const data = new Date(dataCriacao);
                     return (
@@ -129,19 +132,25 @@ function PedidosPageAdmin() {
                   })}
                 </TableBody>
               </Table>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, 100]}
+                component="div"
+                count={data?.count}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage="Linhas por páginas"
+              />
             </TableContainer>
           </Scrollbar>
         </Card>
-        <Modal
+        <Dialog
           open={open}
           onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
         >
-          <FormBox>
-            <FormCreateOrder setOpen={setOpen} setAlert={setAlert}/>
-          </FormBox>
-        </Modal>
+          <FormCreateOrder setOpen={setOpen} setAlert={setAlert} onClose={handleClose} />
+        </Dialog>
 
         <Stack spacing={2} sx={{ width: '100%' }}>
           <Snackbar

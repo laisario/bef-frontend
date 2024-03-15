@@ -1,20 +1,22 @@
 /* eslint-disable camelcase */
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import {axios, axiosForFiles} from '../api';
 
 const useOrders = (id) => {
   const navigate = useNavigate();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const { data, error, isLoading, refetch } = useQuery(['propostas', id], async () => {
+  const { data, error, isLoading, refetch } = useQuery(['propostas', id, page, rowsPerPage], async () => {
     if (id) {
-      const response = await axios.get(`/propostas/${id}`, { params: { page_size: 9999 } });
+      const response = await axios.get(`/propostas/${id}`, { params: { page_size: rowsPerPage } });
       return response?.data;
     }
-    const response = await axios.get('/propostas', { params: { page_size: 9999 } });
-    return response?.data?.results;
+    const response = await axios.get('/propostas', { params: { page_size: rowsPerPage, page: page + 1, } });
+    return response?.data;
   });
 
   const aprovacaoProposta = {
@@ -33,6 +35,16 @@ const useOrders = (id) => {
     await axios.delete(`/propostas/${id}`);
     navigate('/admin/pedidos');
   };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+      setRowsPerPage(parseInt(event.target.value, 10));
+      setPage(0);
+  };
+
   const edit = async (form, setResponseStatus, setOpen) => {
     const {
       form: { local, total, forma_de_pagamento, transporte, numero, data_aprovacao, certificado: anexo },
@@ -139,6 +151,10 @@ const useOrders = (id) => {
     colorAprovacaoProposta,
     pedidosEmAnalise,
     edit,
+    page,
+    rowsPerPage,
+    handleChangePage,
+    handleChangeRowsPerPage,
   };
 };
 

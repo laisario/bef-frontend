@@ -12,6 +12,8 @@ import {
   RadioGroup,
   FormControlLabel,
   Typography,
+  Dialog,
+  DialogContent,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import dayjs from 'dayjs';
@@ -47,7 +49,7 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
   const [enderecoEntrega, setEnderecoEntrega] = useState(data?.endereco_de_entrega ? "novoEndereco" : null);
   const [prazoDeEntrega, setPrazoDeEntrega] = useState(dayjs.isDayjs(data?.prazo_de_entrega) ? dayjs(data?.prazo_de_entrega).format('DD/MM/YYYY') : null);
   const [validade, setValidade] = useState(dayjs.isDayjs(data?.validade) ? dayjs(data?.validade).format('DD/MM/YYYY') : null);
-  const [dataAprovacao, setDataAprovacao] = useState( dayjs.isDayjs(data?.data_aprovacao) ? dayjs(data?.data_aprovacao).format('DD/MM/YYYY') : null);
+  const [dataAprovacao, setDataAprovacao] = useState(dayjs.isDayjs(data?.data_aprovacao) ? dayjs(data?.data_aprovacao).format('DD/MM/YYYY') : null);
   const { isValid: cepValido, ...cepInfo } = useCEP(CEP);
   const { id } = useParams();
   const { edit, isLoading } = useOrders(id);
@@ -61,24 +63,9 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
-      <Modal open={open} onClose={handleClose}>
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            minWidth: 600,
-            bgcolor: 'background.paper',
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-          }}
-        >
+    <Dialog open={open} onClose={handleClose}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
+        <DialogContent>
           <Box display="flex" gap={2}>
             <TextField
               id="numero"
@@ -100,7 +87,7 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
               sx={{ width: '50%' }}
             />
           </Box>
-          <Box display="flex" gap={2}>
+          <Box display="flex" gap={2} sx={{my:2}}>
             <DatePicker
               label="Prazo de entrega"
               value={prazoDeEntrega}
@@ -156,7 +143,7 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
               </Select>
             </FormControl>
           </Box>
-          <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+          <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, my: 2 }}>
             <FormLabel id="aprovacao">Endereço de entrega: </FormLabel>
             <RadioGroup row aria-labelledby="aprovacao">
               <FormControlLabel
@@ -316,9 +303,9 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
               Salvar
             </LoadingButton>
           </Box>
-        </Box>
-      </Modal>
-    </LocalizationProvider>
+        </DialogContent>
+      </LocalizationProvider>
+    </Dialog>
   );
 }
 

@@ -12,15 +12,18 @@ import {
   Select,
   OutlinedInput,
   MenuItem,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import SquareFootIcon from '@mui/icons-material/SquareFoot';
 import Chip from '@mui/material/Chip';
 import { useState } from 'react';
-import {axios} from '../../api';
+import { axios } from '../../api';
 import useInstrumentos from '../../hooks/useInstrumentos';
 import useOrders from '../../hooks/useOrders';
 
-function Form({ setOpen, setAlert}) {
+function Form({ setOpen, setAlert, handleClose }) {
   const [informacoesAdicionais, setInformacoesAdicionais] = useState('');
   const [errMsg, setErrMsg] = useState('');
   const [loading, setIsLoading] = useState(false);
@@ -45,7 +48,7 @@ function Form({ setOpen, setAlert}) {
         informacoesAdicionais,
       });
       setIsLoading(false);
-      setAlert((prevAlert) => ({...prevAlert, propostaEnviada: true}));
+      setAlert((prevAlert) => ({ ...prevAlert, propostaEnviada: true }));
       setOpen(false);
       await refetch()
       return { error: false };
@@ -58,29 +61,17 @@ function Form({ setOpen, setAlert}) {
   };
 
   return (
-    <Paper
-      sx={{
-        marginTop: 2,
-        padding: 3,
-        width: '50',
-      }}
-    >
-      <Grid container justifyContent="center" alignItems="center">
-        <SquareFootIcon fontSize="large" color="primary" />
-      </Grid>
-      <Grid item>
-        <Typography variant="h5" textAlign="center" sx={{ margin: 2 }}>
-          Criar novo pedido de calibração
-        </Typography>
-      </Grid>
-      <Grid item>
-        <Box component="form" onSubmit={handleSubmit} noValidate>
+    <>
+      <DialogTitle>Criar novo pedido de calibração</DialogTitle>
+      <DialogContent>
           <FormControl fullWidth>
-            <InputLabel id="demo-multiple-chip-label">Instrumentos</InputLabel>
+            <InputLabel id="input-select">Instrumentos</InputLabel>
             <Select
-              labelId="demo-multiple-chip-label"
-              id="demo-multiple-chip"
+              labelId="input-select"
+              id="input-select"
               multiple
+              label="Instrumentos"
+              placeholder='Instrumentos'
               value={instrumentos}
               onChange={handleChange}
               input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
@@ -114,13 +105,15 @@ function Form({ setOpen, setAlert}) {
             error={errMsg}
             helperText={errMsg}
           />
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} color="primary">
-            Enviar proposta
-          </Button>
-        </Box>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose}>Cancelar</Button>
+        <Button onClick={handleSubmit} variant="contained"  color="primary">
+          Enviar proposta
+        </Button>
         {loading && <CircularProgress />}
-      </Grid>
-    </Paper>
+      </DialogActions>
+    </>
   );
 }
 

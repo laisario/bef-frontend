@@ -1,19 +1,18 @@
 /* eslint-disable react/prop-types */
 import {
   Box,
-  Grid,
   TextField,
   Button,
-  Typography,
-  Paper,
   CircularProgress,
   FormControl,
   InputLabel,
   Select,
   OutlinedInput,
   MenuItem,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
-import SquareFootIcon from '@mui/icons-material/SquareFoot';
 import Chip from '@mui/material/Chip';
 import { useState } from 'react';
 import { axios } from '../../api';
@@ -21,7 +20,7 @@ import useInstrumentos from '../../hooks/useInstrumentos';
 import useOrders from '../../hooks/useOrders';
 import useClients from '../../hooks/useClients';
 
-function FormCreateOrder({ setOpen, setAlert }) {
+function FormCreateOrder({ setOpen, setAlert, handleClose }) {
   const [form, setForm] = useState({
     cliente: '',
     informacoesAdicionais: '',
@@ -61,23 +60,10 @@ function FormCreateOrder({ setOpen, setAlert }) {
   };
 
   return (
-    <Paper
-      sx={{
-        marginTop: 2,
-        padding: 3,
-        width: '50',
-      }}
-    >
-      <Grid container justifyContent="center" alignItems="center">
-        <SquareFootIcon fontSize="large" color="primary" />
-      </Grid>
-      <Grid item>
-        <Typography variant="h5" textAlign="center" sx={{ margin: 2 }}>
-          Criar novo pedido de calibração
-        </Typography>
-      </Grid>
-      <Grid item>
-        <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2} noValidate>
+    <>
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <DialogTitle>Criar novo pedido de calibração</DialogTitle>
+        <DialogContent>
           <FormControl fullWidth>
             <InputLabel id="cliente-select">Cliente</InputLabel>
             <Select
@@ -95,7 +81,7 @@ function FormCreateOrder({ setOpen, setAlert }) {
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth>
+          <FormControl fullWidth sx={{my: 2}}>
             <InputLabel id="instrumental-select-input">Instrumentos</InputLabel>
             <Select
               labelId="instrumental-select-input"
@@ -134,13 +120,16 @@ function FormCreateOrder({ setOpen, setAlert }) {
             error={errMsg}
             helperText={errMsg}
           />
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} color="primary">
-            Enviar proposta
-          </Button>
-          {loading && <CircularProgress />}
-        </Box>
-      </Grid>
-    </Paper>
+        </DialogContent>
+      </Box>
+      <DialogActions>
+        <Button onClick={handleClose}>Cancelar</Button>
+        <Button onClick={handleSubmit} variant="contained" sx={{ mt: 3, mb: 2 }} color="primary">
+          Enviar proposta
+        </Button>
+        {loading && <CircularProgress />}
+      </DialogActions>
+    </>
   );
 }
 

@@ -17,6 +17,8 @@ import {
   Link,
   Alert,
   Snackbar,
+  TablePagination,
+  Dialog,
 } from '@mui/material';
 import { styled } from '@mui/system';
 // components
@@ -59,8 +61,9 @@ export default function UserPage() {
   const [open, setOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
-  const { data } = useOrders();
+  const { data, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = useOrders();
   const { vertical, horizontal, propostaEnviada } = alert;
+
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -71,7 +74,6 @@ export default function UserPage() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-
   const colorAprovacaoProposta = {
     false: 'error',
     true: 'success',
@@ -81,6 +83,7 @@ export default function UserPage() {
     A: 'info',
     F: 'secondary',
   };
+
   return (
     <>
       <Helmet>
@@ -103,7 +106,7 @@ export default function UserPage() {
               <Table>
                 <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
                 <TableBody>
-                  {data?.map((row, index) => {
+                  {data?.results?.map((row, index) => {
                     const { id, total, data_criacao: dataCriacao, status, aprovacao } = row;
                     const data = new Date(dataCriacao);
                     return (
@@ -138,18 +141,27 @@ export default function UserPage() {
                 </TableBody>
               </Table>
             </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, 100]}
+              component="div"
+              count={data?.results?.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="Linhas por páginas"
+            />
           </Scrollbar>
         </Card>
-        <Modal
+        <Dialog
           open={open}
           onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
+          PaperProps={{
+            component: 'form',
+          }}
         >
-          <FormBox>
-            <Form setOpen={setOpen} setAlert={setAlert} />
-          </FormBox>
-        </Modal>
+          <Form setOpen={setOpen} setAlert={setAlert} handleClose={handleClose} />
+        </Dialog>
 
         <Stack spacing={2} sx={{ width: '100%' }}>
           <Snackbar
