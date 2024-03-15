@@ -217,7 +217,6 @@ export default function DocumentosPage() {
     const [selectedDocuments, setSelectedDocuments] = useState([]);
     const { data, status, deleteDocumento, isDeleting, search, setSearch, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage} = useDocumentos(null);
     const [isSearching, setIsSearching] = useState(false);
-    console.log(data)
     const navigate = useNavigate()
     const handleOpenForm = () => {
         setOpen(true);

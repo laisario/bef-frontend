@@ -62,7 +62,6 @@ function PedidosPageAdmin() {
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
   const { data, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = useOrders();
   const { vertical, horizontal, propostaEnviada } = alert;
-  console.log(data)
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
       return;
