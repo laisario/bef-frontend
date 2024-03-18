@@ -13,8 +13,10 @@ import RevisionCard from '../../components/admin/RevisionCard';
 function DetalhesDocumentoPage() {
   const { id } = useParams();
   const { data, status, statusColor, openFormRevision, setOpenFormRevision } = useDocumentos(id);
-  const url = data?.arquivo?.split('.');
-  const fileType = url[url?.length - 1];
+  const url = !!data?.arquivo && new URL(`${data?.arquivo}`);
+  const splittedUrl = url?.pathname?.split('.');
+  const fileType = !!splittedUrl?.length && splittedUrl[splittedUrl.length - 1];
+  console.log(fileType)
   const revisoes = data?.revisoes;
   const navigate = useNavigate();
   return (
