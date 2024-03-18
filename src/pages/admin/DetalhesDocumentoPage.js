@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Box, Button, Container, Grid, Typography } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import FileViewer from 'react-file-viewer'
@@ -13,7 +13,8 @@ import RevisionCard from '../../components/admin/RevisionCard';
 function DetalhesDocumentoPage() {
   const { id } = useParams();
   const { data, status, statusColor, openFormRevision, setOpenFormRevision } = useDocumentos(id);
-  const fileType = data?.arquivo?.split('.')[1];
+  const url = data?.arquivo?.split('.');
+  const fileType = url[url?.length - 1];
   const revisoes = data?.revisoes;
   const navigate = useNavigate();
   return (
