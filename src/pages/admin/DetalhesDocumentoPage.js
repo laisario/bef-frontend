@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Button, Container, Grid, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Container, Grid, Typography } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import FileViewer from 'react-file-viewer'
 import './styles.css'
@@ -12,13 +12,13 @@ import RevisionCard from '../../components/admin/RevisionCard';
 
 function DetalhesDocumentoPage() {
   const { id } = useParams();
-  const { data, status, statusColor, openFormRevision, setOpenFormRevision } = useDocumentos(id);
+  const { data, status, statusColor, openFormRevision, setOpenFormRevision, isLoading } = useDocumentos(id);
   const url = !!data?.arquivo && new URL(`${data?.arquivo}`);
   const splittedUrl = url?.pathname?.split('.');
   const fileType = !!splittedUrl?.length && splittedUrl[splittedUrl.length - 1];
-  console.log(fileType)
   const revisoes = data?.revisoes;
   const navigate = useNavigate();
+
   return (
     <>
       <Helmet>
@@ -26,12 +26,14 @@ function DetalhesDocumentoPage() {
       </Helmet>
       <Container>
         <Grid container spacing={4}>
-          <Grid style={{ height: '750px' }} item xs={12} md={8}>
-            {fileType === 'xlsx' || fileType === 'xlsm'
-              ? <ExcelViewer />
-              : <FileViewer className="pg-viewer" filePath={data?.arquivo} fileType={fileType} onError={(e) => console.log("erro:", e)} />
-            }
-          </Grid>
+          {isLoading ? <Grid item xs={12} md={8} display="flex" justifyContent="center" alignItems="center"><CircularProgress /></Grid> :
+            <Grid style={{ height: '750px' }} item xs={12} md={8}>
+              {fileType === 'xlsx' || fileType === 'xlsm'
+                ? <ExcelViewer />
+                : <FileViewer className="pg-viewer" filePath={data?.arquivo} fileType={fileType} onError={(e) => console.log("erro:", e)} />
+              }
+            </Grid>
+          }
           <Grid item xs={12} md={4}>
             <DocInformationCard data={data} status={status} statusColor={statusColor} setOpenFormRevision={setOpenFormRevision} />
             {!!revisoes?.length &&
