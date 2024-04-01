@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import debounce from 'lodash.debounce';
+import { useMemo, useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { isExpired } from '../utils/formatTime';
@@ -6,15 +7,20 @@ import {axios} from '../api';
 
 const useInstrumentos = (id) => {
   const navigate = useNavigate();
-
-  const { data, error, isLoading, refetch } = useQuery(['instrumentos', id], async () => {
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const { data, error, isLoading, refetch } = useQuery(['instrumentos', id, debouncedSearch], async () => {
     if (id) {
       const response = await axios.get(`/instrumentos/${id}`, { params: { page_size: 9999 } });
       return response?.data;
     }
-    const response = await axios.get('/instrumentos', { params: { page_size: 9999 } });
+    const response = await axios.get('/instrumentos', { params: { page_size: 9999, search: debouncedSearch } });
     return response?.data?.results;
   });
+
+  const handleSearch = debounce((value) => setDebouncedSearch(value));
+
+  useEffect(() => {handleSearch(search)}, [search])
 
   const {
     data: instrumentosEmpresa,
@@ -60,6 +66,8 @@ const useInstrumentos = (id) => {
     errorInstrumentosEmpresa,
     isLoadingInstrumentosEmpresa,
     refetch,
+    search,
+    setSearch,
   };
 };
 

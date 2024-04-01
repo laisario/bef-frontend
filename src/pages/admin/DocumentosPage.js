@@ -20,7 +20,6 @@ import Tooltip from '@mui/material/Tooltip';
 import CircularProgress from '@mui/material/CircularProgress';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import RateReviewIcon from '@mui/icons-material/RateReview';
 import { visuallyHidden } from '@mui/utils';
 import { Container, Stack } from '@mui/system';
 import { Helmet } from 'react-helmet-async';
@@ -129,7 +128,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-    const { numSelected, deleteDocuments, isDeleting, isSearching, setIsSearching, search, setSearch } = props;
+    const { numSelected, deleteDocuments, isDeleting, search, setSearch, isLoading } = props;
     return (
         <Toolbar
             sx={{
@@ -168,7 +167,7 @@ function EnhancedTableToolbar(props) {
                     label='Procure um documento'
                     id='search-bar'
                     value={search}
-                    sx={{ width: '60%'}}
+                    sx={{ width: '60%' }}
                     onChange={(e) => setSearch(e.target.value)}
                     size="small"
                     InputProps={{
@@ -180,13 +179,6 @@ function EnhancedTableToolbar(props) {
                     }}
                 />
             }
-
-            {numSelected === 1 && <Tooltip title="Revisar">
-                <IconButton>
-                    <RateReviewIcon />
-                </IconButton>
-            </Tooltip>}
-
 
 
             {numSelected > 0 ? (
@@ -215,8 +207,7 @@ export default function DocumentosPage() {
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selectedDocuments, setSelectedDocuments] = useState([]);
-    const { data, status, deleteDocumento, isDeleting, search, setSearch, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage} = useDocumentos(null);
-    const [isSearching, setIsSearching] = useState(false);
+    const { data, status, deleteDocumento, isDeleting, search, setSearch, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, isLoading } = useDocumentos(null);
     const navigate = useNavigate()
     const handleOpenForm = () => {
         setOpen(true);
@@ -267,10 +258,9 @@ export default function DocumentosPage() {
                             numSelected={selectedDocuments.length}
                             deleteDocuments={() => { deleteDocumento(selectedDocuments); setSelectedDocuments([]) }}
                             isDeleting={isDeleting}
-                            isSearching={isSearching}
-                            setIsSearching={setIsSearching}
                             search={search}
                             setSearch={setSearch}
+                            isLoading={isLoading}
                         />
                         <TableContainer>
                             <Table
@@ -284,48 +274,48 @@ export default function DocumentosPage() {
                                     onRequestSort={handleRequestSort}
                                     rowCount={data?.results?.length}
                                 />
-                                <TableBody>
-                                    {data?.results?.map((row, index) => {
-                                        const isItemSelected = isSelected(row.id);
-                                        const labelId = `enhanced-table-checkbox-${index}`;
+                                    <TableBody>
+                                        {!isLoading ? data?.results?.map((row, index) => {
+                                            const isItemSelected = isSelected(row.id);
+                                            const labelId = `enhanced-table-checkbox-${index}`;
 
-                                        return (
-                                            <TableRow
-                                                hover
-                                                role="checkbox"
-                                                aria-checked={isItemSelected}
-                                                tabIndex={-1}
-                                                key={row.id}
-                                                onClick={() => { navigate(`/admin/documento/${row?.id}`) }}
-                                                sx={{ cursor: 'pointer' }}
-                                            >
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox
-                                                        color="primary"
-                                                        onClick={(event) => handleClick(event, row.id)}
-                                                        checked={isItemSelected}
-                                                        inputProps={{
-                                                            'aria-labelledby': labelId,
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell
-                                                    component="th"
-                                                    id={labelId}
-                                                    scope="row"
-                                                    padding="none"
+                                            return (
+                                                <TableRow
+                                                    hover
+                                                    role="checkbox"
+                                                    aria-checked={isItemSelected}
+                                                    tabIndex={-1}
+                                                    key={row.id}
+                                                    onClick={() => { navigate(`/admin/documento/${row?.id}`) }}
+                                                    sx={{ cursor: 'pointer' }}
                                                 >
-                                                    {row?.codigo?.codigo?.toUpperCase()}
-                                                </TableCell>
-                                                <TableCell>{titleCase(row?.titulo)}</TableCell>
-                                                <TableCell>{status[row?.status]}</TableCell>
-                                                <TableCell>{fDate(row?.data_revisao)}</TableCell>
-                                                <TableCell>{fDate(row?.data_validade)}</TableCell>
-                                                <TableCell align="right">{row?.analise_critica} dias</TableCell>
-                                            </TableRow>
-                                        );
-                                    })}
-                                </TableBody>
+                                                    <TableCell padding="checkbox">
+                                                        <Checkbox
+                                                            color="primary"
+                                                            onClick={(event) => handleClick(event, row.id)}
+                                                            checked={isItemSelected}
+                                                            inputProps={{
+                                                                'aria-labelledby': labelId,
+                                                            }}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell
+                                                        component="th"
+                                                        id={labelId}
+                                                        scope="row"
+                                                        padding="none"
+                                                    >
+                                                        {row?.codigo?.codigo?.toUpperCase()}
+                                                    </TableCell>
+                                                    <TableCell>{titleCase(row?.titulo)}</TableCell>
+                                                    <TableCell>{status[row?.status]}</TableCell>
+                                                    <TableCell>{fDate(row?.data_revisao)}</TableCell>
+                                                    <TableCell>{fDate(row?.data_validade)}</TableCell>
+                                                    <TableCell align="right">{row?.analise_critica} dias</TableCell>
+                                                </TableRow>
+                                            );
+                                        }) : <CircularProgress />}
+                                    </TableBody>
                             </Table>
                         </TableContainer>
                         <TablePagination

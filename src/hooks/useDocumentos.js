@@ -6,12 +6,10 @@ import {axios} from '../api';
 const useDocumentos = (id) => {
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [search, setSearch] = useState('')
-  const [documentos, setDocumentos] = useState([])
   const [openFormRevision, setOpenFormRevision] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  
   const { data, error, isLoading, refetch } = useQuery(['documentos', id, page, rowsPerPage, debouncedSearch], async () => {
     if (id) {
       const response = await axios.get(`/documentos/${id}`);
@@ -21,7 +19,7 @@ const useDocumentos = (id) => {
     return response?.data
   });
   
-  const handleSearch = debounce((value) => setDebouncedSearch(value))
+  const handleSearch = debounce((value) => setDebouncedSearch(value));
 
   useEffect(() => {handleSearch(search)}, [search])
   
@@ -64,7 +62,6 @@ const useDocumentos = (id) => {
     statusColor,
     search,
     setSearch,
-    documentos,
     openFormRevision, 
     setOpenFormRevision,
     page,
