@@ -47,7 +47,7 @@ function ProductDetailPage() {
             }
           </Box>
         </Stack>
-        <Paper sx={{ padding: 4 }}>
+        <Paper sx={{ padding: 4, backgroundColor: theme.palette.background.neutral }}>
           <Grid container flexDirection="row" justifyContent="space-between">
             <Box>
               {!!instrumento?.instrumento?.tipo_de_instrumento?.descricao &&
@@ -67,7 +67,7 @@ function ProductDetailPage() {
                 Fabricante: {instrumento?.instrumento?.tipo_de_instrumento?.fabricante}
               </Typography>}
               {!!instrumento?.frequencia && <Typography variant="subtitle1" fontWeight="500">
-                Frequência: {instrumento?.frequencia} {+(instrumento?.frequencia) > 1 ? 'dias' : 'dia'}
+                Frequência: {instrumento?.frequencia} {+(instrumento?.frequencia) > 1 ? 'meses' : 'mês'}
               </Typography>}
               {!!instrumento?.instrumento?.tipo_de_instrumento?.resolução && <Typography variant="subtitle1" fontWeight="500">
                 Resolução: {instrumento?.instrumento?.tipo_de_instrumento?.resolução}
@@ -84,11 +84,13 @@ function ProductDetailPage() {
                 label={posicaoInstrumento[instrumento?.posicao]}
                 color={colorPosicaoInstrumento[instrumento?.posicao]}
                 variant="outlined"
+                sx={{backgroundColor: theme.palette.background.default}}
               />
               <Chip
                 label={instrumento?.instrumento?.tipo_de_servico === 'A' ? 'Acreditado' : 'Não acreditado'}
                 variant="outlined"
                 color={instrumento?.instrumento?.tipo_de_servico === 'A' ? 'info' : 'primary'}
+                sx={{backgroundColor: theme.palette.background.default}}
               />
             </Box>
           </Grid>
@@ -108,10 +110,13 @@ function ProductDetailPage() {
                       maior_erro: maiorErro,
                       numero_do_certificado: numeroDoCertificado,
                       observacoes,
-                      orde_de_servico: ordemDeServico,
+                      ordem_de_servico: ordemDeServico,
                       referencia_do_criterio: referenciaDoCriterio,
                       status,
                       data,
+                      id,
+                      analise_critica: analiseCritica,
+                      restricao_analise_critica: restricaoAnaliseCritica,
                     },
                     index
                   ) => (
@@ -128,6 +133,9 @@ function ProductDetailPage() {
                         referenciaDoCriterio,
                         status,
                         data,
+                        id,
+                        analiseCritica,
+                        restricaoAnaliseCritica
                       }}
                       key={index}
                       specialCases={{

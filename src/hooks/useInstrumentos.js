@@ -1,14 +1,15 @@
 import debounce from 'lodash.debounce';
 import { useMemo, useState, useEffect } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { isExpired } from '../utils/formatTime';
-import {axios} from '../api';
+import { axios } from '../api';
 
 const useInstrumentos = (id) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const queryClient = useQueryClient()
   const { data, error, isLoading, refetch } = useQuery(['instrumentos', id, debouncedSearch], async () => {
     if (id) {
       const response = await axios.get(`/instrumentos/${id}`, { params: { page_size: 9999 } });
@@ -20,7 +21,7 @@ const useInstrumentos = (id) => {
 
   const handleSearch = debounce((value) => setDebouncedSearch(value));
 
-  useEffect(() => {handleSearch(search)}, [search])
+  useEffect(() => { handleSearch(search) }, [search])
 
   const {
     data: instrumentosEmpresa,
@@ -39,7 +40,7 @@ const useInstrumentos = (id) => {
       isExpired(instrumento?.data_ultima_calibracao, instrumento?.instrumento.tipo_de_instrumento.frequencia)
     );
   }, [data]);
-  
+
   const instrumentosCalibrados = useMemo(() => {
     if (id) {
       return null;
@@ -55,6 +56,23 @@ const useInstrumentos = (id) => {
     navigate('/dashboard/produtos');
   };
 
+  const update = async ({ idCalibration, analiseCliente }) => {
+    const patchData = { analise_critica: analiseCliente?.criticalAnalysis }
+    if (!!analiseCliente?.restrictions?.length) {
+      patchData.restricao_analise_critica = analiseCliente?.restrictions
+    }
+    const response = await axios.patch(`/calibracoes/${idCalibration}/`, patchData);
+    return response.data;
+
+  }
+
+  const { mutate } = useMutation({
+    mutationFn: update,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instrumentos'] })
+    },
+  })
+
   return {
     instrumentosVencidos,
     instrumentosCalibrados,
@@ -68,6 +86,7 @@ const useInstrumentos = (id) => {
     refetch,
     search,
     setSearch,
+    mutate,
   };
 };
 

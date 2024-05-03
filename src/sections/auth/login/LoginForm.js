@@ -35,7 +35,7 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit}>
       <Stack spacing={3}>
-        <TextField error={!!error} name="email" label="Email" value={email} onChange={(e) => { if (error) { setError(null) } setEmail(e.target.value) }} />
+        <TextField error={!!error} name="email" label="Email ou usuário" value={email} onChange={(e) => { if (error) { setError(null) } setEmail(e.target.value) }} />
 
         <TextField
           error={!!error}

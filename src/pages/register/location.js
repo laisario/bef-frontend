@@ -18,10 +18,6 @@ export default function RegisterLocationPage() {
           Localizacao
         </Typography>
 
-        <Typography variant="body2" sx={{ mb: 5 }}>
-          Fala pra gente onde você se encontra
-        </Typography>
-
         <AddressInformation />
       </Container>
     </>

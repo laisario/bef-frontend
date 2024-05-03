@@ -53,7 +53,7 @@ export default function LoginPage() {
           </Typography>
 
           <Typography variant="body2" sx={{ mb: 5 }}>
-            Nao tem uma conta? {''}
+            Não tem uma conta? {''}
             <Link to="/register" component={RouterLink} variant="subtitle2" sx={{ textDecoration: 'none', cursor: 'pointer' }}>Criar conta</Link>
           </Typography>
 

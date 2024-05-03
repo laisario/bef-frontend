@@ -31,7 +31,7 @@ function ProductCardAdmin({ product }) {
         <Box>
           <Chip
             label={product?.tipo_de_servico === 'A' ? 'Acreditado' : 'Não acreditado'}
-            color={product?.tipo_de_servico === 'A' ? 'default' : 'warning'}
+            color={product?.tipo_de_servico === 'A' ? 'primary' : 'warning'}
             variant="filled"
             mb={2}
           />

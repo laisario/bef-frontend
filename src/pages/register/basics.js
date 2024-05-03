@@ -19,7 +19,7 @@ export default function RegisterBasicsPage() {
         </Typography>
 
         <Typography variant="body2" sx={{ mb: 5 }}>
-          Deixe seus instrumentos calibradinhos com a gente
+          Calibre seus instrumentos conosco
         </Typography>
 
         <BasicInformation />
