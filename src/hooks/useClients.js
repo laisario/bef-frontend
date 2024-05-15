@@ -10,6 +10,7 @@ function useClients(id) {
     const response = await axios.get('/clientes', { params: { page_size: 9999 } });
     return response?.data?.results;
   });
+  console.log(`aaaaa`)
   return {
     clientes, 
     error,
