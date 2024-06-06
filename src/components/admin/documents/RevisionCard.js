@@ -4,9 +4,9 @@ import { useTheme } from '@emotion/react';
 import { useParams } from 'react-router-dom';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import PersonIcon from '@mui/icons-material/Person';
-import useDocumentos from '../../hooks/useDocumentos';
-import { fDate } from '../../utils/formatTime';
-import { axios } from '../../api';
+import useDocumentos from '../../../hooks/useDocumentos';
+import { fDate } from '../../../utils/formatTime';
+import { axios } from '../../../api';
 
 function RevisionCard({ revisao }) {
     const [errMsg, setErrMsg] = useState('');
@@ -50,7 +50,7 @@ function RevisionCard({ revisao }) {
                 <CardContent>
                     <Typography variant='body2'><strong>Aprovações:</strong></Typography>
                     <Grid container flexDirection="row">
-                        {revisao?.aprovacoes.map((aprovacao) => (<Grid item sx={{ backgroundColor: theme.palette.grey[400], p: 1, borderRadius: 1, mr: 2, mt: 1 }}>
+                        {revisao?.aprovacoes.map((aprovacao) => (<Grid key={aprovacao.id} item sx={{ backgroundColor: theme.palette.grey[400], p: 1, borderRadius: 1, mr: 2, mt: 1 }}>
                             <Box display="flex" flexDirection="row">
                                 <PersonIcon />
                                 <Typography variant='body2'>{aprovacao.aprovador.username}</Typography>

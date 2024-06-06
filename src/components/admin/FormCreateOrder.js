@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Dialog,
 } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import { useState } from 'react';
@@ -20,7 +21,7 @@ import useInstrumentos from '../../hooks/useInstrumentos';
 import useOrders from '../../hooks/useOrders';
 import useClients from '../../hooks/useClients';
 
-function FormCreateOrder({ setOpen, setAlert, handleClose }) {
+function FormCreateOrder({ setOpen, setAlert, onClose, open, admin }) {
   const [form, setForm] = useState({
     cliente: '',
     informacoesAdicionais: '',
@@ -40,7 +41,6 @@ function FormCreateOrder({ setOpen, setAlert, handleClose }) {
 
   const instrumentosPorCliente = todosInstrumentos?.filter((instrumento) => instrumento.cliente.id === form.cliente)
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -50,6 +50,11 @@ function FormCreateOrder({ setOpen, setAlert, handleClose }) {
       setIsLoading(false);
       setAlert((prevAlert) => ({ ...prevAlert, propostaEnviada: true }));
       setOpen(false);
+      setForm({
+        cliente: '',
+        informacoesAdicionais: '',
+        instrumentos: [],
+      })
       await refetch();
       return { error: false };
     } catch (err) {
@@ -60,11 +65,14 @@ function FormCreateOrder({ setOpen, setAlert, handleClose }) {
   };
 
   return (
-    <>
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <DialogTitle>Criar novo pedido de calibração</DialogTitle>
-        <DialogContent>
-          <FormControl fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+    >
+      <DialogTitle>Criar novo pedido de calibração</DialogTitle>
+      <DialogContent>
+        {admin && (
+          <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel id="cliente-select">Cliente</InputLabel>
             <Select
               labelId="cliente-select"
@@ -81,55 +89,56 @@ function FormCreateOrder({ setOpen, setAlert, handleClose }) {
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth sx={{my: 2}}>
-            <InputLabel id="instrumental-select-input">Instrumentos</InputLabel>
-            <Select
-              labelId="instrumental-select-input"
-              id="demo-multiple-chip"
-              multiple
-              name="instrumentos"
-              value={form.instrumentos}
-              onChange={handleChange}
-              input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={instrumentosPorCliente?.find(instrumento => instrumento.id === value)?.tag} />
-                  ))}
-                </Box>
-              )}
-            >
-              {instrumentosPorCliente?.map((instrumento) => (
-                <MenuItem key={instrumento.id} value={instrumento.id}>
-                  <strong>{instrumento.tag}</strong>: {instrumento.numero_de_serie} -{' '}
-                  {instrumento.instrumento.tipo_de_instrumento.descricao} {instrumento.instrumento.minimo}{' '}
-                  {instrumento.instrumento.maximo} {instrumento.instrumento.unidade}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <TextField
-            type="text"
-            multiline
-            name="informacoesAdicionais"
-            value={form.informacoesAdicionais}
-            label="Informações adicionais"
+        )}
+        <FormControl fullWidth sx={{ my: 2 }}>
+          <InputLabel id="instrument-select-input">Instrumentos</InputLabel>
+          <Select
+            labelId="instrument-select-input"
+            id="instrument-select-input"
+            multiple
+            name="instrumentos"
+            value={form.instrumentos}
+            label="Instrumentos"
             onChange={handleChange}
-            placeholder="Informações adicionais"
-            fullWidth
-            error={errMsg}
-            helperText={errMsg}
-          />
-        </DialogContent>
-      </Box>
+            input={<OutlinedInput id="instrument-select-input" label="Instrumentos" />}
+            renderValue={(selected) => (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {selected.map((value) => (
+                  <Chip key={value} label={instrumentosPorCliente?.find(instrumento => instrumento.id === value)?.tag} />
+                ))}
+              </Box>
+            )}
+          >
+            {!!instrumentosPorCliente?.length && instrumentosPorCliente?.map((instrumento) => (
+              <MenuItem key={instrumento.id} value={instrumento.id}>
+                <strong>{instrumento.tag}</strong>: {instrumento.numero_de_serie} -{' '}
+                {instrumento.instrumento.tipo_de_instrumento.descricao} {instrumento.instrumento.minimo}{' '}
+                {instrumento.instrumento.maximo} {instrumento.instrumento.unidade}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <TextField
+          type="text"
+          multiline
+          name="informacoesAdicionais"
+          value={form.informacoesAdicionais}
+          label="Informações adicionais"
+          onChange={handleChange}
+          placeholder="Informações adicionais"
+          fullWidth
+          error={errMsg}
+          helperText={errMsg}
+        />
+      </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancelar</Button>
+        <Button onClick={() => { onClose(); setForm({}) }}>Cancelar</Button>
         <Button onClick={handleSubmit} variant="contained" sx={{ mt: 3, mb: 2 }} color="primary">
           Enviar proposta
         </Button>
         {loading && <CircularProgress />}
       </DialogActions>
-    </>
+    </Dialog>
   );
 }
 

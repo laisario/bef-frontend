@@ -1,11 +1,8 @@
 /* eslint-disable react/prop-types */
 import {
   Box,
-  Grid,
   TextField,
   Button,
-  Typography,
-  Paper,
   CircularProgress,
   FormControl,
   InputLabel,
@@ -16,7 +13,6 @@ import {
   DialogContent,
   DialogActions,
 } from '@mui/material';
-import SquareFootIcon from '@mui/icons-material/SquareFoot';
 import Chip from '@mui/material/Chip';
 import { useState } from 'react';
 import { axios } from '../../api';
@@ -64,7 +60,7 @@ function Form({ setOpen, setAlert, handleClose }) {
     <>
       <DialogTitle>Criar novo pedido de calibração</DialogTitle>
       <DialogContent>
-          <FormControl fullWidth>
+          <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel id="input-select">Instrumentos</InputLabel>
             <Select
               labelId="input-select"
@@ -74,7 +70,7 @@ function Form({ setOpen, setAlert, handleClose }) {
               placeholder='Instrumentos'
               value={instrumentos}
               onChange={handleChange}
-              input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+              input={<OutlinedInput id="input-select" label="Instrumentos" />}
               renderValue={(selected) => (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {selected.map((value) => (

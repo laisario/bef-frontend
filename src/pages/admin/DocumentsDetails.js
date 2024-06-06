@@ -8,9 +8,9 @@ import useDocumentos from '../../hooks/useDocumentos';
 import ExcelViewer from '../../components/drivers/ExcelViewer';
 import FormCreateRevision from '../../components/admin/FormCreateRevision';
 import DocInformationCard from '../../components/admin/DocInformationCard';
-import RevisionCard from '../../components/admin/RevisionCard';
+import RevisionCard from '../../components/admin/documents/RevisionCard';
 
-function DetalhesDocumentoPage() {
+function DocumentsDetails() {
   const { id } = useParams();
   const { data, status, statusColor, openFormRevision, setOpenFormRevision, isLoading } = useDocumentos(id);
   const url = !!data?.arquivo && new URL(`${data?.arquivo}`);
@@ -55,4 +55,4 @@ function DetalhesDocumentoPage() {
   )
 }
 
-export default DetalhesDocumentoPage
+export default DocumentsDetails

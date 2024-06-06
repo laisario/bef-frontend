@@ -24,7 +24,7 @@ export default function CsvViewer({ csvContent }) {
             worker: true,
             skipEmptyLines: true,
             complete: (results) => {
-                if (!!results?.errors?.length) console.log("deu ruim")
+                if (results?.errors?.length) console.log("deu ruim")
                 setParsedCsv(results?.data)
             }
         })
@@ -41,7 +41,7 @@ export default function CsvViewer({ csvContent }) {
                     <Table sx={{ minWidth: 1200 }} aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                {Object.keys(parsedCsv[0]).map(key => <TableCell>{key}</TableCell>)}
+                                {Object.keys(parsedCsv[0]).map(key => <TableCell key={key}>{key}</TableCell>)}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -52,7 +52,7 @@ export default function CsvViewer({ csvContent }) {
                                         key={index}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
-                                        {values.map(value => <TableCell align="left">{value}</TableCell>)}
+                                        {values.map(value => <TableCell key={value} align="left">{value}</TableCell>)}
                                     </TableRow>
                                 )
                             })}

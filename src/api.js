@@ -24,19 +24,19 @@ const createAxiosInstance = ({ file = false } = {}) => {
     })
 
     instance.interceptors.response.use(
-        (response) => {
+        (response) => 
         //   if (response.data && response.headers?.['content-type'] === 'application/json') {
         //     response.data = humps.camelizeKeys(response.data)
         //   }
-          return response
-        },
-        (error) => {
+           response
+        ,
+        (error) => 
         //   if (error.response.data && error.response.headers?.['content-type'] === 'application/json') {
         //     const newError = { response: { data: {} } }
         //     newError.response.data = humps.camelizeKeys(error.response.data)
         //   }
-          return Promise.reject(error)
-        },
+           Promise.reject(error)
+        ,
       )
 
     return instance

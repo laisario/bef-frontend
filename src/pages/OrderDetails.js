@@ -9,7 +9,7 @@ import useOrders from '../hooks/useOrders';
 import CardInformation from '../components/orders/CardInformation';
 import Iconify from '../components/iconify';
 import { capitalizeFirstLetter as CFL } from '../utils/formatString';
-import { fDate, fDateTime } from '../utils/formatTime';
+import { fDate } from '../utils/formatTime';
 
 const formaPagamento = {
   CD: 'Débito',
@@ -37,19 +37,19 @@ function OrderDetails() {
   return (
     <>
       <Helmet>
-        <title> Pedido | B&F </title>
+        <title> Proposta | B&F </title>
       </Helmet>
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Box direction="column">
             {!!data?.numero &&
               <Typography variant="h4" gutterBottom>
-                Pedido número: {data?.numero}
+                Proposta número: {data?.numero}
               </Typography>
             }
             {!!data?.data_criacao &&
               <Typography variant="h6" gutterBottom>
-                {fDateTime(data?.data_criacao)}
+                {fDate(data?.data_criacao)}
               </Typography>
             }
           </Box>
@@ -62,7 +62,7 @@ function OrderDetails() {
                   onClick={() => aprovar()}
                   startIcon={<Iconify icon="eva:checkmark-fill" />}
                 >
-                  Aprovar pedido
+                  Aprovar proposta
                 </Button>
                 <Button
                   variant="contained"
@@ -70,7 +70,7 @@ function OrderDetails() {
                   onClick={() => recusar()}
                   startIcon={<Iconify icon="ph:x-bold" />}
                 >
-                  Reprovar pedido
+                  Reprovar proposta
                 </Button>
               </>
             )}
@@ -117,7 +117,7 @@ function OrderDetails() {
             <Box display="flex" gap={1} flexDirection="column">
               {data?.status === 'A' ? (
                 <Chip
-                  label="Aguardando resposta"
+                  label="Aguardando retorno B&F"
                   color={colorAprovacaoProposta[data?.aprovacao]}
                   variant="outlined"
                 />
@@ -152,7 +152,7 @@ function OrderDetails() {
                         maximo,
                         minimo,
                         unidade,
-                        capacidade_de_medicao: { valor, unidade: unidadeMedicao },
+                        capacidade_de_medicao: capacidadeDeMedicao,
                         tipo_de_instrumento: { descricao },
                         tipo_de_servico: tipoDeServico
                       },
@@ -169,8 +169,7 @@ function OrderDetails() {
                         maximo,
                         minimo,
                         unidade,
-                        valor,
-                        unidadeMedicao,
+                        capacidadeDeMedicao,
                         posicao,
                         descricao,
                         tipoDeServico

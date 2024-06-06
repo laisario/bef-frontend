@@ -21,7 +21,7 @@ const useInstrumentos = (id) => {
 
   const handleSearch = debounce((value) => setDebouncedSearch(value));
 
-  useEffect(() => { handleSearch(search) }, [search])
+  useEffect(() => { handleSearch(search) }, [search, handleSearch])
 
   const {
     data: instrumentosEmpresa,
@@ -39,7 +39,7 @@ const useInstrumentos = (id) => {
     return data?.filter((instrumento) =>
       isExpired(instrumento?.data_ultima_calibracao, instrumento?.instrumento.tipo_de_instrumento.frequencia)
     );
-  }, [data]);
+  }, [id, data]);
 
   const instrumentosCalibrados = useMemo(() => {
     if (id) {
@@ -49,7 +49,7 @@ const useInstrumentos = (id) => {
       (instrumento) =>
         !isExpired(instrumento?.data_ultima_calibracao, instrumento?.instrumento.tipo_de_instrumento.frequencia)
     );
-  }, [data]);
+  }, [id, data]);
 
   const deleteInstrument = async () => {
     await axios.delete(`/instrumentos/${id}`);
@@ -58,7 +58,7 @@ const useInstrumentos = (id) => {
 
   const update = async ({ idCalibration, analiseCliente }) => {
     const patchData = { analise_critica: analiseCliente?.criticalAnalysis }
-    if (!!analiseCliente?.restrictions?.length) {
+    if (analiseCliente?.restrictions?.length) {
       patchData.restricao_analise_critica = analiseCliente?.restrictions
     }
     const response = await axios.patch(`/calibracoes/${idCalibration}/`, patchData);
@@ -68,6 +68,18 @@ const useInstrumentos = (id) => {
 
   const { mutate } = useMutation({
     mutationFn: update,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instrumentos', 'calibracoes'] })
+    },
+  })
+
+  const updatePrice = async ({id, price}) => {
+    const response = await axios.patch(`/instrumentos/${id}/`, { preco_alternativo_calibracao: price });
+    return response.data;
+  }
+
+  const { mutate: mutatePrice } = useMutation({
+    mutationFn: updatePrice,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instrumentos'] })
     },
@@ -87,6 +99,7 @@ const useInstrumentos = (id) => {
     search,
     setSearch,
     mutate,
+    mutatePrice,
   };
 };
 

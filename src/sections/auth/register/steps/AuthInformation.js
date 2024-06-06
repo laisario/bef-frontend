@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 // @mui
-import { Link, Box, Stack, IconButton, InputAdornment, TextField, Checkbox, Typography, Button } from '@mui/material';
+import { Box, Stack, IconButton, InputAdornment, TextField, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
 import Iconify from '../../../../components/iconify';
@@ -13,7 +13,7 @@ import PasswordStrengthMeter from './components/PasswordStrengthMeter';
 export default function AuthInformation() {
   const navigate = useNavigate();
   const { registerAuth, loading } = useAuth()
-
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null)

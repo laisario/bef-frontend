@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
 
@@ -19,9 +19,9 @@ const AuthProvider = ({ children }) => {
       const decoded = jwtDecode(token);
       setUser({ token, nome: decoded?.nome, admin: decoded?.admin });
     }
-  }, []);
+  }, [token]);
 
-  const redirectUsers = (user) => {
+  const redirectUsers = useCallback((user) => {
     const adminRoutes = ['/admin'];
     const authenticatedRoutes = ['/dashboard', '/admin'];
     if (!user && authenticatedRoutes.some((route) => window.location.hash.includes(route))) {
@@ -35,11 +35,11 @@ const AuthProvider = ({ children }) => {
     }
    
     return null
-  }
+  }, [navigate])
   
   useEffect(() => {
     redirectUsers(user)
-  }, [user, window.location.hash]);
+  }, [user, redirectUsers]);
 
   return (
     <AuthContext.Provider

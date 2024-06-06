@@ -6,7 +6,6 @@ import {
   MenuItem,
   Select,
   TextField,
-  Modal,
   FormLabel,
   Radio,
   RadioGroup,
@@ -15,10 +14,10 @@ import {
   Dialog,
   DialogContent,
 } from '@mui/material';
+import { useForm, useWatch } from "react-hook-form";
 import { LoadingButton } from '@mui/lab';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
-import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -26,41 +25,47 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import useOrders from '../../hooks/useOrders';
 import Iconify from '../iconify';
-import FormAdress from '../adress/FormAdress';
-import useCEP from '../../hooks/useCEP';
+import FormAdress from '../address/FormAdress';
 
 function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen }) {
-  const [form, setForm] = useState({
-    local: data?.local || '',
-    total: data?.total || '',
-    forma_de_pagamento: data?.condicao_de_pagamento || '',
-    transporte: data?.transporte || '',
-    numero: data?.numero || 0,
-    certificado: data?.anexo || null,
+  const form = useForm({
+    defaultValues: {
+      numeroProposta: data?.numero || 0,
+      transporte: data?.transporte || '',
+      local: data?.local || '',
+      total: data?.total || '',
+      formaDePagamento: data?.condicao_de_pagamento || '',
+      anexo: data?.anexo || null,
+      CEP: data?.endereco_de_entrega?.cep || "",
+      rua: data?.endereco_de_entrega?.logradouro || "",
+      numeroEndereco: data?.endereco_de_entrega?.numero || "",
+      bairro: data?.endereco_de_entrega?.bairro?.nome || "",
+      cidade: data?.endereco_de_entrega?.bairro?.cidade || "",
+      estado: data?.endereco_de_entrega?.estado || "",
+      complemento: data?.endereco_de_entrega?.complemento || "",
+      aprovado: data?.aprovacao?.toString(),
+      enderecoDeEntrega: data?.endereco_de_entrega ? "novoEndereco" : null,
+      prazoDeEntrega: data?.prazo_de_entrega,
+      validade: data?.validade,
+      dataAprovacao: data?.data_aprovacao,
+      prazoDePagamento: data?.prazo_de_pagamento,
+    },
   });
-  const [CEP, setCEP] = useState(data?.endereco_de_entrega?.cep || "");
-  const [rua, setRua] = useState(data?.endereco_de_entrega?.logradouro || "");
-  const [numero, setNumero] = useState(data?.endereco_de_entrega?.numero || "");
-  const [bairro, setBairro] = useState(data?.endereco_de_entrega?.bairro?.nome || "");
-  const [cidade, setCidade] = useState(data?.endereco_de_entrega?.bairro?.cidade || "");
-  const [estado, setEstado] = useState(data?.endereco_de_entrega?.estado || "");
-  const [complemento, setComplemento] = useState(data?.endereco_de_entrega?.complemento || "");
-  const [aprovado, setAprovado] = useState(data?.aprovacao?.toString());
-  const [enderecoEntrega, setEnderecoEntrega] = useState(data?.endereco_de_entrega ? "novoEndereco" : null);
-  const [prazoDeEntrega, setPrazoDeEntrega] = useState(dayjs.isDayjs(data?.prazo_de_entrega) ? dayjs(data?.prazo_de_entrega).format('DD/MM/YYYY') : null);
-  const [validade, setValidade] = useState(dayjs.isDayjs(data?.validade) ? dayjs(data?.validade).format('DD/MM/YYYY') : null);
-  const [dataAprovacao, setDataAprovacao] = useState(dayjs.isDayjs(data?.data_aprovacao) ? dayjs(data?.data_aprovacao).format('DD/MM/YYYY') : null);
-  const { isValid: cepValido, ...cepInfo } = useCEP(CEP);
+
+  const {
+    enderecoDeEntrega,
+    aprovado,
+    anexo,
+    prazoDeEntrega,
+    validade,
+    prazoDePagamento,
+    dataAprovacao,
+    local,
+    formaDePagamento,
+  } = useWatch({ control: form.control })
+
   const { id } = useParams();
   const { edit, isLoading } = useOrders(id);
-  const handleChange = (event) => {
-    const { name, value, files } = event.target;
-    if (name === 'certificado') {
-      setForm((prevForm) => ({ ...prevForm, [name]: files[0] }));
-    } else {
-      setForm((prevForm) => ({ ...prevForm, [name]: value }));
-    }
-  };
 
   return (
     <Dialog open={open} onClose={handleClose}>
@@ -70,55 +75,66 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
             <TextField
               id="numero"
               label="Número proposta"
-              name="numero"
-              value={form.numero}
-              onChange={handleChange}
+              name="numeroProposta"
               variant="outlined"
               type="text"
               sx={{ width: '50%' }}
+              {...form.register("numeroProposta")}
             />
             <TextField
               id="transporte"
               label="Transporte"
               name="transporte"
-              value={form.transporte}
-              onChange={handleChange}
               variant="outlined"
               sx={{ width: '50%' }}
+              {...form.register("transporte")}
             />
           </Box>
-          <Box display="flex" gap={2} sx={{my:2}}>
+          <Box display="flex" gap={2} sx={{ my: 2 }}>
             <DatePicker
               label="Prazo de entrega"
-              value={prazoDeEntrega}
-              onChange={(value) => setPrazoDeEntrega(value)}
+              {...form.register("prazoDeEntrega")}
+              value={prazoDeEntrega ? dayjs(prazoDeEntrega) : null}
+              onChange={newValue => form.setValue("prazoDeEntrega", newValue)}
               sx={{ width: '50%' }}
             />
             <DatePicker
               label="Validade"
+              {...form.register("validade")}
+              value={validade ? dayjs(validade) : null}
+              onChange={newValue => form.setValue("validade", newValue)}
               sx={{ width: '50%' }}
-              value={validade}
-              onChange={(value) => setValidade(value)}
             />
           </Box>
-          {data?.aprovacao && (
+          <Box display="flex" gap={2} sx={{ my: 2 }}>
             <DatePicker
-              label="Data aprovação"
-              value={dataAprovacao}
-              onChange={(value) => setDataAprovacao(value)}
-              sx={{ width: '50%' }}
+              label="Prazo de pagamento"
+              sx={{ width: data?.aprovacao ? '50%' : '100%' }}
+              {...form.register("prazoDePagamento")}
+              value={prazoDePagamento ? dayjs(prazoDePagamento) : null}
+              onChange={newValue => form.setValue("prazoDePagamento", newValue)}
+
             />
-          )}
+            {data?.aprovacao && (
+              <DatePicker
+                label="Data aprovação"
+                {...form.register("dataAprovacao")}
+                value={dataAprovacao ? dayjs(dataAprovacao) : null}
+                onChange={newValue => form.setValue("dataAprovacao", newValue)}
+                sx={{ width: '50%' }}
+              />
+            )}
+          </Box>
           <Box display="flex" gap={2}>
             <FormControl sx={{ width: '50%' }} margin="normal">
-              <InputLabel id="demo-simple-select-label">Local</InputLabel>
+              <InputLabel id="label-local">Local</InputLabel>
               <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={form.local}
+                labelId="label-local"
+                id="label-local"
                 name="local"
                 label="Local"
-                onChange={handleChange}
+                {...form.register("local")}
+                value={local}
               >
                 <MenuItem value="L">Laboratório</MenuItem>
                 <MenuItem value="C">Cliente</MenuItem>
@@ -127,13 +143,13 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
             <FormControl margin="normal" sx={{ width: '50%' }}>
               <InputLabel id="select-pagamento">Forma de pagamento</InputLabel>
               <Select
-                labelId="demo-simple-select-label"
+                labelId="select-pagamento"
                 id="select-pagamento"
-                value={form.forma_de_pagamento}
-                name="forma_de_pagamento"
+                name="formaDePagamento"
                 label="Forma de Pagamento"
-                onChange={handleChange}
                 fullWidth
+                {...form.register("formaDePagamento")}
+                value={formaDePagamento}
               >
                 <MenuItem value="CD">Cartão débito</MenuItem>
                 <MenuItem value="CC">Cartão crédito</MenuItem>
@@ -150,10 +166,8 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
                 value="enderecoCadastrado"
                 control={
                   <Radio
-                    checked={enderecoEntrega === 'enderecoCadastrado'}
-                    onClick={() =>
-                      setEnderecoEntrega(enderecoEntrega === 'enderecoCadastrado' ? null : 'enderecoCadastrado')
-                    }
+                    checked={enderecoDeEntrega === 'enderecoCadastrado'}
+                    {...form.register("enderecoDeEntrega")}
                   />
                 }
                 label="Endereço cliente cadastrado"
@@ -162,36 +176,15 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
                 value="novoEndereco"
                 control={
                   <Radio
-                    checked={enderecoEntrega === 'novoEndereco'}
-                    onClick={() => setEnderecoEntrega(enderecoEntrega === 'novoEndereco' ? null : 'novoEndereco')}
+                    checked={enderecoDeEntrega === 'novoEndereco'}
+                    {...form.register("enderecoDeEntrega")}
                   />
                 }
                 label="Novo enderenço"
               />
             </RadioGroup>
           </FormControl>
-          {enderecoEntrega === 'novoEndereco' && (
-            <FormAdress
-              valid={cepValido}
-              cepInfo={cepInfo}
-              form={{
-                CEP,
-                rua,
-                numero,
-                bairro,
-                cidade,
-                estado,
-                setCEP,
-                setRua,
-                setNumero,
-                setBairro,
-                setCidade,
-                setEstado,
-                complemento,
-                setComplemento,
-              }}
-            />
-          )}
+          {enderecoDeEntrega === 'novoEndereco' && <FormAdress form={form} />}
           {data?.status === 'F' && (
             <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}>
               <FormLabel id="aprovacao">Situação: </FormLabel>
@@ -201,7 +194,7 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
                   control={
                     <Radio
                       checked={aprovado === 'true'}
-                      onClick={() => setAprovado(aprovado === 'true' ? null : 'true')}
+                      {...form.register("aprovado")}
                     />
                   }
                   label="Aprovada"
@@ -211,7 +204,7 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
                   control={
                     <Radio
                       checked={aprovado === 'false'}
-                      onClick={() => setAprovado(aprovado === 'false' ? null : 'false')}
+                      {...form.register("aprovado")}
                     />
                   }
                   label="Reprovada"
@@ -222,24 +215,24 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
           <Box display="flex" gap={1}>
             <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}>
               <FormLabel id="anexo">Anexo: </FormLabel>
-              {form?.certificado ? (
+              {anexo ? (
                 <>
                   <Button component="label" color="info" variant="contained" startIcon={<CloudUploadIcon />}>
                     Enviar arquivo
                     <input
                       style={{ display: 'none' }}
                       id="upload-btn"
-                      name="certificado"
-                      onChange={handleChange}
+                      name="anexo"
+                      {...form.register("anexo")}
                       type="file"
                     />
                   </Button>
                   <Button
                     component="a"
                     href={
-                      !!form?.certificado && form?.certificado instanceof File
-                        ? URL.createObjectURL(form?.certificado)
-                        : form?.certificado
+                      !!anexo && anexo instanceof File
+                        ? URL.createObjectURL(anexo)
+                        : anexo
                     }
                     target="_blank"
                     color="info"
@@ -254,9 +247,9 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
                   <input
                     style={{ display: 'none' }}
                     id="upload-btn"
-                    name="certificado"
-                    onChange={handleChange}
+                    name="anexo"
                     type="file"
+                    {...form.register("anexo")}
                   />
                 </Button>
               )}
@@ -279,24 +272,7 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
               size="large"
               variant="contained"
               onClick={async () => {
-                edit(
-                  {
-                    form,
-                    CEP: cepInfo?.cep || CEP,
-                    numero,
-                    rua: cepInfo?.rua || rua,
-                    bairro: cepInfo?.bairro || bairro,
-                    cidade: cepInfo?.cidade || cidade,
-                    estado: cepInfo?.estado || estado,
-                    complemento,
-                    enderecoEntrega,
-                    aprovado,
-                    validade,
-                    prazoDeEntrega,
-                  },
-                  setResponseStatus,
-                  setOpen
-                );
+                form.handleSubmit(edit(form, setResponseStatus, setOpen))
                 handleClose();
               }}
             >

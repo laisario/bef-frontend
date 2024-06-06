@@ -7,11 +7,13 @@ import useOrders from '../../hooks/useOrders';
 // sections
 import { AppNewsOrders, AppOrderTimeline, AppWidgetSummary } from '../../sections/@dashboard/app';
 import { isExpired } from '../../utils/formatTime';
+import useDocumentos from '../../hooks/useDocumentos';
 
 
-function HomePageAdmin() {
+function DashboardApp() {
   const { todosInstrumentos, instrumentosCalibrados, instrumentosVencidos, isLoading } = useInstrumentos();
-  const { data, pedidosEmAnalise } = useOrders();
+  const { data, propostasEmAnalise } = useOrders();
+  const { documentosVencidos } = useDocumentos()
   return (
     <>
       <Helmet>
@@ -45,17 +47,17 @@ function HomePageAdmin() {
 
             <Grid item xs={12} sm={6} md={3}>
               <AppWidgetSummary
-                title="Instrumentos cadastrados"
-                total={todosInstrumentos?.length || 0}
+                title="Documentos vencidos"
+                total={documentosVencidos?.length || 0}
                 color="info"
-                icon={'fluent-mdl2:total'}
+                icon={'mdi:file-document-alert-outline'}
               />
             </Grid>
 
             <Grid item xs={12} sm={6} md={3}>
               <AppWidgetSummary
-                title="Pedidos em analise"
-                total={pedidosEmAnalise?.length}
+                title="Pedidos esperando análise"
+                total={propostasEmAnalise?.length}
                 color="warning"
                 icon={'ant-design:file-sync-outlined'}
               />
@@ -64,7 +66,7 @@ function HomePageAdmin() {
             <Grid item xs={12} md={7} lg={8}>
               <AppNewsOrders
                 title="Instrumentos clientes"
-                list={todosInstrumentos?.slice(0, 5)?.map((instrumento, index) => ({
+                list={todosInstrumentos?.slice(0, 5)?.map((instrumento) => ({
                   isExpired: isExpired(
                     instrumento.data_ultima_calibracao,
                     instrumento.instrumento.tipo_de_instrumento.frequencia
@@ -90,7 +92,7 @@ function HomePageAdmin() {
             <Grid item xs={12} md={5} lg={4}>
               <AppOrderTimeline
                 title="Pedidos"
-                list={data?.results.slice(0, 5)?.map((proposta, index) => ({
+                list={data?.results.slice(0, 5)?.map((proposta) => ({
                   id: proposta?.id,
                   title: `Pedido ${proposta?.id}`,
                   status: proposta?.status,
@@ -105,4 +107,4 @@ function HomePageAdmin() {
   );
 }
 
-export default HomePageAdmin;
+export default DashboardApp;

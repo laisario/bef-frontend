@@ -4,10 +4,10 @@ import { Button, Container, Grid, Stack, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Iconify from '../../components/iconify/Iconify';
 import useDocumentos from '../../hooks/useDocumentos';
-import RevisionCard from '../../components/admin/RevisionCard';
+import RevisionCard from '../../components/admin/documents/RevisionCard';
 import FormCreateRevision from '../../components/admin/FormCreateRevision';
 
-function RevisionsDocumentPage() {
+function DocumentRevisions() {
   const { id } = useParams();
   const { data, openFormRevision, setOpenFormRevision } = useDocumentos(id);
   const revisoes = data?.revisoes;
@@ -28,7 +28,7 @@ function RevisionsDocumentPage() {
 
         <Grid container spacing={2}>
           {revisoes?.map((revisao) => (
-            <Grid item xs={6}>
+            <Grid item key={revisao?.id} xs={6}>
               <RevisionCard revisao={revisao} key={revisao.id} />
             </Grid>
           ))}
@@ -40,4 +40,4 @@ function RevisionsDocumentPage() {
   )
 }
 
-export default RevisionsDocumentPage
+export default DocumentRevisions

@@ -44,7 +44,7 @@ function DocInformationCard({data, status, statusColor, setOpenFormRevision}) {
                     }
                     {!!data?.frequencia &&
                         <Typography sx={{ mt: 1 }} variant="body2">
-                            <strong>Frequência: </strong>{data?.frequencia}
+                            <strong>Frequência: </strong>{data?.frequencia > 1 ? `${data?.frequencia} anos` : `${data?.frequencia} ano` } 
                         </Typography>
                     }
                     {!!data?.revisoes.length && <Typography sx={{ mt: 1 }} variant="body2">

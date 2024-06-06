@@ -1,6 +1,6 @@
 import { useState } from 'react';
 // @mui
-import { alpha, useTheme } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 import { MenuItem, IconButton, Popover } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Avatar } from '../../../components/avatar'
@@ -12,8 +12,7 @@ import { useAuth } from '../../../context/Auth';
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
   const navigate = useNavigate()
-  const theme = useTheme()
-  const { logout, user } = useAuth()
+  const { logout } = useAuth()
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
   };

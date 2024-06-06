@@ -18,8 +18,8 @@ const navConfig = [
     icon: icon('ic_user'),
   },
   {
-    title: 'meus pedidos',
-    path: '/dashboard/pedidos',
+    title: 'minhas propostas',
+    path: '/dashboard/propostas',
     icon: icon('ic_cart'),
   },
 ];

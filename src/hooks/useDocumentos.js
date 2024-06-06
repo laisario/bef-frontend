@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation } from 'react-query';
 import debounce from 'lodash.debounce';
 import {axios} from '../api';
+import { isExpired } from '../utils/formatTime';
 
 const useDocumentos = (id) => {
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -21,7 +22,7 @@ const useDocumentos = (id) => {
   
   const handleSearch = debounce((value) => setDebouncedSearch(value));
 
-  useEffect(() => {handleSearch(search)}, [search])
+  useEffect(() => {handleSearch(search)}, [search, handleSearch])
   
   const status = {
     'V': 'Vigente',
@@ -50,6 +51,14 @@ const useDocumentos = (id) => {
       setRowsPerPage(parseInt(event.target.value, 10));
       setPage(0);
   };
+  const documentosVencidos = useMemo(() => {
+    if (id) {
+      return null;
+    }
+    return data?.results?.filter((document) =>
+      isExpired(document?.data_validade, document?.frequencia, "year")
+    );
+  }, [id, data]);
 
   return {
     data,
@@ -68,6 +77,7 @@ const useDocumentos = (id) => {
     rowsPerPage,
     handleChangePage,
     handleChangeRowsPerPage,
+    documentosVencidos
   }
 }
 

@@ -28,7 +28,6 @@ export default function FormCreateDocument({ open, setOpen }) {
         analiseCritica: 0,
         arquivo: null,
     })
-    const [errMsg, setErrMsg] = useState('');
     const [loading, setIsLoading] = useState(false);
     const [dataDeValidade, setDataDeValidade] = useState(null);
     const [dataDeRevisao, setDataDeRevisao] = useState(null);
@@ -85,8 +84,7 @@ export default function FormCreateDocument({ open, setOpen }) {
                                 return { error: false };
                             } catch (err) {
                                 setIsLoading(false);
-                                setErrMsg(err.message);
-                                return { error: true };
+                                return { error: err };
                             }
                         },
                     }}

@@ -26,11 +26,17 @@ export function formatCEP(value = '') {
     return format
 }
 
-const useCEP = (cep) => {
+const useCEP = (cep, form) => {
     const isValid = useMemo(() =>  validarCEP(cep), [cep])
-
     const { data } = useQuery(['cep', cep], async () => {
         const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`, { withCredentials: false })
+        if (form) {
+            form.setValue("rua", response?.data?.logradouro)
+            form.setValue("bairro", response?.data?.bairro)
+            form.setValue("cidade", response?.data?.localidade)
+            form.setValue("estado", response?.data?.uf)
+            form.setValue("CEP", formatCEP(cep))
+        }
         return response?.data
     }, {
         enabled: isValid

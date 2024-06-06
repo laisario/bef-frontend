@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Box, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Iconify from '../../../../components/iconify';
 import { useAuth } from '../../../../context/Auth';
 import useCEP from '../../../../hooks/useCEP';
-import FormAdress from '../../../../components/adress/FormAdress';
+import FormAdress from '../../../../components/address/FormAdress';
 
 // ----------------------------------------------------------------------
 

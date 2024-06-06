@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Stack } from '@mui/material';
 // mock
-import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
@@ -39,7 +38,6 @@ Nav.propTypes = {
 
 export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
-  const { id } = useParams();
   const { user } = useAuth();
 
   const isDesktop = useResponsive('up', 'lg');
@@ -102,7 +100,7 @@ export default function Nav({ openNav, onCloseNav }) {
             </Typography>
           </Box>
 
-          <Button href="#/dashboard/pedidos" startIcon={<Iconify icon="eva:plus-fill" />} variant="contained">
+          <Button href="#/dashboard/propostas" startIcon={<Iconify icon="eva:plus-fill" />} variant="contained">
             Novo pedido
           </Button>
         </Stack>
