@@ -14,7 +14,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { Container, Stack } from '@mui/system';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@mui/material';
-import FormCreateDocument from '../../components/admin/FormCreateDocument';
+import FormCreate from '../../components/admin/documents/FormCreate';
 import Iconify from '../../components/iconify/Iconify';
 import titleCase from '../../utils/formatTitle';
 import TableHeader from '../../components/admin/documents/TableHeader';
@@ -26,7 +26,19 @@ import TableToolbar from '../../components/admin/documents/TableToolbar';
 export default function Documents() {
     const [open, setOpen] = useState(false);
     const [selectedDocuments, setSelectedDocuments] = useState([]);
-    const { data, status, deleteDocumento, isDeleting, search, setSearch, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, isLoading } = useDocumentos(null);
+    const [filter, setFilter] = useState(false)
+    const { data,
+        status,
+        deleteDocumento,
+        isDeleting,
+        page,
+        rowsPerPage,
+        handleChangePage,
+        handleChangeRowsPerPage,
+        isLoading,
+        formFilter,
+        formCreate
+    } = useDocumentos(null);
     const navigate = useNavigate()
 
     const handleOpenForm = () => {
@@ -65,82 +77,78 @@ export default function Documents() {
                     </Button>
                 </Stack>
 
-                <FormCreateDocument open={open} setOpen={setOpen} />
+                <FormCreate open={open} setOpen={setOpen} form={formCreate} />
 
-                <Box sx={{ width: '100%', borderRadius: '12px' }}>
-                    <Paper sx={{ width: '100%', mb: 2, boxShadow: '0 0 2px 0 rgba(145, 158, 171, 0.2),0 12px 24px -4px rgba(145, 158, 171, 0.12)', borderRadius: "12px" }}>
-                        <TableToolbar
+                <TableToolbar
+                    numSelected={selectedDocuments.length}
+                    deleteDocuments={() => { deleteDocumento(selectedDocuments); setSelectedDocuments([]) }}
+                    isDeleting={isDeleting}
+                    form={formFilter}
+                    isLoading={isLoading}
+                    filter={filter}
+                    setFilter={setFilter}
+                />
+                <TableContainer>
+                    <Table
+                        aria-labelledby="tabelaDocumentos"
+                    >
+                        <TableHeader
                             numSelected={selectedDocuments.length}
-                            deleteDocuments={() => { deleteDocumento(selectedDocuments); setSelectedDocuments([]) }}
-                            isDeleting={isDeleting}
-                            search={search}
-                            setSearch={setSearch}
-                            isLoading={isLoading}
+                            onSelectAllClick={handleSelectAllClick}
+                            rowCount={data?.results?.length}
                         />
-                        <TableContainer>
-                            <Table
-                                aria-labelledby="tabelaDocumentos"
-                            >
-                                <TableHeader
-                                    numSelected={selectedDocuments.length}
-                                    onSelectAllClick={handleSelectAllClick}
-                                    rowCount={data?.results?.length}
-                                />
-                                <TableBody>
-                                    {!isLoading ? data?.results?.map((row, index) => {
-                                        const isItemSelected = isSelected(row.id);
-
-                                        return (
-                                            <TableRow
-                                                hover
-                                                role="checkbox"
-                                                aria-checked={isItemSelected}
-                                                tabIndex={-1}
-                                                key={row.id}
-                                                onClick={() => { navigate(`/admin/documento/${row?.id}`) }}
-                                                sx={{ cursor: 'pointer' }}
-                                            >
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox
-                                                        color="primary"
-                                                        onClick={(event) => handleClick(event, row.id)}
-                                                        checked={isItemSelected}
-                                                        inputProps={{
-                                                            'aria-labelledby': index,
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell
-                                                    component="th"
-                                                    id={index}
-                                                    scope="row"
-                                                    padding="none"
-                                                >
-                                                    {row?.codigo?.codigo?.toUpperCase()}
-                                                </TableCell>
-                                                <TableCell>{titleCase(row?.titulo)}</TableCell>
-                                                <TableCell>{status[row?.status]}</TableCell>
-                                                <TableCell>{fDate(row?.data_revisao)}</TableCell>
-                                                <TableCell>{fDate(row?.data_validade)}</TableCell>
-                                                <TableCell>{row?.analise_critica} dias</TableCell>
-                                            </TableRow>
-                                        );
-                                    }) : <CircularProgress />}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <TablePagination
-                            rowsPerPageOptions={[5, 10, 25, 50, 100]}
-                            component="div"
-                            count={data?.count}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                            labelRowsPerPage="Linhas por páginas"
-                        />
-                    </Paper>
-                </Box>
+                        <TableBody>
+                            {!isLoading ? data?.results?.map((row, index) => {
+                                const isItemSelected = isSelected(row.id);
+                                return (
+                                    <TableRow
+                                        hover
+                                        role="checkbox"
+                                        aria-checked={isItemSelected}
+                                        tabIndex={-1}
+                                        key={row.id}
+                                        onClick={() => { navigate(`/admin/documento/${row?.id}`) }}
+                                        sx={{ cursor: 'pointer' }}
+                                    >
+                                        <TableCell padding="checkbox">
+                                            <Checkbox
+                                                color="primary"
+                                                onClick={(event) => handleClick(event, row.id)}
+                                                checked={isItemSelected}
+                                                inputProps={{
+                                                    'aria-labelledby': index,
+                                                }}
+                                            />
+                                        </TableCell>
+                                        <TableCell
+                                            component="th"
+                                            id={index}
+                                            scope="row"
+                                            padding="none"
+                                        >
+                                            {row?.codigo?.codigo?.toUpperCase()}
+                                        </TableCell>
+                                        <TableCell>{!!row?.titulo && titleCase(row?.titulo)}</TableCell>
+                                        <TableCell>{!!row?.status && status[row?.status]}</TableCell>
+                                        <TableCell>{!!row?.data_revisao && fDate(row?.data_revisao)}</TableCell>
+                                        <TableCell>{!!row?.data_validade && fDate(row?.data_validade)}</TableCell>
+                                        <TableCell>{!!row?.analise_critica && (row?.analise_critica > 1 ? `${row?.analise_critica} meses` : `${row?.analise_critica} mês`)}</TableCell>
+                                    </TableRow>
+                                );
+                            }) : <CircularProgress />}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                    component="div"
+                    count={data?.count}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    labelRowsPerPage="Linhas por páginas"
+                />
             </Container>
         </>
     );

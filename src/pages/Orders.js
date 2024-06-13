@@ -37,6 +37,7 @@ import TableToolbar from '../components/orders/TableToolbar';
 
 const TABLE_HEAD = [
   { id: 'id', label: '', alignRight: false },
+  { id: 'numero', label: 'Número', alignRight: false },
   { id: 'data', label: 'Data', alignRight: false },
   { id: 'total', label: 'Total', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
@@ -87,14 +88,14 @@ export default function UserPage() {
         </Stack>
 
         <Card>
-          <TableToolbar  form={formFilter} />
+          <TableToolbar form={formFilter} />
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
                 <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
                 <TableBody>
                   {data?.results?.map((row, index) => {
-                    const { id, total, data_criacao: dataCriacao, status, aprovacao } = row;
+                    const { id, total, data_criacao: dataCriacao, status, aprovacao, numero } = row;
                     const data = new Date(dataCriacao);
                     return (
                       <TableRow
@@ -107,6 +108,8 @@ export default function UserPage() {
                       >
                         <TableCell align="left">{index + 1}</TableCell>
 
+                        <TableCell align="left">{numero}</TableCell>
+                        
                         <TableCell align="left">{fDate(data)}</TableCell>
 
                         <TableCell align="left">{+total > 0 ? `R$ ${total}` : "Aguardando resposta"}</TableCell>

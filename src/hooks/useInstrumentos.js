@@ -81,7 +81,7 @@ const useInstrumentos = (id) => {
   const { mutate: mutatePrice } = useMutation({
     mutationFn: updatePrice,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['instrumentos'] })
+      queryClient.invalidateQueries({ queryKey: ['propostas'] })
     },
   })
 

@@ -17,6 +17,7 @@ const useOrders = (id) => {
       status: "",
       dateStart: "",
       dateStop: "",
+      filterByDate: false,
     }
   })
   const [debouncedSearchFilter, setDebouncedSearchFilter] = useState('')
@@ -25,22 +26,34 @@ const useOrders = (id) => {
     search,
     status,
     dateStart,
-    dateStop
+    dateStop,
+    filterByDate
   } = useWatch({ control: formFilter.control })
 
-  const { data, error, isLoading, refetch } = useQuery(['propostas', id, page, rowsPerPage, debouncedSearchFilter, status], async () => {
+  const { data, error, isLoading, refetch } = useQuery(['propostas', id, page, rowsPerPage, debouncedSearchFilter, status, filterByDate], async () => {
     if (id) {
       const response = await axios.get(`/propostas/${id}`, { params: { page_size: rowsPerPage } });
       return response?.data;
     }
-    const response = await axios.get('/propostas', { params: { page_size: rowsPerPage, page: page + 1, search: debouncedSearchFilter, data_criacao_start: dateStart, data_criacao_stop: dateStop, status } });
+    const response = await axios.get('/propostas',
+      {
+        params:
+        {
+          page_size: rowsPerPage,
+          page: page + 1,
+          search: debouncedSearchFilter,
+          data_criacao_after: dateStart ? dayjs(dateStart).format('YYYY-MM-DD') : null,
+          data_criacao_before: dateStop ? dayjs(dateStop).format('YYYY-MM-DD') : null,
+          status
+        }
+      });
     return response?.data;
   });
 
   const handleSearchFilter = debounce((value) => setDebouncedSearchFilter(value));
 
   useEffect(() => { handleSearchFilter(search) }, [search, handleSearchFilter])
-  
+
   const aprovacaoProposta = {
     null: 'Proposta em análise',
     false: 'Proposta negada',
@@ -173,7 +186,8 @@ const useOrders = (id) => {
     handleChangePage,
     handleChangeRowsPerPage,
     formFilter,
-    deleteOrderAndNavigate
+    deleteOrderAndNavigate,
+    isDeleting
   };
 };
 

@@ -31,9 +31,9 @@ function CardInformation({ instrumento, proposta }) {
     "C": instrumento?.precoCalibracaoNoCliente,
     "L": instrumento?.precoCalibracaoNoLaboratorio,
   }
-  const updatePrice = () => {
+  const updatePrice = async () => {
     try {
-      mutatePrice({id: instrumento.id, price: form.watch("precoAlternativoCalibracao")})
+      mutatePrice({ id: instrumento.id, price: form.watch("precoAlternativoCalibracao") })
     } catch (error) {
       console.log("Xi deu ruim", error)
     }
@@ -106,41 +106,40 @@ function CardInformation({ instrumento, proposta }) {
           <Typography fontWeight="900" color={'grey'} variant="body1">
             Preço calibração
           </Typography>
-          <Box display="flex" alignItems="center">
+          <Box display="flex" alignItems="center" justifyContent="space-between">
             {editPrice
               ?
-              <FormControl variant="outlined">
-                <TextField
-                  type="number"
-                  name="precoAlternativoCalibracao"
-                  label="Editar preço"
-                  size="small"
-                  autoFocus
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">R$</InputAdornment>,
-                  }}
-                  {...form.register("precoAlternativoCalibracao")}
-                />
-              </FormControl>
+              <Box sx={{display: "flex", flexDirection: "row", justifyContent: "flex-end", alignItems: "center"}}>
+                <FormControl variant="outlined" sx={{ width: '50%' }}>
+                  <TextField
+                    type="number"
+                    name="precoAlternativoCalibracao"
+                    label="Editar preço"
+                    size="small"
+                    autoFocus
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                    }}
+                    {...form.register("precoAlternativoCalibracao")}
+                  />
+                </FormControl>
+                <IconButton size="small" onClick={() => { setEditPrice(false); form.setValue("precoAlternativoCalibracao", "") }}>
+                  <CloseIcon fontSize='small' />
+                </IconButton>
+                <IconButton
+                  onClick={updatePrice}
+                >
+                  <CheckIcon fontSize='small' />
+                </IconButton>
+              </Box>
               : <Typography fontWeight="400" color={'grey'} variant="body1">
                 R$ {!!instrumento?.precoAlternativoCalibracao ? instrumento?.precoAlternativoCalibracao : priceOptions[proposta?.local]}
               </Typography>
             }
-            {pathname.includes('/admin') && proposta.status === 'F' && (
-              editPrice
-                ? <>
-                  <IconButton size="small" onClick={() => {setEditPrice(false);  form.setValue("precoAlternativoCalibracao", "")}}>
-                    <CloseIcon fontSize='small' />
-                  </IconButton>
-                  <IconButton
-                    onClick={updatePrice}
-                  >
-                    <CheckIcon fontSize='small' />
-                  </IconButton>
-                </>
-                : <IconButton size="small" onClick={() => setEditPrice(true)}>
-                  <EditIcon fontSize='small' />
-                </IconButton>
+            {pathname.includes('/admin') && proposta.status === 'F' && !editPrice && (
+              <IconButton size="small" onClick={() => setEditPrice(true)}>
+                <EditIcon fontSize='small' />
+              </IconButton>
             )}
           </Box>
         </Box>

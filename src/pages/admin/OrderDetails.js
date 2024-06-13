@@ -21,7 +21,7 @@ import useOrders from '../../hooks/useOrders';
 import CardInformation from '../../components/orders/CardInformation';
 import Iconify from '../../components/iconify';
 import { capitalizeFirstLetter as CFL } from '../../utils/formatString';
-import FormEditProposta from '../../components/admin/FormEditOrder';
+import FormEdit from '../../components/admin/order/FormEdit';
 
 const formaPagamento = {
   CD: 'Débito',
@@ -69,9 +69,9 @@ function OrderDetails() {
                 Proposta número: {data?.numero}
               </Typography>
             }
-            {!!data?.cliente?.empresa &&
+            {(!!data?.cliente?.empresa || !!data?.cliente?.nome)  &&
               <Typography variant="h6" gutterBottom>
-                {!!data?.cliente?.nome?.length ? `${data.cliente.empresa} - ${data.cliente.nome}` : data.cliente.empresa}
+                {data?.cliente?.nome?.length && data?.cliente?.empresa  ? `${data?.cliente?.empresa} - ${data?.cliente?.nome}` : data?.cliente?.empresa || data?.cliente?.nome}
               </Typography>
             }
           </Box>
@@ -110,7 +110,7 @@ function OrderDetails() {
           </Alert>
         )}
         {!!data && (
-          <FormEditProposta
+          <FormEdit
             open={edit}
             data={data}
             handleClose={() => setEdit(false)}

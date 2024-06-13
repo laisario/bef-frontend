@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import Iconify from '../../components/iconify/Iconify';
 import useDocumentos from '../../hooks/useDocumentos';
 import RevisionCard from '../../components/admin/documents/RevisionCard';
-import FormCreateRevision from '../../components/admin/FormCreateRevision';
+import FormCreateRevision from '../../components/admin/documents/FormCreateRevision';
 
 function DocumentRevisions() {
   const { id } = useParams();

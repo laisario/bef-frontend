@@ -6,8 +6,8 @@ import './styles.css'
 import { useNavigate, useParams } from 'react-router-dom';
 import useDocumentos from '../../hooks/useDocumentos';
 import ExcelViewer from '../../components/drivers/ExcelViewer';
-import FormCreateRevision from '../../components/admin/FormCreateRevision';
-import DocInformationCard from '../../components/admin/DocInformationCard';
+import FormCreateRevision from '../../components/admin/documents/FormCreateRevision';
+import InformationCard from '../../components/admin/documents/InformationCard';
 import RevisionCard from '../../components/admin/documents/RevisionCard';
 
 function DocumentsDetails() {
@@ -35,7 +35,7 @@ function DocumentsDetails() {
             </Grid>
           }
           <Grid item xs={12} md={4}>
-            <DocInformationCard data={data} status={status} statusColor={statusColor} setOpenFormRevision={setOpenFormRevision} />
+            <InformationCard data={data} status={status} statusColor={statusColor} setOpenFormRevision={setOpenFormRevision} />
             {!!revisoes?.length &&
               <Box>
                 <Box display="flex" flexDirection="row" justifyContent="space-between">
@@ -49,7 +49,7 @@ function DocumentsDetails() {
             }
           </Grid>
         </Grid>
-        {openFormRevision && <FormCreateRevision open={openFormRevision} setOpen={setOpenFormRevision} />}
+        {openFormRevision && <FormCreateRevision idCreator={data?.criador}  open={openFormRevision} setOpen={setOpenFormRevision} />}
       </Container>
     </>
   )

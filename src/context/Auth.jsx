@@ -17,7 +17,7 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (token) {
       const decoded = jwtDecode(token);
-      setUser({ token, nome: decoded?.nome, admin: decoded?.admin });
+      setUser({ token, nome: decoded?.nome, admin: decoded?.admin, id: decoded?.user_id });
     }
   }, [token]);
 

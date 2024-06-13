@@ -1,29 +1,52 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation } from 'react-query';
 import debounce from 'lodash.debounce';
-import {axios} from '../api';
+import { useForm, useWatch } from 'react-hook-form';
+import { axios } from '../api';
 import { isExpired } from '../utils/formatTime';
 
 const useDocumentos = (id) => {
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [search, setSearch] = useState('')
   const [openFormRevision, setOpenFormRevision] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const { data, error, isLoading, refetch } = useQuery(['documentos', id, page, rowsPerPage, debouncedSearch], async () => {
+  const formFilter = useForm({
+    defaultValues: {
+      search: "",
+      status: "",
+    }
+  })
+  const {
+    search,
+    status: statusFilter,
+  } = useWatch({ control: formFilter.control })
+  const formCreate = useForm({
+    defaultValues: {
+      codigo: '',
+      identificador: '',
+      titulo: '',
+      status: 'vigente',
+      elaborador: '',
+      frequencia: 0,
+      arquivo: null,
+      dataValidade: '',
+      dataRevisao: '',
+      revisores: [],
+    }
+  })
+  const { data, error, isLoading, refetch } = useQuery(['documentos', id, page, rowsPerPage, debouncedSearch, statusFilter], async () => {
     if (id) {
       const response = await axios.get(`/documentos/${id}`);
       return response?.data
     }
-    const response = await axios.get('/documentos', { params: { page: page + 1, page_size: rowsPerPage, search: debouncedSearch } });
+    const response = await axios.get('/documentos', { params: { page: page + 1, page_size: rowsPerPage, search: debouncedSearch, status: statusFilter } });
     return response?.data
   });
-  
+
   const handleSearch = debounce((value) => setDebouncedSearch(value));
 
-  useEffect(() => {handleSearch(search)}, [search, handleSearch])
-  
+  useEffect(() => { handleSearch(search) }, [search, handleSearch])
+
   const status = {
     'V': 'Vigente',
     'O': 'Obsoleto',
@@ -41,15 +64,15 @@ const useDocumentos = (id) => {
     onSuccess: () => {
       refetch()
     },
-   })
+  })
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
   const documentosVencidos = useMemo(() => {
     if (id) {
@@ -63,21 +86,21 @@ const useDocumentos = (id) => {
   return {
     data,
     error,
+    status,
     isLoading,
     refetch,
-    status,
     deleteDocumento,
     isDeleting,
     statusColor,
-    search,
-    setSearch,
-    openFormRevision, 
+    openFormRevision,
     setOpenFormRevision,
     page,
     rowsPerPage,
     handleChangePage,
     handleChangeRowsPerPage,
-    documentosVencidos
+    documentosVencidos,
+    formFilter,
+    formCreate
   }
 }
 

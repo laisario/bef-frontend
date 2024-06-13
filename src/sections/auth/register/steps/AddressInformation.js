@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+import { useForm, useWatch } from 'react-hook-form';
 import Iconify from '../../../../components/iconify';
 import { useAuth } from '../../../../context/Auth';
 import useCEP from '../../../../hooks/useCEP';
@@ -11,16 +11,26 @@ import FormAdress from '../../../../components/address/FormAdress';
 
 export default function AddressInformation() {
   const navigate = useNavigate();
-  const [CEP, setCEP] = useState('');
-  const [rua, setRua] = useState('');
-  const [numero, setNumero] = useState('');
-  const [bairro, setBairro] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [estado, setEstado] = useState('');
-  const [complemento, setComplemento] = useState('');
   const { registerLocation, loading } = useAuth();
-
-  const { isValid, ...cepInfo } = useCEP(CEP);
+  const form = useForm({defaultValues: {
+    CEP: "",
+    rua: "",
+    numero: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
+    complemento: "",
+  }})
+  const {
+    CEP,
+    rua,
+    numero,
+    bairro,
+    cidade,
+    estado,
+    complemento
+  } = useWatch({control: form.control})
+  const { isValid, ...cepInfo } = useCEP(CEP, form);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,23 +50,7 @@ export default function AddressInformation() {
     <form onSubmit={handleSubmit}>
       <FormAdress
         valid={isValid}
-        form={{
-          CEP,
-          rua,
-          numero,
-          bairro,
-          cidade,
-          estado,
-          setCEP,
-          setRua,
-          setNumero,
-          setBairro,
-          setCidade,
-          setEstado,
-          complemento,
-          setComplemento,
-        }}
-        cepInfo={cepInfo}
+        form={form}
       />
       <Box display="flex" alignItems="center" justifyContent="space-between" mt={4}>
         <Button

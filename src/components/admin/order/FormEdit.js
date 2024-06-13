@@ -23,11 +23,11 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import useOrders from '../../hooks/useOrders';
-import Iconify from '../iconify';
-import FormAdress from '../address/FormAdress';
+import useOrders from '../../../hooks/useOrders';
+import Iconify from '../../iconify';
+import FormAdress from '../../address/FormAdress';
 
-function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen }) {
+function FormEdit({ data, open, handleClose, setResponseStatus, setOpen }) {
   const form = useForm({
     defaultValues: {
       numeroProposta: data?.numero || 0,
@@ -285,4 +285,4 @@ function FormEditProposta({ data, open, handleClose, setResponseStatus, setOpen 
   );
 }
 
-export default FormEditProposta;
+export default FormEdit;
