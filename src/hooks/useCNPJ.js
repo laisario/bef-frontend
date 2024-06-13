@@ -95,9 +95,9 @@ const useCNPJ = (cnpj) => {
                 setEmpresa({})
             }
         })()
-    }, [cnpj])
+    }, [cnpj, isValid, tries])
 
-    return !!empresa?.razao_social ? { razaoSocial: empresa.razao_social, inscricaoEstadual: getInscricaoEstadual(empresa), cnpj: formatCNPJ(cnpj), isValid } : {}
+    return empresa?.razao_social ? { razaoSocial: empresa.razao_social, inscricaoEstadual: getInscricaoEstadual(empresa), cnpj: formatCNPJ(cnpj), isValid } : {}
 }
 
 export default useCNPJ

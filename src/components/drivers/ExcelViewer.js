@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { OutTable, ExcelRenderer } from 'react-excel-renderer';
+import { ExcelRenderer } from 'react-excel-renderer';
 import 'react-data-grid/lib/styles.css';
 import DataGrid from 'react-data-grid';
 import { useParams } from 'react-router-dom';
@@ -28,11 +28,9 @@ function ExcelViewer() {
             });
         })()
 
-    }, [])
+    }, [data?.arquivo])
 
-    const rowKeyGetter = (row) => {
-        return row.id;
-    };
+    const rowKeyGetter = (row) => row.id;
 
     return (
         <DataGrid columns={table.cols} rows={table.rows} className='rdg-light' rowKeyGetter={rowKeyGetter} rowHeight={25} style={{ "height": "750px" }} />

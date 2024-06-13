@@ -1,4 +1,4 @@
-import { Box, Card, Chip, Divider, Link, Stack, Typography } from '@mui/material';
+import { Box, Card, Chip, Divider, Stack, Typography } from '@mui/material';
 import React from 'react';
 
 function ProductCardAdmin({ product }) {

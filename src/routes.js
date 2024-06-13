@@ -5,9 +5,9 @@ import AdminLayout from './layouts/admin';
 import SimpleLayout from './layouts/simple';
 import AuthLayout from './layouts/auth';
 //
-import DocumentosPage from './pages/admin/DocumentosPage';
-import BlogPage from './pages/BlogPage';
-import PedidosPage from './pages/Orders';
+import Documents from './pages/admin/Documents';
+import DocumentsDetails from './pages/admin/DocumentsDetails';
+import Orders from './pages/Orders';
 import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import ProductsPage from './pages/ProductsPage';
@@ -16,13 +16,12 @@ import OrderDetails from './pages/OrderDetails';
 import RegisterAuthPage from './pages/register/auth';
 import RegisterBasicsPage from './pages/register/basics';
 import RegisterLocationPage from './pages/register/location';
-import PedidosPageAdmin from './pages/admin/PedidosPageAdmin';
-import DetalhesPedidoPageAdmin from './pages/admin/DetalhesPedidoPageAdmin';
-import HomePageAdmin from './pages/admin/HomePageAdmin';
+import OrdersAdmin from './pages/admin/Orders';
+import OrderDetailsAdmin from './pages/admin/OrderDetails';
+import DashboardAppAdmin from './pages/admin/DashboardApp';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ProductsPageAdmin from './pages/admin/ProductsPageAdmin';
-import DetalhesDocumentoPage from './pages/admin/DetalhesDocumentoPage';
-import RevisionsDocumentPage from './pages/admin/RevisionsDocumentPage';
+import DocumentRevisions from './pages/admin/DocumentRevisions';
 
 // ----------------------------------------------------------------------
 
@@ -34,11 +33,10 @@ export default function Router() {
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
-        { path: 'pedidos', element: <PedidosPage /> },
-        { path: 'pedido/:id', element: <OrderDetails /> },
+        { path: 'propostas', element: <Orders /> },
+        { path: 'proposta/:id', element: <OrderDetails /> },
         { path: 'produtos', element: <ProductsPage /> },
         { path: 'produto/:id', element: <ProductDetailPage /> },
-        { path: 'blog', element: <BlogPage /> },
       ],
     },
     {
@@ -75,14 +73,14 @@ export default function Router() {
       path: '/admin',
       element: <AdminLayout />,
       children: [
-        { element: <Navigate to="/admin/home" />, index: true },
-        { path: 'home', element: <HomePageAdmin /> },
-        { path: 'pedidos', element: <PedidosPageAdmin /> },
-        { path: 'pedido/:id', element: <DetalhesPedidoPageAdmin /> },
+        { element: <Navigate to="/admin/app" />, index: true },
+        { path: 'app', element: <DashboardAppAdmin /> },
+        { path: 'propostas', element: <OrdersAdmin /> },
+        { path: 'proposta/:id', element: <OrderDetailsAdmin /> },
         { path: 'produtos', element: <ProductsPageAdmin/> },
-        { path: 'documentos', element: <DocumentosPage /> },
-        { path: 'documento/:id', element: <DetalhesDocumentoPage /> },
-        { path: 'documento/:id/revisoes', element: <RevisionsDocumentPage />}
+        { path: 'documentos', element: <Documents /> },
+        { path: 'documento/:id', element: <DocumentsDetails /> },
+        { path: 'documento/:id/revisoes', element: <DocumentRevisions />}
       ],
     },
   ]);

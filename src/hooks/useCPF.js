@@ -71,11 +71,9 @@ function matchNumbers(value = '') {
     return Array.isArray(match) ? match.map(Number) : []
 }
 
-const useCPF = (cpf) => {
-    return {
+const useCPF = (cpf) => ({
         cpf: formatCPF(cpf),
         isValid: validarCPF(cpf),
-    }
-}
+    })
 
 export default useCPF

@@ -4,12 +4,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import { useTheme } from '@emotion/react';
 import { Box, Checkbox, FormControlLabel, FormGroup, FormHelperText, FormLabel } from '@mui/material';
 import { axios } from '../../api';
 import CsvViewer from './CsvViewer';
@@ -31,7 +26,7 @@ function ExportFilter({ open, handleClose, selecionados, handleChangeCheckbox, v
 
                     const dadosSelecionados = {
                         instrumentosSelecionados: selecionados,
-                        camposSelecionados: Object.entries(valueCheckbox).filter(([_, value]) => !!value).map(([key]) => key)
+                        camposSelecionados: Object.entries(valueCheckbox).filter(([,value]) => !!value).map(([key]) => key)
                     };
 
                     try {

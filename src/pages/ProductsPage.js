@@ -1,17 +1,12 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
-// @mui
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
-import { AppBar, Box, Button, CircularProgress, Container, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Container, Stack, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import GetAppIcon from '@mui/icons-material/GetApp';
-import InfoIcon from '@mui/icons-material/Info';
 import ExportFilter from '../components/instrumentos/ExportFilter';
-// components
 import { ProductList } from '../sections/@dashboard/products';
-// mock
 import useInstrumentos from '../hooks/useInstrumentos';
 
 // ----------------------------------------------------------------------
@@ -47,7 +42,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   width: '100%',
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     [theme.breakpoints.up('sm')]: {
@@ -62,7 +56,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function ProductsPage() {
   const { todosInstrumentos, search, setSearch, isLoading } = useInstrumentos();
-  const navigate = useNavigate()
   const [open, setOpen] = useState(false);
   const [valueCheckbox, setValueCheckbox] = useState({
     tag: true,
@@ -117,7 +110,6 @@ export default function ProductsPage() {
           mb={5}
           flexWrap="wrap"
          >
-
           <Typography variant="h4" gutterBottom>
             Meus Instrumentos
           </Typography>

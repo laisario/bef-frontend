@@ -1,7 +1,7 @@
 // @mui
 import PropTypes from 'prop-types';
 import { Box, Stack, Link, Card, Button, Divider, Typography, CardHeader } from '@mui/material';
-import { alpha, styled } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 // utils
 import { useNavigate } from 'react-router-dom';
 import { fToNow } from '../../../utils/formatTime';

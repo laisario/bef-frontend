@@ -1,15 +1,9 @@
-import { format, getTime, formatDistanceToNow, addDays, isPast } from 'date-fns';
+import { format, getTime, formatDistanceToNow, addDays, isPast, addYears } from 'date-fns';
 import ptLocale from 'date-fns/locale/pt-BR';
 
 // ----------------------------------------------------------------------
 
 export function fDate(date, newFormat) {
-  const fm = newFormat || 'dd MMM yyyy';
-
-  return date ? format(new Date(date), fm) : '';
-}
-
-export function fDateTime(date, newFormat) {
   const fm = newFormat || "dd 'de' MMMM 'de' yyyy";
 
   return date ? format(new Date(date), fm, { locale: ptLocale }) : '';
@@ -28,7 +22,10 @@ export function fToNow(date) {
     : '';
 }
 
-export function isExpired(date, frequency) {
+export function isExpired(date, frequency, timeUnit ) {
+  if (timeUnit && timeUnit === "year") {
+    return date ? isPast(addYears(new Date(date), frequency)) : false;
+  }
   return date ? isPast(addDays(new Date(date), frequency)) : false;
 }
 

@@ -2,9 +2,9 @@
 import PropTypes from 'prop-types';
 import { Box, Button, Card, Divider, Typography, CardHeader, CardContent } from '@mui/material';
 import { Timeline, TimelineDot, TimelineItem, TimelineContent, TimelineSeparator, TimelineConnector } from '@mui/lab';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 // utils
-import { fDateTime } from '../../../utils/formatTime';
+import { fDate } from '../../../utils/formatTime';
 import Iconify from '../../../components/iconify';
 
 // ----------------------------------------------------------------------
@@ -21,9 +21,9 @@ export default function AppOrderTimeline({ title, subheader, list, ...other }) {
 
   const redirect = () => {
     if (pathname.includes('/admin')) {
-      navigate('/admin/pedidos');
+      navigate('/admin/propostas');
     } else {
-      navigate('/dashboard/pedidos');
+      navigate('/dashboard/propostas');
     }
   };
 
@@ -87,7 +87,7 @@ function OrderItem({ item, isLast }) {
         <Typography variant="subtitle2">{title}</Typography>
 
         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-          {fDateTime(time)}
+          {fDate(time)}
         </Typography>
       </TimelineContent>
     </TimelineItem>

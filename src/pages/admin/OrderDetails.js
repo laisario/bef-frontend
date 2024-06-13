@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   Alert,
   Box,
@@ -16,12 +16,12 @@ import Card from '@mui/material/Card';
 import { Helmet } from 'react-helmet-async';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@emotion/react';
+import dayjs from 'dayjs';
 import useOrders from '../../hooks/useOrders';
 import CardInformation from '../../components/orders/CardInformation';
 import Iconify from '../../components/iconify';
 import { capitalizeFirstLetter as CFL } from '../../utils/formatString';
-import { fDate, fDateTime } from '../../utils/formatTime';
-import FormEditProposta from '../../components/admin/FormEditOrder';
+import FormEdit from '../../components/admin/order/FormEdit';
 
 const formaPagamento = {
   CD: 'Débito',
@@ -44,12 +44,12 @@ const colorAprovacaoProposta = {
 };
 
 
-function DetalhesPedidoPageAdmin() {
+function OrderDetails() {
   const [edit, setEdit] = useState(false);
   const [open, setOpen] = useState(false);
   const [response, setResponse] = useState(null);
   const { id } = useParams();
-  const { data, deleteOrder } = useOrders(id);
+  const { data, deleteOrderAndNavigate } = useOrders(id);
   const theme = useTheme();
   const responseMesages = {
     200: 'Pedido editado com sucesso',
@@ -59,24 +59,24 @@ function DetalhesPedidoPageAdmin() {
   return (
     <>
       <Helmet>
-        <title>Pedido | B&F</title>
+        <title>Proposta | B&F</title>
       </Helmet>
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Box direction="column">
             {!!data?.numero &&
               <Typography variant="h4" gutterBottom>
-                Pedido número: {data?.numero}
+                Proposta número: {data?.numero}
               </Typography>
             }
-            {!!data?.data_criacao &&
+            {(!!data?.cliente?.empresa || !!data?.cliente?.nome)  &&
               <Typography variant="h6" gutterBottom>
-                {fDateTime(data?.data_criacao)}
+                {data?.cliente?.nome?.length && data?.cliente?.empresa  ? `${data?.cliente?.empresa} - ${data?.cliente?.nome}` : data?.cliente?.empresa || data?.cliente?.nome}
               </Typography>
             }
           </Box>
           <Box display="flex" gap={2}>
-            <Button onClick={deleteOrder} color="secondary">
+            <Button onClick={deleteOrderAndNavigate} color="secondary">
               <Iconify icon="eva:trash-2-fill" />
             </Button>
             {data?.status !== 'F' ? (
@@ -110,7 +110,7 @@ function DetalhesPedidoPageAdmin() {
           </Alert>
         )}
         {!!data && (
-          <FormEditProposta
+          <FormEdit
             open={edit}
             data={data}
             handleClose={() => setEdit(false)}
@@ -124,14 +124,24 @@ function DetalhesPedidoPageAdmin() {
               {+(data?.total) > 0 &&
                 <Typography variant="h6">Total: R${data?.total}</Typography>
               }
+              {!!data?.data_criacao &&
+                <Typography variant="subtitle1" fontWeight="500">
+                  Proposta criada: {dayjs(data?.data_criacao).locale('pt-BR').format('D [de] MMMM [de] YYYY')}
+                </Typography>
+              }
               {!!data?.local &&
-                <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
+                <Typography variant="subtitle1" fontWeight="500">
                   Local calibração: {data?.local === 'L' ? 'Laboratório B&F' : 'Cliente'}
                 </Typography>
               }
               {!!data?.condicao_de_pagamento &&
                 <Typography variant="subtitle1" fontWeight="500">
                   Forma de pagamento: {formaPagamento[data?.condicao_de_pagamento]}
+                </Typography>
+              }
+              {!!data?.prazo_de_pagamento &&
+                <Typography variant="subtitle1" fontWeight="500">
+                  Prazo de pagamento: {dayjs(data?.prazo_de_pagamento).locale('pt-BR').format('D [de] MMMM [de] YYYY')}
                 </Typography>
               }
               {!!data?.transporte &&
@@ -141,7 +151,7 @@ function DetalhesPedidoPageAdmin() {
               }
               {!!data?.prazo_de_entrega &&
                 <Typography variant="subtitle1" fontWeight="500">
-                  Prazo de entrega: {fDate(data?.prazo_de_entrega)}
+                  Prazo de entrega: {dayjs(data?.prazo_de_entrega).locale('pt-BR').format('D [de] MMMM [de] YYYY')}
                 </Typography>
               }
               {!!data?.endereco_de_entrega &&
@@ -161,56 +171,57 @@ function DetalhesPedidoPageAdmin() {
               />
             </Box>
           </Grid>
-          <Typography variant="h6" my={2}>
-            {data?.instrumentos.length > 1 ? "Instrumentos" : "Instrumento"}
-          </Typography>
-          <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
-            {data?.instrumentos?.map(
-              (
-                {
-                  tag,
-                  numero_de_serie: numeroDeSerie,
-                  posicao,
-                  data_ultima_calibracao: dataUltimaCalibracao,
-                  instrumento: {
-                    maximo,
-                    minimo,
-                    unidade,
-                    capacidade_de_medicao: { valor, unidade: unidadeMedicao },
-                    tipo_de_instrumento: { descricao },
-                  },
-                  id,
-                },
-                index
-              ) => (
-                <CardInformation
-                  instrumento={{
+          {!!data?.instrumentos.length && <>
+            <Typography variant="h6" my={2}>
+              {data?.instrumentos.length > 1 ? "Instrumentos" : "Instrumento"}
+            </Typography>
+            <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
+              {data?.instrumentos?.map(
+                (
+                  {
                     tag,
                     numero_de_serie: numeroDeSerie,
-                    data_ultima_calibracao: dataUltimaCalibracao,
-                    informacoes_adicionais: data.informacoes_adicionais,
-                    local: data.local,
-                    maximo,
-                    minimo,
-                    unidade,
-                    valor,
-                    unidadeMedicao,
                     posicao,
-                    descricao,
+                    data_ultima_calibracao: dataUltimaCalibracao,
+                    instrumento: {
+                      maximo,
+                      minimo,
+                      unidade,
+                      capacidade_de_medicao: capacidadeDeMedicao,
+                      tipo_de_instrumento: { descricao },
+                      tipo_de_servico: tipoDeServico,
+                      preco_calibracao_no_cliente: precoCalibracaoNoCliente,
+                      preco_calibracao_no_laboratorio: precoCalibracaoNoLaboratorio,
+                    },
+                    preco_alternativo_calibracao: precoAlternativoCalibracao,
                     id,
-                  }}
-                  key={index}
-                  specialCases={{
-                    numero_de_serie: 'Número de série',
-                    data_ultima_calibracao: 'Última Calibração',
-                    informacoes_adicionais: 'Informações adicionais',
-                  }}
-                  titles={['tag', 'numero_de_serie', 'data_ultima_calibracao', 'status', 'informacoes_adicionais']}
-                  proposta={data}
-                />
-              )
-            )}
-          </Box>
+                  },
+                  index
+                ) => (
+                  <CardInformation
+                    instrumento={{
+                      tag,
+                      numeroDeSerie,
+                      dataUltimaCalibracao,
+                      maximo,
+                      minimo,
+                      unidade,
+                      capacidadeDeMedicao,
+                      posicao,
+                      descricao,
+                      id,
+                      tipoDeServico,
+                      precoAlternativoCalibracao,
+                      precoCalibracaoNoCliente,
+                      precoCalibracaoNoLaboratorio,
+                    }}
+                    key={index}
+                    proposta={data}
+                  />
+                )
+              )}
+            </Box>
+          </>}
           {!!data?.informacoes_adicionais && (
             <>
               <Typography my={2} variant="h6">
@@ -227,4 +238,4 @@ function DetalhesPedidoPageAdmin() {
   );
 }
 
-export default DetalhesPedidoPageAdmin;
+export default OrderDetails;

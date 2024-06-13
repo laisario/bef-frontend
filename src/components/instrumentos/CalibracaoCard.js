@@ -1,13 +1,10 @@
 /* eslint-disable react/prop-types */
 import { useTheme } from '@emotion/react';
-import { Box, Button, Card, CardActions, CardContent, Checkbox, Chip, FormControl, FormControlLabel, FormGroup, Grid, InputLabel, Link, MenuItem, Select, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, Chip, Link, Tooltip, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import titleCase from '../../utils/formatTitle';
-import { fDateTime } from '../../utils/formatTime';
-import AlertConfirmationCard from './AlertConfirmationCard';
-import useCalibrations from '../../hooks/useCalibration';
-import { axios } from '../../api';
+import { fDate } from '../../utils/formatTime';
 import useInstrumentos from '../../hooks/useInstrumentos';
 import CriticalAnalysisDialog from './CriticalAnalysisDialog';
 
@@ -46,7 +43,7 @@ function CalibracaoCard({ calibracao, titles, specialCases }) {
 
         <Box display="flex" justifyContent="space-between" gap={2} mb={1}>
           <Typography fontWeight="900" color={'grey'} variant="body1">
-            {fDateTime(calibracao?.data)}
+            {fDate(calibracao?.data)}
           </Typography>
           <Chip
             label={calibracao?.status === 'A' ? 'Aprovado' : 'Reprovado'}

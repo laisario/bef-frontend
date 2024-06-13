@@ -1,8 +1,14 @@
 import { Box, Button, Card, CardActions, CardContent, Chip, Typography } from '@mui/material'
 import React from 'react'
-import titleCase from '../../utils/formatTitle';
+import titleCase from '../../../utils/formatTitle';
+import { fDate } from '../../../utils/formatTime';
+import useUsers from '../../../hooks/useUsers';
+import { useAuth } from '../../../context/Auth';
 
-function DocInformationCard({data, status, statusColor, setOpenFormRevision}) {
+function InformationCard({ data, status, statusColor, setOpenFormRevision }) {
+    const { user } = useAuth();
+    const { data: dataUser } = useUsers(data?.criador)
+    const isCreator = data?.criador === user?.id
     return (
         <Card variant="outlined">
             <CardContent sx={{ bgcolor: 'background.paper', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -17,9 +23,9 @@ function DocInformationCard({data, status, statusColor, setOpenFormRevision}) {
                             {data?.identificador}
                         </Typography>
                     }
-                    {data?.elaborador &&
+                    {data?.criador &&
                         <Typography sx={{ mt: 1.5 }} variant="body2">
-                            <strong>Elaborador:</strong> {titleCase(data?.elaborador)}
+                            <strong>Elaborador:</strong> {titleCase(dataUser?.username)}
                         </Typography>
                     }
                     {data?.codigo?.codigo &&
@@ -34,7 +40,7 @@ function DocInformationCard({data, status, statusColor, setOpenFormRevision}) {
                     }
                     {data?.data_revisao &&
                         <Typography sx={{ mt: 1 }} variant="body2">
-                            <strong>Revisão:</strong>{data?.data_revisao}
+                            <strong>Revisão: </strong>{fDate(data?.data_revisao)}
                         </Typography>
                     }
                     {data?.validade &&
@@ -44,12 +50,12 @@ function DocInformationCard({data, status, statusColor, setOpenFormRevision}) {
                     }
                     {!!data?.frequencia &&
                         <Typography sx={{ mt: 1 }} variant="body2">
-                            <strong>Frequência: </strong>{data?.frequencia}
+                            <strong>Frequência: </strong>{data?.frequencia > 1 ? `${data?.frequencia} anos` : `${data?.frequencia} ano`}
                         </Typography>
                     }
                     {!!data?.revisoes.length && <Typography sx={{ mt: 1 }} variant="body2">
-                            <strong>Número revisões: </strong>{data?.revisoes?.length}
-                        </Typography>}
+                        <strong>Número revisões: </strong>{data?.revisoes?.length}
+                    </Typography>}
                 </Box>
                 <Box>
                     {
@@ -59,10 +65,12 @@ function DocInformationCard({data, status, statusColor, setOpenFormRevision}) {
                 </Box>
             </CardContent>
             <CardActions sx={{ display: 'flex', flexDirection: 'row', justifyContent: "flex-end" }}>
-                <Button variant="outlined" size="medium" onClick={() => setOpenFormRevision(true)}>Revisar</Button>
+                {isCreator &&
+                    <Button variant="outlined" size="medium" onClick={() => setOpenFormRevision(true)}>Revisar</Button>
+                }
             </CardActions>
         </Card>
     )
 }
 
-export default DocInformationCard
+export default InformationCard

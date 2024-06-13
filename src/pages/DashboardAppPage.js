@@ -11,7 +11,7 @@ import { isExpired } from '../utils/formatTime';
 
 export default function DashboardAppPage() {
   const { todosInstrumentos, instrumentosCalibrados, instrumentosVencidos, isLoading } = useInstrumentos();
-  const { data, pedidosEmAnalise } = useOrders();
+  const { data, propostasEmAnalise } = useOrders();
 
   return (
     <>
@@ -56,7 +56,7 @@ export default function DashboardAppPage() {
             <Grid item xs={12} sm={6} md={3}>
               <AppWidgetSummary
                 title="Pedidos em analise"
-                total={pedidosEmAnalise?.length}
+                total={propostasEmAnalise?.length}
                 color="warning"
                 icon={'ant-design:file-sync-outlined'}
               />

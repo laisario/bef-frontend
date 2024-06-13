@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
-// @mui
 import {
   Card,
   Table,
@@ -12,55 +11,28 @@ import {
   Container,
   Typography,
   TableContainer,
-  Modal,
-  Box,
   Link,
   Alert,
   Snackbar,
   TablePagination,
-  Dialog,
+  Checkbox,
 } from '@mui/material';
-import { styled } from '@mui/system';
-import useOrders from '../../hooks/useOrders'
-// components
 import Label from '../../components/label';
 import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
-// sections
-import { UserListHead } from '../../sections/@dashboard/user';
-// mock
-import USERLIST from '../../_mock/user';
-
-import { fDateTime } from '../../utils/formatTime';
+import useOrders from '../../hooks/useOrders'
+import { fDate } from '../../utils/formatTime';
 import FormCreateOrder from '../../components/admin/FormCreateOrder';
+import TableHeader from '../../components/admin/order/TableHeader';
+import TableToolbar from '../../components/orders/TableToolbar';
 
-// ----------------------------------------------------------------------
 
-const TABLE_HEAD = [
-  { id: 'id', label: '', alignRight: false },
-  { id: 'data', label: 'Data', alignRight: false },
-  { id: 'cliente', label: 'Cliente', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
-];
 
-// ----------------------------------------------------------------------
-
-const FormBox = styled(Box)({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
-});
-
-function PedidosPageAdmin() {
+function Orders() {
   const [open, setOpen] = useState(false);
-  const [loading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
-  const { data, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = useOrders();
+  const [selectedOrders, setSelectedOrders] = useState([]);
+  const { data, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, formFilter } = useOrders();
   const { vertical, horizontal, propostaEnviada } = alert;
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
@@ -72,59 +44,79 @@ function PedidosPageAdmin() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const statusProposta = {
-    null: 'Proposta em análise',
-    false: 'Proposta negada',
-    true: 'Proposta aprovada',
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      const newSelected = data?.results?.map((n) => n.id);
+      setSelectedOrders(newSelected);
+      return;
+    }
+    setSelectedOrders([]);
   };
 
-  const colorStatusProposta = {
-    null: 'info',
-    false: 'error',
-    true: 'success',
+  const handleClick = (event, id) => {
+    event?.stopPropagation()
+    setSelectedOrders(selectedOrders?.includes(id) ? selectedOrders?.filter(documentId => documentId !== id) : [...selectedOrders, id]);
   };
+
+  const isSelected = (id) => selectedOrders.indexOf(id) !== -1;
   return (
     <>
       <Helmet>
-        <title> Pedidos | B&F </title>
+        <title> Propostas | B&F </title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Pedidos
+            Propostas
           </Typography>
+
           <Button variant="contained" onClick={handleOpen} startIcon={<Iconify icon="eva:plus-fill" />}>
-            Novo pedido
+            Nova proposta
           </Button>
         </Stack>
-
         <Card>
+        <TableToolbar form={formFilter} numSelected={selectedOrders.length} selectedOrders={selectedOrders} admin />
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
+                <TableHeader
+                  numSelected={selectedOrders.length}
+                  onSelectAllClick={handleSelectAllClick}
+                  rowCount={data?.results?.length} />
                 <TableBody>
                   {data?.results?.map((row, index) => {
-                    const { id, total, data_criacao: dataCriacao, status, cliente } = row;
+                    const { id, data_criacao: dataCriacao, status, cliente, numero, aprovacao } = row;
                     const data = new Date(dataCriacao);
+                    const isItemSelected = isSelected(row.id);
                     return (
                       <TableRow
                         hover
                         key={id}
                         tabIndex={-1}
                         component={Link}
-                        href={`#/admin/pedido/${id}`}
+                        href={`#/admin/proposta/${id}`}
                         underline="none"
                       >
-                        <TableCell align="left">{index + 1}</TableCell>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            color="primary"
+                            onClick={(event) => handleClick(event, row.id)}
+                            checked={isItemSelected}
+                            inputProps={{
+                              'aria-labelledby': index,
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell align="left">{numero}</TableCell>
 
-                        <TableCell align="left">{fDateTime(data)}</TableCell>
+                        <TableCell align="left">{fDate(data)}</TableCell>
 
                         <TableCell align="left">{cliente.empresa || cliente.nome}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={status === 'F' ? 'primary' : 'info'}>{status === 'F' ? 'Finalizada' : 'Em análise'}</Label>
+                          <Label color={status === 'F' ? 'primary' : 'info'}>{status === 'F' ? aprovacao === null ? "Finalizada e Aguardando análise cliente" : `Finalizada e 
+                          ${aprovacao ? "aprovada" : "reprovada"}` : 'Aguardando análise'}</Label>
                         </TableCell>
                       </TableRow>
                     );
@@ -144,12 +136,7 @@ function PedidosPageAdmin() {
             </TableContainer>
           </Scrollbar>
         </Card>
-        <Dialog
-          open={open}
-          onClose={handleClose}
-        >
-          <FormCreateOrder setOpen={setOpen} setAlert={setAlert} onClose={handleClose} />
-        </Dialog>
+        <FormCreateOrder open={open} setOpen={setOpen} setAlert={setAlert} onClose={handleClose} admin/>
 
         <Stack spacing={2} sx={{ width: '100%' }}>
           <Snackbar
@@ -172,4 +159,4 @@ function PedidosPageAdmin() {
   );
 }
 
-export default PedidosPageAdmin
+export default Orders

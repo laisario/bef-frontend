@@ -1,23 +1,58 @@
 /* eslint-disable camelcase */
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import dayjs from 'dayjs';
-import {axios, axiosForFiles} from '../api';
+import debounce from 'lodash.debounce';
+import { axios, axiosForFiles } from '../api';
 
 const useOrders = (id) => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const formFilter = useForm({
+    defaultValues: {
+      search: "",
+      status: "",
+      dateStart: "",
+      dateStop: "",
+      filterByDate: false,
+    }
+  })
+  const [debouncedSearchFilter, setDebouncedSearchFilter] = useState('')
 
-  const { data, error, isLoading, refetch } = useQuery(['propostas', id, page, rowsPerPage], async () => {
+  const {
+    search,
+    status,
+    dateStart,
+    dateStop,
+    filterByDate
+  } = useWatch({ control: formFilter.control })
+
+  const { data, error, isLoading, refetch } = useQuery(['propostas', id, page, rowsPerPage, debouncedSearchFilter, status, filterByDate], async () => {
     if (id) {
       const response = await axios.get(`/propostas/${id}`, { params: { page_size: rowsPerPage } });
       return response?.data;
     }
-    const response = await axios.get('/propostas', { params: { page_size: rowsPerPage, page: page + 1, } });
+    const response = await axios.get('/propostas',
+      {
+        params:
+        {
+          page_size: rowsPerPage,
+          page: page + 1,
+          search: debouncedSearchFilter,
+          data_criacao_after: dateStart ? dayjs(dateStart).format('YYYY-MM-DD') : null,
+          data_criacao_before: dateStop ? dayjs(dateStop).format('YYYY-MM-DD') : null,
+          status
+        }
+      });
     return response?.data;
   });
+
+  const handleSearchFilter = debounce((value) => setDebouncedSearchFilter(value));
+
+  useEffect(() => { handleSearchFilter(search) }, [search, handleSearchFilter])
 
   const aprovacaoProposta = {
     null: 'Proposta em análise',
@@ -31,83 +66,78 @@ const useOrders = (id) => {
     true: 'success',
   };
 
-  const deleteOrder = async () => {
-    await axios.delete(`/propostas/${id}`);
-    navigate('/admin/pedidos');
+  const { mutate: deleteOrder, isLoading: isDeleting } = useMutation(async (ids) => Promise.all(ids?.map((id) => axios.delete(`/propostas/${id}`))), {
+    onSuccess: () => {
+      refetch()
+    },
+  })
+
+  const deleteOrderAndNavigate = async () => {
+    deleteOrder([id])
+    navigate('/admin/propostas');
   };
+
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   const edit = async (form, setResponseStatus, setOpen) => {
-    const {
-      form: { local, total, forma_de_pagamento, transporte, numero, data_aprovacao, certificado: anexo },
-      numero: numeroCasa,
-      CEP,
-      rua,
-      bairro,
-      cidade,
-      estado,
-      enderecoEntrega,
-      aprovado,
-      complemento,
-      validade,
-      prazoDeEntrega,
-    } = form;
+    const formValues = form.watch()
     try {
-      if (anexo && anexo instanceof File) {
+      if (formValues.anexo && formValues.anexo instanceof File) {
         const formData = new FormData();
-        formData.append('anexo', anexo);
+        formData.append('anexo', formValues.anexo);
         await axiosForFiles.patch(`/propostas/${id}/anexar/`, formData)
       }
-      if (enderecoEntrega === 'enderecoCadastrado') {
+      if (formValues.enderecoDeEntrega === 'enderecoCadastrado') {
         const response = await axios.patch(`/propostas/${id}/atualizar/`, {
-          local: local || null,
-          total: total || 0,
-          prazoDeEntrega: dayjs.isDayjs (prazoDeEntrega) ? prazoDeEntrega?.format('YYYY-MM-DD') : null,
-          condicaoDePagamento: forma_de_pagamento || null,
-          transporte: transporte || null,
-          numero: numero || 0,
-          endereco_de_entrega: data?.cliente?.endereco || null,
-          validade: dayjs.isDayjs(validade) ? validade?.format('YYYY-MM-DD') : null,
-          data_aprovacao: dayjs.isDayjs(data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
-          aprovacao: aprovado || null,
+          local: formValues.local || null,
+          total: formValues.total || 0,
+          prazoDeEntrega: dayjs.isDayjs(formValues.prazoDeEntrega) ? formValues.prazoDeEntrega?.format('YYYY-MM-DD') : null,
+          condicaoDePagamento: formValues.formaDePagamento || null,
+          transporte: formValues.transporte || null,
+          numero: formValues.numeroProposta || 0,
+          enderecoDeEntrega: data?.cliente?.endereco || null,
+          validade: dayjs.isDayjs(formValues.validade) ? formValues.validade?.format('YYYY-MM-DD') : null,
+          dataAprovacao: dayjs.isDayjs(formValues.dataAprovacao) ? formValues.dataAprovacao?.format('YYYY-MM-DD') : null,
+          aprovacao: formValues.aprovado || null,
+          prazoDePagamento: dayjs.isDayjs(formValues.prazoDePagamento) ? formValues.prazoDePagamento?.format('YYYY-MM-DD') : null,
         });
         setResponseStatus(response)
       } else {
-          const response = await axios.patch(`/propostas/${id}/atualizar/`, {
-          local: local || null,
-          total: total || 0,
-          prazoDeEntrega: dayjs.isDayjs(prazoDeEntrega) ? prazoDeEntrega?.format('YYYY-MM-DD') : null,
-          condicaoDePagamento: forma_de_pagamento || null,
-          transporte: transporte || null,
-          numero: numero || 0,
+        const response = await axios.patch(`/propostas/${id}/atualizar/`, {
+          local: formValues.local || null,
+          total: formValues.total || 0,
+          prazoDeEntrega: dayjs.isDayjs(formValues.prazoDeEntrega) ? formValues.prazoDeEntrega?.format('YYYY-MM-DD') : null,
+          condicaoDePagamento: formValues.formaDePagamento || null,
+          transporte: formValues.transporte || null,
+          numero: formValues.numeroProposta || 0,
           enderecoDeEntregaAdd:
             {
-              cep: CEP || null,
-              numero: numeroCasa || null,
-              logradouro: rua || null,
-              bairro: bairro || null,
-              cidade: cidade || null,
-              estado: estado || null,
-              complemento: complemento || null,
+              cep: formValues.CEP || null,
+              numero: formValues.numeroEndereco || null,
+              logradouro: formValues.rua || null,
+              bairro: formValues.bairro || null,
+              cidade: formValues.cidade || null,
+              estado: formValues.estado || null,
+              complemento: formValues.complemento || null,
             } || null,
-          validade: dayjs.isDayjs(validade) ? validade?.format('YYYY-MM-DD') : null,
-          dataAprovacao: dayjs.isDayjs(data_aprovacao) ? data_aprovacao?.format('YYYY-MM-DD') : null,
-          aprovacao: aprovado || null,
+          validade: dayjs.isDayjs(formValues.validade) ? formValues.validade?.format('YYYY-MM-DD') : null,
+          dataAprovacao: dayjs.isDayjs(formValues.dataAprovacao) ? formValues.dataAprovacao?.format('YYYY-MM-DD') : null,
+          aprovacao: formValues.aprovado || null,
+          prazoDePagamento: dayjs.isDayjs(formValues.prazoDePagamento) ? formValues.prazoDePagamento?.format('YYYY-MM-DD') : null,
         });
         setResponseStatus(response);
       }
       refetch()
     } catch (error) {
-      setResponseStatus
-         (error.response);
+      setResponseStatus(error.response);
       setOpen(true);
       console.log(error);
     }
@@ -116,7 +146,7 @@ const useOrders = (id) => {
   const aprovar = async () => {
     try {
       await axios.post(`/propostas/${id}/aprovar/`);
-      navigate('/dashboard/pedidos');
+      navigate('/dashboard/propostas');
       return { error: false };
     } catch (err) {
       console.log(err);
@@ -127,15 +157,15 @@ const useOrders = (id) => {
   const recusar = async () => {
     try {
       await axios.post(`/propostas/${id}/reprovar/`);
-      navigate('/dashboard/pedidos');
+      navigate('/dashboard/propostas');
       return { error: false };
     } catch (err) {
       console.log(err);
       return { error: true };
     }
   };
-  const pedidosEmAnalise = useMemo(
-    () => (Array.isArray(data) ? data?.filter((pedido) => pedido.status === 'A') : null),
+  const propostasEmAnalise = useMemo(
+    () => (Array.isArray(data?.results) ? data?.results?.filter((pedido) => pedido.status === 'A') : null),
     [data]
   );
 
@@ -149,12 +179,15 @@ const useOrders = (id) => {
     recusar,
     aprovacaoProposta,
     colorAprovacaoProposta,
-    pedidosEmAnalise,
+    propostasEmAnalise,
     edit,
     page,
     rowsPerPage,
     handleChangePage,
     handleChangeRowsPerPage,
+    formFilter,
+    deleteOrderAndNavigate,
+    isDeleting
   };
 };
 

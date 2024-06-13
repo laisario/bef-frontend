@@ -4,7 +4,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { CircularProgress, FormControl, FormControlLabel, FormLabel, Grid, MenuItem, Radio, RadioGroup } from '@mui/material';
+import { CircularProgress, FormControl, FormControlLabel, FormLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -12,44 +12,42 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
-import useProcedimentos from '../../hooks/useProcedimentos';
-import useUsers from '../../hooks/useUsers';
-import useDocumentos from '../../hooks/useDocumentos';
-import {axios, axiosForFiles} from '../../api';
+import { useWatch } from 'react-hook-form';
+import useProcedimentos from '../../../hooks/useProcedimentos';
+import useUsers from '../../../hooks/useUsers';
+import useDocumentos from '../../../hooks/useDocumentos';
+import { axios, axiosForFiles } from '../../../api';
 
-export default function FormCreateDocument({ open, setOpen }) {
-    const [form, setForm] = useState({
-        codigo: '',
-        identificador: '',
-        titulo: '',
-        status: 'vigente',
-        elaborador: '',
-        frequencia: 0,
-        analiseCritica: 0,
-        arquivo: null,
-    })
-    const [errMsg, setErrMsg] = useState('');
+export default function FormCreate({ open, setOpen, form }) {
     const [loading, setIsLoading] = useState(false);
-    const [dataDeValidade, setDataDeValidade] = useState(null);
-    const [dataDeRevisao, setDataDeRevisao] = useState(null);
     const { data: procedimentos } = useProcedimentos()
     const { data: users } = useUsers();
     const { refetch } = useDocumentos()
 
 
     const handleClose = () => {
+        form.reset()
         setOpen(false);
     };
 
     const handleChange = (event) => {
-        const { name, value, files } = event.target;
+        const { name, files } = event.target;
         if (name === 'arquivo') {
-            setForm((prevForm) => ({ ...prevForm, [name]: files[0] }));
-        } else {
-            setForm((prevForm) => ({ ...prevForm, [name]: value }));
+            form.setValue("arquivo", files[0]);
         }
-    }; 
+    };
 
+    const {
+        status,
+        codigo,
+        identificador,
+        titulo,
+        dataRevisao,
+        dataValidade,
+        elaborador,
+        frequencia,
+        arquivo,
+    } = useWatch({ control: form.control })
 
     return (
         <>
@@ -64,29 +62,28 @@ export default function FormCreateDocument({ open, setOpen }) {
                             try {
                                 setIsLoading(true);
                                 const response = await axios.post('/documentos/', {
-                                    codigo: form.codigo,
-                                    identificador: form.identificador,
-                                    titulo: form.titulo,
-                                    status: form.status,
-                                    data_revisao: dayjs(dataDeRevisao).format('YYYY-MM-DD'),
-                                    data_validade: dayjs(dataDeValidade).format('YYYY-MM-DD'),
-                                    elaborador: form.elaborador,
-                                    frequencia: form.frequencia,
-                                    analiseCritica: form.analiseCritica,
+                                    codigo,
+                                    identificador,
+                                    titulo,
+                                    status,
+                                    data_revisao: dayjs(dataRevisao).format('YYYY-MM-DD'),
+                                    data_validade: dayjs(dataValidade).format('YYYY-MM-DD'),
+                                    criador: elaborador,
+                                    frequencia,
                                 });
                                 if (response?.data?.id) {
                                     const formData = new FormData()
-                                    formData.append("arquivo", form?.arquivo)
+                                    formData.append("arquivo", arquivo)
                                     await axiosForFiles.patch(`/documentos/${response?.data?.id}/anexar/`, formData)
                                 }
                                 setIsLoading(false);
                                 setOpen(false);
+                                form.reset()
                                 await refetch();
                                 return { error: false };
                             } catch (err) {
                                 setIsLoading(false);
-                                setErrMsg(err.message);
-                                return { error: true };
+                                return { error: err };
                             }
                         },
                     }}
@@ -99,13 +96,11 @@ export default function FormCreateDocument({ open, setOpen }) {
                                     autoFocus
                                     select
                                     required
-                                    onChange={handleChange}
+                                    {...form.register("codigo")}
                                     margin="dense"
                                     id="codigo"
-                                    value={form.codigo}
                                     name="codigo"
-                                    label="Codigo"
-                                    type="string"
+                                    label="Código"
                                     fullWidth
                                 >
                                     {procedimentos?.map(({ codigo, id }) => (
@@ -118,98 +113,81 @@ export default function FormCreateDocument({ open, setOpen }) {
                             <Grid item xs={8}>
                                 <TextField
                                     autoFocus
-                                    value={form.identificador}
+                                    {...form.register("identificador")}
                                     required
                                     margin="dense"
                                     id="identificador"
                                     name="identificador"
                                     label="Identificador"
-                                    type="string"
-                                    onChange={handleChange}
                                     fullWidth
                                 />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
                                     autoFocus
-                                    value={form.titulo}
+                                    {...form.register("titulo")}
                                     required
                                     margin="dense"
                                     id="titulo"
                                     name="titulo"
-                                    label="Titulo"
-                                    type="string"
-                                    fullWidth
-                                    onChange={handleChange}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <DatePicker
-                                    name="data_de_revisao"
-                                    value={dataDeRevisao}
-                                    label="Revisao"
-                                    onChange={(data) => setDataDeRevisao(data)}
+                                    label="Título"
                                     fullWidth
                                 />
                             </Grid>
                             <Grid item xs={6}>
                                 <DatePicker
-                                    name="data_de_validade"
-                                    value={dataDeValidade}
+                                    {...form.register("dataRevisao")}
+                                    label="Revisão"
+                                    value={dataRevisao ? dayjs(dataRevisao) : null}
+                                    onChange={newValue => form.setValue("dataRevisao", newValue)}
+                                    fullWidth
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <DatePicker
+                                    value={dataValidade ? dayjs(dataValidade) : null}
+                                    {...form.register("dataValidade")}
+                                    onChange={newValue => form.setValue("dataValidade", newValue)}
                                     label="Validade"
-                                    onChange={(data) => setDataDeValidade(data)}
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    autoFocus
-                                    select
-                                    required
-                                    onChange={handleChange}
-                                    margin="dense"
-                                    id="elaborador"
-                                    value={form.elaborador}
-                                    name="elaborador"
-                                    label="Elaborador"
-                                    type="string"
-                                    fullWidth
-                                >
-                                    {users?.map(({ username, id }) => (
-                                        <MenuItem key={id} value={username}>
-                                            {username}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    autoFocus
-                                    id="frquencia"
-                                    value={form.frequencia}
-                                    label="Frequencia"
-                                    name="frequencia"
-                                    variant="outlined"
-                                    type="number"
-                                    onChange={handleChange}
-                                    fullWidth
-                                    margin="dense"
-                                />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    autoFocus
-                                    required
-                                    value={form.analiseCritica}
-                                    margin="dense"
-                                    id="analiseCritica"
-                                    name="analiseCritica"
-                                    label="Analise Critica"
-                                    type="number"
-                                    helperText="Em dias"
-                                    onChange={handleChange}
-                                    fullWidth
-                                />
+                            <Grid item container alignItems="center" spacing={1}>
+                                <Grid item xs={6} sm={8}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="elaborador">Elaborador</InputLabel>
+                                        <Select
+                                            autoFocus
+                                            required
+                                            {...form.register("elaborador")}
+                                            value={elaborador}
+                                            margin="dense"
+                                            id="elaborador"
+                                            name="elaborador"
+                                            label="elaborador"
+                                            fullWidth
+                                        >
+                                            {users?.map(({ username, id }) => (
+                                                <MenuItem key={id} value={id}>
+                                                    {username}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={6} sm={4}>
+                                    <TextField
+                                        autoFocus
+                                        id="frquencia"
+                                        label="Frequencia (em anos)"
+                                        name="frequencia"
+                                        variant="outlined"
+                                        type="number"
+                                        {...form.register("frequencia")}
+                                        fullWidth
+                                        margin="dense"
+                                    />
+                                </Grid>
                             </Grid>
                         </Grid>
                         <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, mt: 2, mb: 2 }}>
@@ -219,10 +197,9 @@ export default function FormCreateDocument({ open, setOpen }) {
                                     value="V"
                                     control={
                                         <Radio
-                                            checked={form.status === 'V'}
-                                            onClick={() =>
-                                                setForm((prevForm) => ({ ...prevForm, status: 'V' }))
-                                            }
+                                            checked={status === 'V'}
+                                            {...form.register("status")}
+
                                         />
                                     }
                                     label="Vigente"
@@ -231,8 +208,8 @@ export default function FormCreateDocument({ open, setOpen }) {
                                     value="O"
                                     control={
                                         <Radio
-                                            checked={form.status === 'O'}
-                                            onClick={() => setForm((prevForm) => ({ ...prevForm, status: 'O' }))}
+                                            checked={status === 'O'}
+                                            {...form.register("status")}
                                         />
                                     }
                                     label="Obsoleto"
@@ -241,8 +218,8 @@ export default function FormCreateDocument({ open, setOpen }) {
                                     value="C"
                                     control={
                                         <Radio
-                                            checked={form.status === 'C'}
-                                            onClick={() => setForm((prevForm) => ({ ...prevForm, status: 'C' }))}
+                                            checked={status === 'C'}
+                                            {...form.register("status")}
                                         />
                                     }
                                     label="Cancelado"
@@ -257,6 +234,7 @@ export default function FormCreateDocument({ open, setOpen }) {
                                 id="upload-btn"
                                 name="arquivo"
                                 type="file"
+                                {...form.register("arquivo")}
                                 onChange={handleChange}
                             />
                         </Button>
@@ -268,7 +246,7 @@ export default function FormCreateDocument({ open, setOpen }) {
                                 <Button onClick={handleClose}>Cancelar</Button>
                             </Grid>
                             <Grid item>
-                               { loading ? <CircularProgress /> : <Button size="large" variant="contained" type="submit">Criar documento</Button>}
+                                {loading ? <CircularProgress /> : <Button size="large" variant="contained" type="submit">Criar documento</Button>}
                             </Grid>
                         </Grid>
                     </DialogActions>

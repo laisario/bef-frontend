@@ -12,15 +12,12 @@ import {
   Container,
   Typography,
   TableContainer,
-  Modal,
-  Box,
   Link,
   Alert,
   Snackbar,
   TablePagination,
   Dialog,
 } from '@mui/material';
-import { styled } from '@mui/system';
 // components
 import Form from '../components/orders/Form';
 import Label from '../components/label';
@@ -33,12 +30,14 @@ import USERLIST from '../_mock/user';
 
 // hooks
 import useOrders from '../hooks/useOrders';
-import { fDateTime } from '../utils/formatTime';
+import { fDate } from '../utils/formatTime';
+import TableToolbar from '../components/orders/TableToolbar';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'id', label: '', alignRight: false },
+  { id: 'numero', label: 'Número', alignRight: false },
   { id: 'data', label: 'Data', alignRight: false },
   { id: 'total', label: 'Total', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
@@ -46,22 +45,10 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-const FormBox = styled(Box)({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
-});
-
 export default function UserPage() {
   const [open, setOpen] = useState(false);
-  const [loading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
-  const { data, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = useOrders();
+  const { data, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, formFilter } = useOrders();
   const { vertical, horizontal, propostaEnviada } = alert;
 
   const handleCloseAlert = (event, reason) => {
@@ -87,27 +74,28 @@ export default function UserPage() {
   return (
     <>
       <Helmet>
-        <title> Pedidos | B&F </title>
+        <title> Propostas | B&F </title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Meus pedidos
+            Minhas propostas
           </Typography>
           <Button variant="contained" onClick={handleOpen} startIcon={<Iconify icon="eva:plus-fill" />}>
-            Novo pedido
+            Nova proposta
           </Button>
         </Stack>
 
         <Card>
+          <TableToolbar form={formFilter} />
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
                 <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
                 <TableBody>
                   {data?.results?.map((row, index) => {
-                    const { id, total, data_criacao: dataCriacao, status, aprovacao } = row;
+                    const { id, total, data_criacao: dataCriacao, status, aprovacao, numero } = row;
                     const data = new Date(dataCriacao);
                     return (
                       <TableRow
@@ -115,23 +103,25 @@ export default function UserPage() {
                         key={id}
                         tabIndex={-1}
                         component={Link}
-                        href={`#/dashboard/pedido/${id}`}
+                        href={`#/dashboard/proposta/${id}`}
                         underline="none"
                       >
                         <TableCell align="left">{index + 1}</TableCell>
 
-                        <TableCell align="left">{fDateTime(data)}</TableCell>
+                        <TableCell align="left">{numero}</TableCell>
+                        
+                        <TableCell align="left">{fDate(data)}</TableCell>
 
                         <TableCell align="left">{+total > 0 ? `R$ ${total}` : "Aguardando resposta"}</TableCell>
 
                         <TableCell align="left">
                           {status === 'F' && aprovacao !== null ? (
                             <Label color={colorAprovacaoProposta[aprovacao]}>
-                              {aprovacao ? 'Pedido aprovado' : 'Pedido reprovado'}
+                              Proposta {aprovacao ? 'aprovada' : 'reprovada'}
                             </Label>
                           ) : (
                             <Label color={colorStatusProposta[status]}>
-                              {aprovacao === null && status === 'F' ? 'Esperando sua análise' : 'Em análise B&f'}
+                              {aprovacao === null && status === 'F' ? 'Esperando sua análise' : 'Aguardando retorno B&f'}
                             </Label>
                           )}
                         </TableCell>

@@ -4,7 +4,7 @@ import { Box, Chip, Container, Grid, Paper, Stack, Typography } from '@mui/mater
 import Card from '@mui/material/Card';
 import { Helmet } from 'react-helmet-async';
 import { useTheme } from '@emotion/react';
-import { fDateTime } from '../utils/formatTime';
+import { fDate } from '../utils/formatTime';
 import useInstrumentos from '../hooks/useInstrumentos';
 import CalibracaoCard from '../components/instrumentos/CalibracaoCard';
 
@@ -58,7 +58,7 @@ function ProductDetailPage() {
               </Typography>}
               {!!unidades?.length && <Typography>{unidades?.length > 1 ? "Unidades: " : "Unidade: "} {unidades.map(({ unidade }) => `${unidade} `)}</Typography>}
               {!!instrumento?.data_ultima_calibracao && <Typography variant="subtitle1" fontWeight="500">
-                Última calibração: {fDateTime(instrumento?.data_ultima_calibracao)}
+                Última calibração: {fDate(instrumento?.data_ultima_calibracao)}
               </Typography>}
               {!!instrumento?.instrumento?.tipo_de_instrumento?.modelo && <Typography variant="subtitle1" fontWeight="500">
                 Modelo: {instrumento?.instrumento?.tipo_de_instrumento?.modelo}
