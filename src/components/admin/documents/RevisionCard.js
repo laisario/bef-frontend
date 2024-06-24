@@ -26,7 +26,6 @@ function RevisionCard({ revisao }) {
             await refetch();
             return { error: false };
         } catch (error) {
-            console.log(error)
             setIsLoading(false);
             setErrMsg(error.response.data.error);
             return { error: true };

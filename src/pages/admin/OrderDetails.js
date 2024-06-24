@@ -46,7 +46,7 @@ const colorAprovacaoProposta = {
 
 function OrderDetails() {
   const [edit, setEdit] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
   const [response, setResponse] = useState(null);
   const { id } = useParams();
   const { data, deleteOrderAndNavigate } = useOrders(id);
@@ -56,6 +56,7 @@ function OrderDetails() {
     400: 'Endereço é obrigatório',
     500: 'Aconteceu um erro no servidor.',
   };
+  console.log(openAlert)
   return (
     <>
       <Helmet>
@@ -90,7 +91,7 @@ function OrderDetails() {
             )}
           </Box>
         </Stack>
-        {open && (
+        {openAlert && (
           <Alert
             action={
               <IconButton
@@ -98,24 +99,24 @@ function OrderDetails() {
                 color="inherit"
                 size="small"
                 onClick={() => {
-                  setOpen(false);
+                  setOpenAlert((oldValue) => !oldValue);
                 }}
               >
                 <CloseIcon fontSize="inherit" />
               </IconButton>
             }
-            severity={response.status === 200 ? "success" : "error"}
+            severity={response?.status === 200 ? "success" : "error"}
           >
-            {responseMesages[response?.status] || response.statusText}
+            {responseMesages[response?.status] || response?.statusText}
           </Alert>
         )}
         {!!data && (
           <FormEdit
             open={edit}
             data={data}
-            handleClose={() => setEdit(false)}
+            setEdit={setEdit}
             setResponseStatus={setResponse}
-            setOpen={setOpen}
+            setOpenAlert={setOpenAlert}
           />
         )}
         <Paper sx={{ padding: 4 }}>

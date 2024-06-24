@@ -18,7 +18,7 @@ function TableToolbar({ numSelected, form, selectedOrders, admin }) {
         dateStop,
         status,
     } = useWatch({ control: form.control })
-    const { deleteOrder, refetch } = useOrders()
+    const { deleteOrder } = useOrders()
     const isDesktop = useResponsive('up', 'md');
     const resetFilters = () => {
         form.reset()

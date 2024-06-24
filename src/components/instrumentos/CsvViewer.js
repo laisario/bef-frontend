@@ -13,7 +13,7 @@ import Button from '@mui/material/Button';
 import { readString, useCSVDownloader } from "react-papaparse"
 import { DialogActions, DialogContent } from '@mui/material';
 
-export default function CsvViewer({ csvContent }) {
+export default function CsvViewer({ csvContent, fileName }) {
     const [parsedCsv, setParsedCsv] = React.useState(null)
     const { CSVDownloader } = useCSVDownloader()
 
@@ -62,7 +62,7 @@ export default function CsvViewer({ csvContent }) {
             </DialogContent>
             <DialogActions>
                 <Button onClick={() => setParsedCsv(null)}>Cancelar</Button>
-                <CSVDownloader style={{ background: 'transparent', border: 0 }} type="button" filename="meus_instrumentos" bom data={parsedCsv}><Button>Download</Button></CSVDownloader>
+                <CSVDownloader style={{ background: 'transparent', border: 0 }} type="button" filename={fileName} bom data={parsedCsv}><Button>Download</Button></CSVDownloader>
             </DialogActions>
         </Dialog>
     );

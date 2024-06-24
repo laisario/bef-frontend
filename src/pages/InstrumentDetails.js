@@ -22,7 +22,7 @@ const colorPosicaoInstrumento = {
   F: 'warning',
 };
 
-function ProductDetailPage() {
+function InstrumentDetails() {
   const { id } = useParams();
   const { todosInstrumentos: instrumento } = useInstrumentos(id);
   const theme = useTheme();
@@ -178,4 +178,4 @@ function ProductDetailPage() {
   );
 }
 
-export default ProductDetailPage;
+export default InstrumentDetails;

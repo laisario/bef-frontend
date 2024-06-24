@@ -27,7 +27,7 @@ import useOrders from '../../../hooks/useOrders';
 import Iconify from '../../iconify';
 import FormAdress from '../../address/FormAdress';
 
-function FormEdit({ data, open, handleClose, setResponseStatus, setOpen }) {
+function FormEdit({ data, open, setEdit, setResponseStatus, setOpenAlert }) {
   const form = useForm({
     defaultValues: {
       numeroProposta: data?.numero || 0,
@@ -52,6 +52,11 @@ function FormEdit({ data, open, handleClose, setResponseStatus, setOpen }) {
     },
   });
 
+  const handleClose = () => {
+    setEdit((oldValue) => !oldValue)
+    form.reset()
+  }
+
   const {
     enderecoDeEntrega,
     aprovado,
@@ -63,10 +68,8 @@ function FormEdit({ data, open, handleClose, setResponseStatus, setOpen }) {
     local,
     formaDePagamento,
   } = useWatch({ control: form.control })
-
   const { id } = useParams();
   const { edit, isLoading } = useOrders(id);
-
   return (
     <Dialog open={open} onClose={handleClose}>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
@@ -272,7 +275,7 @@ function FormEdit({ data, open, handleClose, setResponseStatus, setOpen }) {
               size="large"
               variant="contained"
               onClick={async () => {
-                form.handleSubmit(edit(form, setResponseStatus, setOpen))
+                form.handleSubmit(edit(form, setResponseStatus, setOpenAlert))
                 handleClose();
               }}
             >

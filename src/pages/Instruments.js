@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
-import { Box, Button, CircularProgress, Container, Stack, Typography } from '@mui/material';
+import { Box, Button, Checkbox, CircularProgress, Container, FormControlLabel, FormGroup, Stack, Typography, useTheme } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import ExportFilter from '../components/instrumentos/ExportFilter';
@@ -54,7 +54,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 
-export default function ProductsPage() {
+export default function Instruments() {
   const { todosInstrumentos, search, setSearch, isLoading } = useInstrumentos();
   const [open, setOpen] = useState(false);
   const [valueCheckbox, setValueCheckbox] = useState({
@@ -70,11 +70,25 @@ export default function ProductsPage() {
   });
   const [error, setError] = useState(false);
   const [selecionados, setSelecionados] = useState([])
+  const [selectAll, setSelectAll] = useState(false)
+  const theme = useTheme()
 
   const handleChangeCheckbox = (event) => {
     const { name, checked } = event.target;
     setValueCheckbox({ ...valueCheckbox, [name]: checked });
   };
+  console.log(selectAll)
+  useEffect(() => {
+    if (selectAll) {
+      setSelecionados(todosInstrumentos?.map(({ id }) => id))
+    } else {
+      setSelecionados([])
+    }
+  }, [selectAll])
+
+  const handleCheckboxSelectAll = () => {
+    setSelectAll((oldSelectAll) => !oldSelectAll)
+  }
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -94,6 +108,7 @@ export default function ProductsPage() {
       dataDaProximaChecagem: true,
     });
     setError(false);
+    setSelectAll(false)
   };
 
   return (
@@ -109,7 +124,7 @@ export default function ProductsPage() {
           justifyContent="space-between"
           mb={5}
           flexWrap="wrap"
-         >
+        >
           <Typography variant="h4" gutterBottom>
             Meus Instrumentos
           </Typography>
@@ -125,6 +140,9 @@ export default function ProductsPage() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </Search>
+            <FormGroup sx={{mx: 1}}>
+              <FormControlLabel control={<Checkbox checked={selectAll} />} onChange={handleCheckboxSelectAll} label="Selecionar todos" />
+            </FormGroup>
             <Button variant="contained" disabled={selecionados?.length === 0} sx={{ ml: 1 }} onClick={handleClickOpen} endIcon={<GetAppIcon />}>Exportar</Button>
           </Box>
         </Stack>

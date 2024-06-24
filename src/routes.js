@@ -10,7 +10,7 @@ import DocumentsDetails from './pages/admin/DocumentsDetails';
 import Orders from './pages/Orders';
 import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
-import ProductsPage from './pages/ProductsPage';
+import Instruments from './pages/Instruments';
 import DashboardAppPage from './pages/DashboardAppPage';
 import OrderDetails from './pages/OrderDetails';
 import RegisterAuthPage from './pages/register/auth';
@@ -19,7 +19,7 @@ import RegisterLocationPage from './pages/register/location';
 import OrdersAdmin from './pages/admin/Orders';
 import OrderDetailsAdmin from './pages/admin/OrderDetails';
 import DashboardAppAdmin from './pages/admin/DashboardApp';
-import ProductDetailPage from './pages/ProductDetailPage';
+import InstrumentDetails from './pages/InstrumentDetails';
 import ProductsPageAdmin from './pages/admin/ProductsPageAdmin';
 import DocumentRevisions from './pages/admin/DocumentRevisions';
 
@@ -35,8 +35,8 @@ export default function Router() {
         { path: 'app', element: <DashboardAppPage /> },
         { path: 'propostas', element: <Orders /> },
         { path: 'proposta/:id', element: <OrderDetails /> },
-        { path: 'produtos', element: <ProductsPage /> },
-        { path: 'produto/:id', element: <ProductDetailPage /> },
+        { path: 'produtos', element: <Instruments /> },
+        { path: 'produto/:id', element: <InstrumentDetails /> },
       ],
     },
     {

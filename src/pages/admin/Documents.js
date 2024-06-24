@@ -1,19 +1,18 @@
 import { useState } from 'react';
-import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import GetAppIcon from '@mui/icons-material/GetApp';
 import Typography from '@mui/material/Typography';
 import { useNavigate } from "react-router-dom";
-import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Container, Stack } from '@mui/system';
 import { Helmet } from 'react-helmet-async';
-import { Button } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import FormCreate from '../../components/admin/documents/FormCreate';
 import Iconify from '../../components/iconify/Iconify';
 import titleCase from '../../utils/formatTitle';
@@ -21,11 +20,14 @@ import TableHeader from '../../components/admin/documents/TableHeader';
 import { fDate } from '../../utils/formatTime';
 import useDocumentos from '../../hooks/useDocumentos';
 import TableToolbar from '../../components/admin/documents/TableToolbar';
-
+import useResponsive from '../../hooks/useResponsive';
+import { axios } from '../../api';
+import CsvViewer from '../../components/instrumentos/CsvViewer';
 
 export default function Documents() {
     const [open, setOpen] = useState(false);
     const [selectedDocuments, setSelectedDocuments] = useState([]);
+    const [csvContent, setCsvContent] = useState(null)
     const [filter, setFilter] = useState(false)
     const { data,
         status,
@@ -40,6 +42,7 @@ export default function Documents() {
         formCreate
     } = useDocumentos(null);
     const navigate = useNavigate()
+    const isMobile = useResponsive('down', 'md');
 
     const handleOpenForm = () => {
         setOpen(true);
@@ -62,20 +65,47 @@ export default function Documents() {
 
     const isSelected = (id) => selectedDocuments.indexOf(id) !== -1;
 
+    const exportDocuments = async () => {
+        try {
+            const resposta = await axios.post('/documentos/exportar/', {documentos_selecionados: selectedDocuments});;
+            if (resposta.status === 200) {
+                console.log('Exportação realizada com sucesso!');
+                setCsvContent(resposta?.data)
+            } else {
+                console.log('Xi status não foi 200')
+            }
+        } catch (error) {
+            console.error('Erro ao enviar dados para o backend:', error);
+        }
+
+
+    };
+
     return (
         <>
             <Helmet>
                 <title> Documentos | B&F </title>
             </Helmet>
             <Container>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-                    <Typography variant="h4" gutterBottom>
-                        Documentos
-                    </Typography>
-                    <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenForm}>
-                        Novo documento
-                    </Button>
-                </Stack>
+                <Grid container display="flex" flexDirection={isMobile ? "column" : "row"} alignItems={isMobile ? "flex-start" : "center"} justifyContent="space-between" mb={5}>
+                    <Grid item sm={6} xs={12}>
+                        <Typography variant="h4" gutterBottom>
+                            Documentos
+                        </Typography>
+                    </Grid>
+                    <Grid item container spacing={2} sm={6} xs={12} justifyContent={isMobile ? "flex-start" : "flex-end"}>
+                        <Grid item>
+                            <Button variant="contained" startIcon={<GetAppIcon />} onClick={exportDocuments} disabled={selectedDocuments.length < 1} >
+                                Exportar
+                            </Button>
+                        </Grid>
+                        <Grid item>
+                            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenForm}>
+                                Novo documento
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Grid>
 
                 <FormCreate open={open} setOpen={setOpen} form={formCreate} />
 
@@ -150,6 +180,7 @@ export default function Documents() {
                     labelRowsPerPage="Linhas por páginas"
                 />
             </Container>
+            <CsvViewer csvContent={csvContent} fileName="documentos" />
         </>
     );
 }

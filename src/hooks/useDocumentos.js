@@ -25,16 +25,15 @@ const useDocumentos = (id) => {
       codigo: '',
       identificador: '',
       titulo: '',
-      status: 'vigente',
+      status: '',
       elaborador: '',
-      frequencia: 0,
+      frequencia: null,
       arquivo: null,
       dataValidade: '',
       dataRevisao: '',
-      revisores: [],
     }
   })
-  const { data, error, isLoading, refetch } = useQuery(['documentos', id, page, rowsPerPage, debouncedSearch, statusFilter], async () => {
+  const { data, error, isLoading, refetch, isError } = useQuery(['documentos', id, page, rowsPerPage, debouncedSearch, statusFilter], async () => {
     if (id) {
       const response = await axios.get(`/documentos/${id}`);
       return response?.data
@@ -100,7 +99,8 @@ const useDocumentos = (id) => {
     handleChangeRowsPerPage,
     documentosVencidos,
     formFilter,
-    formCreate
+    formCreate,
+    isError,
   }
 }
 

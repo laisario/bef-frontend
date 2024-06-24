@@ -4,7 +4,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { CircularProgress, FormControl, FormControlLabel, FormLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select } from '@mui/material';
+import { Alert, CircularProgress, FormControl, FormControlLabel, FormLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -20,13 +20,13 @@ import { axios, axiosForFiles } from '../../../api';
 
 export default function FormCreate({ open, setOpen, form }) {
     const [loading, setIsLoading] = useState(false);
-    const { data: procedimentos } = useProcedimentos()
+    const [erro, setErro] = useState({});
+    const { data: procedimentos } = useProcedimentos();
     const { data: users } = useUsers();
     const { refetch } = useDocumentos()
-
-
     const handleClose = () => {
         form.reset()
+        setErro({})
         setOpen(false);
     };
 
@@ -36,6 +36,14 @@ export default function FormCreate({ open, setOpen, form }) {
             form.setValue("arquivo", files[0]);
         }
     };
+
+    const erroMessages = {
+        "status": 'Selecione um status para o documento.',
+        "data_revisao": "Preencha a data de revisão.",
+        "data_validade": "Preencha a data de validade.",
+        "arquivo": erro?.arquivo,
+    }
+
 
     const {
         status,
@@ -66,8 +74,8 @@ export default function FormCreate({ open, setOpen, form }) {
                                     identificador,
                                     titulo,
                                     status,
-                                    data_revisao: dayjs(dataRevisao).format('YYYY-MM-DD'),
-                                    data_validade: dayjs(dataValidade).format('YYYY-MM-DD'),
+                                    data_revisao: dayjs(dataRevisao).format('YYYY-MM-DD') || null,
+                                    data_validade: dayjs(dataValidade).format('YYYY-MM-DD' || null),
                                     criador: elaborador,
                                     frequencia,
                                 });
@@ -82,7 +90,9 @@ export default function FormCreate({ open, setOpen, form }) {
                                 await refetch();
                                 return { error: false };
                             } catch (err) {
+                                console.log(err)
                                 setIsLoading(false);
+                                setErro(err.response.data)
                                 return { error: err };
                             }
                         },
@@ -186,6 +196,7 @@ export default function FormCreate({ open, setOpen, form }) {
                                         {...form.register("frequencia")}
                                         fullWidth
                                         margin="dense"
+                                        required
                                     />
                                 </Grid>
                             </Grid>
@@ -238,6 +249,23 @@ export default function FormCreate({ open, setOpen, form }) {
                                 onChange={handleChange}
                             />
                         </Button>
+                        {!!arquivo &&
+                            <Button
+                                component="a"
+                                size="small"
+                                href={
+                                    !!arquivo && arquivo instanceof File
+                                        ? URL.createObjectURL(arquivo)
+                                        : arquivo
+                                }
+                                target="_blank"
+                                variant="outlined"
+                                sx={{ marginLeft: 1 }}
+                            >
+                                Ver arquivo
+                            </Button>
+                        }
+                        {!!erro && Object.keys(erro)?.map((errKeys, i) => <Alert severity="error">{erroMessages[errKeys]}</Alert>)}
                     </DialogContent>
 
                     <DialogActions>

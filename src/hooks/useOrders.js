@@ -87,7 +87,7 @@ const useOrders = (id) => {
     setPage(0);
   };
 
-  const edit = async (form, setResponseStatus, setOpen) => {
+  const edit = async (form, setResponseStatus, setOpenAlert) => {
     const formValues = form.watch()
     try {
       if (formValues.anexo && formValues.anexo instanceof File) {
@@ -135,10 +135,11 @@ const useOrders = (id) => {
         });
         setResponseStatus(response);
       }
+      setOpenAlert(true);
       refetch()
     } catch (error) {
       setResponseStatus(error.response);
-      setOpen(true);
+      setOpenAlert(true);
       console.log(error);
     }
   };
