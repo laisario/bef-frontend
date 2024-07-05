@@ -17,6 +17,14 @@ const posicaoInstrumento = {
   F: 'Fora de uso',
 };
 
+const localLabel = {
+  P: "Instalação permanente",
+  C: "Instalação do cliente",
+  T: "Terceirizado"
+}
+
+
+
 function CardInformation({ instrumento, proposta }) {
   const [editPrice, setEditPrice] = useState(false)
   const { pathname } = useLocation();
@@ -101,6 +109,30 @@ function CardInformation({ instrumento, proposta }) {
           {instrumento?.valor} {instrumento?.unidadeMedicao}
         </Typography>
       </Box>)}
+      {!!instrumento?.local && (<Box display="flex" justifyContent="space-between">
+        <Typography fontWeight="900" color={'grey'} variant="body1">
+          Local
+        </Typography>
+        <Typography fontWeight="400" color={'grey'} variant="body1">
+          {localLabel[instrumento?.local]}
+        </Typography>
+      </Box>)}
+      {!!instrumento?.prazoDeEntrega && (<Box display="flex" justifyContent="space-between">
+        <Typography fontWeight="900" color={'grey'} variant="body1">
+          Prazo de entrega
+        </Typography>
+        <Typography fontWeight="400" color={'grey'} variant="body1">
+          {fDate(instrumento?.prazoDeEntrega)}
+        </Typography>
+      </Box>)}
+      {!!instrumento?.diasUteis && (<Box display="flex" justifyContent="space-between">
+        <Typography fontWeight="900" color={'grey'} variant="body1">
+          Dias úteis
+        </Typography>
+        <Typography fontWeight="400" color={'grey'} variant="body1">
+          {instrumento.diasUteis}
+        </Typography>
+      </Box>)}
       {(!!instrumento?.precoCalibracaoNoCliente || !!instrumento?.precoCalibracaoNoLaboratorio) &&
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography fontWeight="900" color={'grey'} variant="body1">
@@ -109,7 +141,7 @@ function CardInformation({ instrumento, proposta }) {
           <Box display="flex" alignItems="center" justifyContent="space-between">
             {editPrice
               ?
-              <Box sx={{display: "flex", flexDirection: "row", justifyContent: "flex-end", alignItems: "center"}}>
+              <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }}>
                 <FormControl variant="outlined" sx={{ width: '50%' }}>
                   <TextField
                     type="number"
@@ -136,7 +168,7 @@ function CardInformation({ instrumento, proposta }) {
                 R$ {!!instrumento?.precoAlternativoCalibracao ? instrumento?.precoAlternativoCalibracao : priceOptions[proposta?.local]}
               </Typography>
             }
-            {pathname.includes('/admin') && proposta.status === 'F' && !editPrice && (
+            {pathname.includes('/admin') && !editPrice && (
               <IconButton size="small" onClick={() => setEditPrice(true)}>
                 <EditIcon fontSize='small' />
               </IconButton>

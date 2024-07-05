@@ -54,10 +54,31 @@ const useDocumentos = (id) => {
 
 
   const statusColor = {
-    'O': 'info',
+    'O': 'warning',
     'C': 'error',
     'V': 'success',
   };
+
+
+  const findCriticalAnalysisStage = (criticalAnalysis) => {
+    let color = ''
+    if (criticalAnalysis > 30) {
+      color = 'success'
+    } else if (criticalAnalysis < 1) {
+      color = 'error'
+    } else {
+      color = 'warning'
+    }
+    return color
+  }
+
+  const criticalAnalysisMonths = (criticalAnalysis) => {
+    if (criticalAnalysis < 30 && criticalAnalysis > 0) {
+      return criticalAnalysis > 1 ? `${criticalAnalysis} dias` : `${criticalAnalysis} dia` 
+    }
+    const months = Math.floor(criticalAnalysis / 30)
+    return months > 1 ? `${months} meses` : `${months} mês`
+  }
 
   const { mutate: deleteDocumento, isLoading: isDeleting } = useMutation(async (ids) => Promise.all(ids?.map((id) => axios.delete(`/documentos/${id}`))), {
     onSuccess: () => {
@@ -101,6 +122,8 @@ const useDocumentos = (id) => {
     formFilter,
     formCreate,
     isError,
+    findCriticalAnalysisStage,
+    criticalAnalysisMonths,
   }
 }
 

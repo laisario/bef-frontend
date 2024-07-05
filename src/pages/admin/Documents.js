@@ -23,6 +23,7 @@ import TableToolbar from '../../components/admin/documents/TableToolbar';
 import useResponsive from '../../hooks/useResponsive';
 import { axios } from '../../api';
 import CsvViewer from '../../components/instrumentos/CsvViewer';
+import Label from '../../components/label';
 
 export default function Documents() {
     const [open, setOpen] = useState(false);
@@ -31,6 +32,7 @@ export default function Documents() {
     const [filter, setFilter] = useState(false)
     const { data,
         status,
+        statusColor,
         deleteDocumento,
         isDeleting,
         page,
@@ -39,7 +41,9 @@ export default function Documents() {
         handleChangeRowsPerPage,
         isLoading,
         formFilter,
-        formCreate
+        formCreate,
+        findCriticalAnalysisStage,
+        criticalAnalysisMonths,
     } = useDocumentos(null);
     const navigate = useNavigate()
     const isMobile = useResponsive('down', 'md');
@@ -67,7 +71,7 @@ export default function Documents() {
 
     const exportDocuments = async () => {
         try {
-            const resposta = await axios.post('/documentos/exportar/', {documentos_selecionados: selectedDocuments});;
+            const resposta = await axios.post('/documentos/exportar/', { documentos_selecionados: selectedDocuments });;
             if (resposta.status === 200) {
                 console.log('Exportação realizada com sucesso!');
                 setCsvContent(resposta?.data)
@@ -77,9 +81,9 @@ export default function Documents() {
         } catch (error) {
             console.error('Erro ao enviar dados para o backend:', error);
         }
-
-
     };
+
+    console.log(criticalAnalysisMonths(328))
 
     return (
         <>
@@ -159,10 +163,20 @@ export default function Documents() {
                                             {row?.codigo?.codigo?.toUpperCase()}
                                         </TableCell>
                                         <TableCell>{!!row?.titulo && titleCase(row?.titulo)}</TableCell>
-                                        <TableCell>{!!row?.status && status[row?.status]}</TableCell>
+                                        <TableCell>
+                                            <Label color={statusColor[row?.status]}>
+                                                {status[row?.status]}
+                                            </Label>
+                                        </TableCell>
                                         <TableCell>{!!row?.data_revisao && fDate(row?.data_revisao)}</TableCell>
-                                        <TableCell>{!!row?.data_validade && fDate(row?.data_validade)}</TableCell>
-                                        <TableCell>{!!row?.analise_critica && (row?.analise_critica > 1 ? `${row?.analise_critica} meses` : `${row?.analise_critica} mês`)}</TableCell>
+                                        <TableCell> {!!row?.data_validade && fDate(row?.data_validade)}</TableCell>
+                                        <TableCell>
+                                            {!!row?.analise_critica && (
+                                                <Label color={findCriticalAnalysisStage(row?.analise_critica)}>
+                                                    {criticalAnalysisMonths(row?.analise_critica)}
+                                                </Label>
+                                            )}
+                                        </TableCell>
                                     </TableRow>
                                 );
                             }) : <CircularProgress />}

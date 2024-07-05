@@ -1,5 +1,5 @@
 export { default as AppTasks } from './AppTasks';
-export { default as AppNewsOrders } from './AppNewsOrders';
+export { default as AppNewsInstruments } from './AppNewsInstruments';
 export { default as AppCurrentVisits } from './AppCurrentVisits';
 export { default as AppOrderTimeline } from './AppOrderTimeline';
 export { default as AppTrafficBySite } from './AppTrafficBySite';

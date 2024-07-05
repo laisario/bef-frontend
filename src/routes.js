@@ -4,26 +4,22 @@ import DashboardLayout from './layouts/dashboard';
 import AdminLayout from './layouts/admin';
 import SimpleLayout from './layouts/simple';
 import AuthLayout from './layouts/auth';
-//
+// pages
 import Documents from './pages/admin/Documents';
 import DocumentsDetails from './pages/admin/DocumentsDetails';
 import Orders from './pages/Orders';
 import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import Instruments from './pages/Instruments';
-import DashboardAppPage from './pages/DashboardAppPage';
-import OrderDetails from './pages/OrderDetails';
+import DashboardApp from './pages/DashboardApp';
 import RegisterAuthPage from './pages/register/auth';
 import RegisterBasicsPage from './pages/register/basics';
 import RegisterLocationPage from './pages/register/location';
 import OrdersAdmin from './pages/admin/Orders';
-import OrderDetailsAdmin from './pages/admin/OrderDetails';
-import DashboardAppAdmin from './pages/admin/DashboardApp';
+import OrderDetails from './pages/OrderDetails';
 import InstrumentDetails from './pages/InstrumentDetails';
 import ProductsPageAdmin from './pages/admin/ProductsPageAdmin';
 import DocumentRevisions from './pages/admin/DocumentRevisions';
-
-// ----------------------------------------------------------------------
 
 export default function Router() {
   const routes = useRoutes([
@@ -32,7 +28,7 @@ export default function Router() {
       element: <DashboardLayout />,
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
-        { path: 'app', element: <DashboardAppPage /> },
+        { path: 'app', element: <DashboardApp /> },
         { path: 'propostas', element: <Orders /> },
         { path: 'proposta/:id', element: <OrderDetails /> },
         { path: 'produtos', element: <Instruments /> },
@@ -74,9 +70,9 @@ export default function Router() {
       element: <AdminLayout />,
       children: [
         { element: <Navigate to="/admin/app" />, index: true },
-        { path: 'app', element: <DashboardAppAdmin /> },
+        { path: 'app', element: <DashboardApp admin/> },
         { path: 'propostas', element: <OrdersAdmin /> },
-        { path: 'proposta/:id', element: <OrderDetailsAdmin /> },
+        { path: 'proposta/:id', element: <OrderDetails admin/> },
         { path: 'produtos', element: <ProductsPageAdmin/> },
         { path: 'documentos', element: <Documents /> },
         { path: 'documento/:id', element: <DocumentsDetails /> },

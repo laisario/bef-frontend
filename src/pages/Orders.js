@@ -48,7 +48,7 @@ const TABLE_HEAD = [
 export default function UserPage() {
   const [open, setOpen] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
-  const { data, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, formFilter } = useOrders();
+  const { data, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, formFilter, statusColor, statusString } = useOrders();
   const { vertical, horizontal, propostaEnviada } = alert;
 
   const handleCloseAlert = (event, reason) => {
@@ -61,15 +61,6 @@ export default function UserPage() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const colorAprovacaoProposta = {
-    false: 'error',
-    true: 'success',
-  };
-
-  const colorStatusProposta = {
-    A: 'info',
-    F: 'secondary',
-  };
 
   return (
     <>
@@ -95,7 +86,7 @@ export default function UserPage() {
                 <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
                 <TableBody>
                   {data?.results?.map((row, index) => {
-                    const { id, total, data_criacao: dataCriacao, status, aprovacao, numero } = row;
+                    const { id, total, data_criacao: dataCriacao, status, numero } = row;
                     const data = new Date(dataCriacao);
                     return (
                       <TableRow
@@ -109,21 +100,13 @@ export default function UserPage() {
                         <TableCell align="left">{index + 1}</TableCell>
 
                         <TableCell align="left">{numero}</TableCell>
-                        
+
                         <TableCell align="left">{fDate(data)}</TableCell>
 
                         <TableCell align="left">{+total > 0 ? `R$ ${total}` : "Aguardando resposta"}</TableCell>
 
                         <TableCell align="left">
-                          {status === 'F' && aprovacao !== null ? (
-                            <Label color={colorAprovacaoProposta[aprovacao]}>
-                              Proposta {aprovacao ? 'aprovada' : 'reprovada'}
-                            </Label>
-                          ) : (
-                            <Label color={colorStatusProposta[status]}>
-                              {aprovacao === null && status === 'F' ? 'Esperando sua análise' : 'Aguardando retorno B&f'}
-                            </Label>
-                          )}
+                          <Label color={statusColor[status]}>{statusString[status]}</Label>
                         </TableCell>
                       </TableRow>
                     );

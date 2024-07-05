@@ -1,43 +1,73 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import { Box, Button, Chip, Container, Grid, Link, Paper, Stack, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  Container,
+  Grid,
+  IconButton,
+  Paper,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import Card from '@mui/material/Card';
 import { Helmet } from 'react-helmet-async';
+import DownloadIcon from '@mui/icons-material/Download';
+import CloseIcon from '@mui/icons-material/Close';
+import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { useTheme } from '@emotion/react';
+import dayjs from 'dayjs';
 import useOrders from '../hooks/useOrders';
 import CardInformation from '../components/orders/CardInformation';
 import Iconify from '../components/iconify';
 import { capitalizeFirstLetter as CFL } from '../utils/formatString';
+import FormElaborate from '../components/admin/order/FormElaborate';
 import { fDate } from '../utils/formatTime';
+
 
 const formaPagamento = {
   CD: 'Débito',
   CC: 'Crédito',
   P: 'Pix',
   D: 'Dinheiro',
+  B: 'Boleto',
 };
 
-const aprovacaoProposta = {
-  null: 'Aguardando sua análise',
-  false: 'Proposta negada',
-  true: 'Proposta aprovada',
-};
-
-const colorAprovacaoProposta = {
-  null: 'info',
-  false: 'error',
-  true: 'success',
-};
-
-function OrderDetails() {
+function OrderDetails({ admin }) {
+  const [edit, setEdit] = useState(false);
+  const [elaborate, setElaborate] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [response, setResponse] = useState({
+    status: 0,
+    message: '',
+  });
   const { id } = useParams();
-  const { data, aprovar, recusar } = useOrders(id);
+  const {
+    data,
+    deleteOrderAndNavigate,
+    statusColor,
+    aprove,
+    refuse,
+    statusString,
+    sendProposolByEmail,
+    pdfFile,
+  } = useOrders(id);
   const theme = useTheme();
+
+  const handleSendEmail = async () => {
+    const response = await sendProposolByEmail()
+    setResponse({ status: response?.status, message: response?.message })
+    setOpenAlert(true)
+  }
+
   return (
     <>
       <Helmet>
-        <title> Proposta | B&F </title>
+        <title>Proposta | B&F</title>
       </Helmet>
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
@@ -47,44 +77,103 @@ function OrderDetails() {
                 Proposta número: {data?.numero}
               </Typography>
             }
-            {!!data?.data_criacao &&
+            {admin ? (!!data?.cliente?.empresa || !!data?.cliente?.nome) &&
+              <Typography variant="h6" gutterBottom>
+                {data?.cliente?.nome?.length && data?.cliente?.empresa ? `${data?.cliente?.empresa} - ${data?.cliente?.nome}` : data?.cliente?.empresa || data?.cliente?.nome}
+              </Typography>
+              : !!data?.data_criacao &&
               <Typography variant="h6" gutterBottom>
                 {fDate(data?.data_criacao)}
               </Typography>
             }
           </Box>
-          <Box>
-            {data?.status === "F" && data?.aprovacao === null && (
-              <>
+
+
+          {admin ? (
+            <Box display="flex" gap={2}>
+              <Tooltip title="Deletar proposta">
+                <Button onClick={deleteOrderAndNavigate} color="secondary">
+                  <Iconify icon="eva:trash-2-fill" />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Enviar proposta para email">
+                <Button variant="outlined" disabled={data?.status === "E"} onClick={handleSendEmail} endIcon={<ForwardToInboxIcon />}>Enviar para cliente</Button>
+              </Tooltip>
+              {data?.status === 'E' ? (
+                <Button variant="contained" onClick={() => setElaborate(true)} endIcon={<Iconify icon="eva:checkmark-fill" />}>
+                  Elaborar proposta
+                </Button>
+              ) : (
+                <Button variant="contained" onClick={() => { setEdit(true); setElaborate(true) }} endIcon={<Iconify icon="eva:edit-fill" />}>
+                  Editar proposta
+                </Button>
+              )}
+            </Box>
+          ) : (
+            <Box display='flex'>
+              <Tooltip title="Clique para aprovar a proposta">
                 <Button
                   variant="contained"
+                  disabled={data?.status !== "AA"}
                   sx={{ marginX: 2 }}
-                  onClick={() => aprovar()}
+                  onClick={() => aprove()}
                   startIcon={<Iconify icon="eva:checkmark-fill" />}
                 >
                   Aprovar proposta
                 </Button>
+              </Tooltip>
+              <Tooltip title="Clique para reprovar a proposta">
                 <Button
                   variant="contained"
                   color="error"
-                  onClick={() => recusar()}
+                  disabled={data?.status !== "AA"}
+                  onClick={() => refuse()}
                   startIcon={<Iconify icon="ph:x-bold" />}
                 >
                   Reprovar proposta
                 </Button>
-              </>
-            )}
-          </Box>
+              </Tooltip>
+            </Box>
+          )}
         </Stack>
+        {openAlert && (
+          <Alert
+            action={
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  setOpenAlert((oldValue) => !oldValue);
+                }}
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            }
+            severity={response?.status === 200 ? "success" : "error"}
+          >
+            {response?.message}
+          </Alert>
+        )}
+        {!!data && (
+          <FormElaborate
+            open={elaborate}
+            data={data}
+            setElaborate={setElaborate}
+            setResponseStatus={setResponse}
+            setOpenAlert={setOpenAlert}
+            editProposol={edit}
+          />
+        )}
         <Paper sx={{ padding: 4 }}>
           <Grid container flexDirection="row" justifyContent="space-between">
             <Box>
-              {!!data?.total && +(data?.total) > 0 &&
+              {+(data?.total) > 0 &&
                 <Typography variant="h6">Total: R${data?.total}</Typography>
               }
-              {!!data?.local &&
-                <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
-                  Local calibração: {data?.local === 'L' ? 'Laboratório B&F' : 'Local'}
+              {!!data?.data_criacao &&
+                <Typography variant="subtitle1" fontWeight="500">
+                  Proposta criada: {dayjs(data?.data_criacao).locale('pt-BR').format('D [de] MMMM [de] YYYY')}
                 </Typography>
               }
               {!!data?.condicao_de_pagamento &&
@@ -92,96 +181,107 @@ function OrderDetails() {
                   Forma de pagamento: {formaPagamento[data?.condicao_de_pagamento]}
                 </Typography>
               }
+              {!!data?.prazo_de_pagamento &&
+                <Typography variant="subtitle1" fontWeight="500">
+                  Prazo de pagamento: {dayjs(data?.prazo_de_pagamento).locale('pt-BR').format('D [de] MMMM [de] YYYY')}
+                </Typography>
+              }
               {!!data?.transporte &&
                 <Typography variant="subtitle1" fontWeight="500">
                   Transporte: {CFL(data?.transporte)}
                 </Typography>
               }
-              {!!data?.prazo_de_entrega &&
-                <Typography variant="subtitle1" fontWeight="500">
-                  Prazo de entrega: {fDate(data?.prazo_de_entrega)}
-                </Typography>
-              }
               {!!data?.endereco_de_entrega &&
                 <Typography variant="subtitle1" fontWeight="500">
-                  Endereço de entrega: {data?.endereco_de_entrega?.logradouro || ''}{' '}
-                  {!!data?.endereco_de_entrega?.numero && ', '} {data?.endereco_de_entrega?.numero || ''}
-                  {!!data?.endereco_de_entrega?.complemento && ' - '}
-                  {!data?.endereco_de_entrega?.complemento ? data?.endereco_de_entrega?.complemento : ''}{' '}
-                  {!!data?.endereco_de_entrega?.bairro?.nome && ' - '}
-                  {data?.endereco_de_entrega?.bairro?.nome || ''}
-                  {!!data?.endereco_de_entrega?.cep && ' - '} {data?.endereco_de_entrega?.cep || ''}
+                  Endereço de entrega: {data?.endereco_de_entrega?.logradouro}, {data?.endereco_de_entrega?.numero}
+                  {' - '}
+                  {!!data?.endereco_de_entrega?.complemento && data?.endereco_de_entrega?.complemento} -{' '}
+                  {data?.endereco_de_entrega?.bairro?.nome} - {data?.endereco_de_entrega?.cep}
                 </Typography>
               }
             </Box>
-            <Box display="flex" gap={1} flexDirection="column">
-              {data?.status === 'A' ? (
-                <Chip
-                  label="Aguardando retorno B&F"
-                  color={colorAprovacaoProposta[data?.aprovacao]}
-                  variant="outlined"
-                />
-              ) : (
-                <Chip
-                  label={aprovacaoProposta[data?.aprovacao]}
-                  color={colorAprovacaoProposta[data?.aprovacao]}
-                  variant="outlined"
-                />
-              )}
-              {!!data?.anexo && (
-                <Button startIcon={<ReceiptLongIcon />}>
-                  <Link href={data?.anexo} target="_blank">Anexo</Link>
+            <Box display="flex" flexDirection="column" gap={1}>
+              <Chip
+                label={statusString[data?.status]}
+                color={statusColor[data?.status]}
+                variant="filled"
+              />
+
+              {!!pdfFile && <Tooltip placement="right-end" title="Clique para abrir pdf da proposta">
+                <Button
+                  startIcon={<DownloadIcon />}
+                  target="_blank"
+                  href={pdfFile}
+                >
+                  Visualizar proposta
                 </Button>
+              </Tooltip>}
+              {!!data?.anexo && (
+                <Tooltip placement="right-end" title="Clique para ver documento anexado">
+                  <Button startIcon={<ReceiptLongIcon />} href={data?.anexo} target="_blank">
+                    Abrir anexo
+                  </Button>
+                </Tooltip>
               )}
             </Box>
           </Grid>
-          {!!data?.instrumentos.length && (
-            <>
-              <Typography variant="h6" my={2}>
-                {data?.instrumentos.length > 1 ? "Instrumentos" : "Instrumento"}
-              </Typography>
-              <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
-                {data?.instrumentos?.map(
-                  (
-                    {
-                      tag,
-                      numero_de_serie: numeroDeSerie,
-                      posicao,
-                      data_ultima_calibracao: dataUltimaCalibracao,
-                      instrumento: {
-                        maximo,
-                        minimo,
-                        unidade,
-                        capacidade_de_medicao: capacidadeDeMedicao,
-                        tipo_de_instrumento: { descricao },
-                        tipo_de_servico: tipoDeServico
-                      },
+          {!!data?.instrumentos.length && <>
+            <Typography variant="h6" my={2}>
+              {data?.instrumentos.length > 1 ? "Instrumentos" : "Instrumento"}
+            </Typography>
+            <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
+              {data?.instrumentos?.map(
+                (
+                  {
+                    tag,
+                    numero_de_serie: numeroDeSerie,
+                    posicao,
+                    data_ultima_calibracao: dataUltimaCalibracao,
+                    instrumento: {
+                      maximo,
+                      minimo,
+                      unidade,
+                      capacidade_de_medicao: capacidadeDeMedicao,
+                      tipo_de_instrumento: { descricao },
+                      tipo_de_servico: tipoDeServico,
+                      preco_calibracao_no_cliente: precoCalibracaoNoCliente,
+                      preco_calibracao_no_laboratorio: precoCalibracaoNoLaboratorio,
                     },
-                    index
-                  ) => (
-                    <CardInformation
-                      instrumento={{
-                        tag,
-                        numeroDeSerie,
-                        dataUltimaCalibracao,
-                        informacoesAdicionais: data.informacoes_adicionais,
-                        local: data.local,
-                        maximo,
-                        minimo,
-                        unidade,
-                        capacidadeDeMedicao,
-                        posicao,
-                        descricao,
-                        tipoDeServico
-                      }}
-                      proposta={data}
-                      key={index}
-                    />
-                  )
-                )}
-              </Box>
-            </>
-          )}
+                    preco_alternativo_calibracao: precoAlternativoCalibracao,
+                    id,
+                    local,
+                    prazo_de_entrega: prazoDeEntrega,
+                    dias_uteis: diasUteis
+                  },
+                  index
+                ) => (
+                  <CardInformation
+                    instrumento={{
+                      tag,
+                      numeroDeSerie,
+                      dataUltimaCalibracao,
+                      maximo,
+                      minimo,
+                      unidade,
+                      capacidadeDeMedicao,
+                      posicao,
+                      descricao,
+                      id,
+                      tipoDeServico,
+                      precoAlternativoCalibracao,
+                      precoCalibracaoNoCliente,
+                      precoCalibracaoNoLaboratorio,
+                      local,
+                      prazoDeEntrega,
+                      diasUteis
+                    }}
+                    key={index}
+                    proposta={data}
+                  />
+                )
+              )}
+            </Box>
+          </>}
           {!!data?.informacoes_adicionais && (
             <>
               <Typography my={2} variant="h6">

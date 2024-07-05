@@ -12,13 +12,13 @@ import palette from '../../../theme/palette';
 
 // ----------------------------------------------------------------------
 
-AppNewsOrders.propTypes = {
+AppNewsInstruments.propTypes = {
   title: PropTypes.string,
   subheader: PropTypes.string,
   list: PropTypes.array.isRequired,
 };
 
-export default function AppNewsOrders({ title, subheader, list, admin, ...other }) {
+export default function AppNewsInstruments({ title, subheader, list, admin, ...other }) {
   const navigate = useNavigate();
   return (
     <Card {...other}>

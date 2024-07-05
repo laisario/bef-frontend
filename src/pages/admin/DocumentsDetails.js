@@ -2,7 +2,6 @@ import React from 'react'
 import { Box, Button, CircularProgress, Container, Grid, Typography } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import FileViewer from 'react-file-viewer'
-import './styles.css'
 import { useNavigate, useParams } from 'react-router-dom';
 import useDocumentos from '../../hooks/useDocumentos';
 import ExcelViewer from '../../components/drivers/ExcelViewer';

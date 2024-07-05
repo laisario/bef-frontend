@@ -32,7 +32,15 @@ function Orders() {
   const [open, setOpen] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
   const [selectedOrders, setSelectedOrders] = useState([]);
-  const { data, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, formFilter } = useOrders();
+  const { data,
+    page,
+    rowsPerPage,
+    handleChangePage,
+    handleChangeRowsPerPage,
+    formFilter,
+    statusColor,
+    statusString,
+  } = useOrders();
   const { vertical, horizontal, propostaEnviada } = alert;
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
@@ -40,7 +48,6 @@ function Orders() {
     }
     setAlert((prevAlert) => ({ ...prevAlert, propostaEnviada: false }));
   };
-
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -76,7 +83,7 @@ function Orders() {
           </Button>
         </Stack>
         <Card>
-        <TableToolbar form={formFilter} numSelected={selectedOrders.length} selectedOrders={selectedOrders} admin />
+          <TableToolbar form={formFilter} numSelected={selectedOrders.length} selectedOrders={selectedOrders} admin />
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
@@ -115,8 +122,7 @@ function Orders() {
                         <TableCell align="left">{cliente.empresa || cliente.nome}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={status === 'F' ? 'primary' : 'info'}>{status === 'F' ? aprovacao === null ? "Finalizada e Aguardando análise cliente" : `Finalizada e 
-                          ${aprovacao ? "aprovada" : "reprovada"}` : 'Aguardando análise'}</Label>
+                          <Label color={statusColor[status]}>{statusString[status]}</Label>
                         </TableCell>
                       </TableRow>
                     );
@@ -136,7 +142,7 @@ function Orders() {
             </TableContainer>
           </Scrollbar>
         </Card>
-        <FormCreateOrder open={open} setOpen={setOpen} setAlert={setAlert} onClose={handleClose} admin/>
+        <FormCreateOrder open={open} setOpen={setOpen} setAlert={setAlert} onClose={handleClose} admin />
 
         <Stack spacing={2} sx={{ width: '100%' }}>
           <Snackbar

@@ -251,7 +251,6 @@ export default function FormCreate({ open, setOpen, form }) {
                         </Button>
                         {!!arquivo &&
                             <Button
-                                component="a"
                                 size="small"
                                 href={
                                     !!arquivo && arquivo instanceof File
@@ -259,13 +258,14 @@ export default function FormCreate({ open, setOpen, form }) {
                                         : arquivo
                                 }
                                 target="_blank"
+                                component="a"
                                 variant="outlined"
                                 sx={{ marginLeft: 1 }}
                             >
                                 Ver arquivo
                             </Button>
                         }
-                        {!!erro && Object.keys(erro)?.map((errKeys, i) => <Alert severity="error">{erroMessages[errKeys]}</Alert>)}
+                        {!!erro && Object.keys(erro)?.map((errKeys, i) => <Alert severity="error" key={i}>{erroMessages[errKeys]}</Alert>)}
                     </DialogContent>
 
                     <DialogActions>

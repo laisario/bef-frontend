@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -11,6 +11,7 @@ const useOrders = (id) => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [pdfFile, setPDFFile] = useState(null);
   const formFilter = useForm({
     defaultValues: {
       search: "",
@@ -29,7 +30,7 @@ const useOrders = (id) => {
     dateStop,
     filterByDate
   } = useWatch({ control: formFilter.control })
-
+  const queryClient = useQueryClient()
   const { data, error, isLoading, refetch } = useQuery(['propostas', id, page, rowsPerPage, debouncedSearchFilter, status, filterByDate], async () => {
     if (id) {
       const response = await axios.get(`/propostas/${id}`, { params: { page_size: rowsPerPage } });
@@ -66,11 +67,26 @@ const useOrders = (id) => {
     true: 'success',
   };
 
+  const statusColor = {
+    "E": 'info',
+    "AA": 'warning',
+    "A": 'success',
+    "R": 'error',
+  }
+
+  const statusString = {
+    "E": 'Em elaboração',
+    "AA": 'Aguardando aprovação',
+    "A": 'Aprovada',
+    "R": 'Reprovada',
+  }
+
   const { mutate: deleteOrder, isLoading: isDeleting } = useMutation(async (ids) => Promise.all(ids?.map((id) => axios.delete(`/propostas/${id}`))), {
     onSuccess: () => {
-      refetch()
+      queryClient.invalidateQueries({ queryKey: ['propostas'] })
     },
   })
+
 
   const deleteOrderAndNavigate = async () => {
     deleteOrder([id])
@@ -86,83 +102,109 @@ const useOrders = (id) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+  
+  const handleDownloadProposol = async () => {
+    const response = await getProposolPDF()
+    if (response.data && "url" in response.data) {
+      setPDFFile(response.data.url)
+    } else {
+      setPDFFile(null)
+    }
+  }
 
-  const edit = async (form, setResponseStatus, setOpenAlert) => {
+  useEffect(() => {
+    (async () => handleDownloadProposol())()
+  }, [])
+
+
+  const elaborate = async (form, setResponseStatus, setOpenAlert, editProposol) => {
     const formValues = form.watch()
+    const formatDayjs = (date) => dayjs.isDayjs(date) ? date.format('YYYY-MM-DD') : null;
+
+    const commonData = {
+      total: formValues.total || 0,
+      condicaoDePagamento: formValues.formaDePagamento || null,
+      transporte: formValues.transporte || null,
+      numero: formValues.numeroProposta || 0,
+      validade: formatDayjs(formValues.validade),
+      dataAprovacao: formatDayjs(formValues.dataAprovacao),
+      status: formValues.status || null,
+      prazoDePagamento: formatDayjs(formValues.prazoDePagamento),
+      edit: editProposol,
+    };
     try {
       if (formValues.anexo && formValues.anexo instanceof File) {
+        console.log("aaaaaaaaaaaaaaaaaaa")
         const formData = new FormData();
         formData.append('anexo', formValues.anexo);
         await axiosForFiles.patch(`/propostas/${id}/anexar/`, formData)
       }
+      let response;
       if (formValues.enderecoDeEntrega === 'enderecoCadastrado') {
-        const response = await axios.patch(`/propostas/${id}/atualizar/`, {
-          local: formValues.local || null,
-          total: formValues.total || 0,
-          prazoDeEntrega: dayjs.isDayjs(formValues.prazoDeEntrega) ? formValues.prazoDeEntrega?.format('YYYY-MM-DD') : null,
-          condicaoDePagamento: formValues.formaDePagamento || null,
-          transporte: formValues.transporte || null,
-          numero: formValues.numeroProposta || 0,
+        response = await axios.patch(`/propostas/${id}/elaborar/`, {
+          ...commonData,
           enderecoDeEntrega: data?.cliente?.endereco || null,
-          validade: dayjs.isDayjs(formValues.validade) ? formValues.validade?.format('YYYY-MM-DD') : null,
-          dataAprovacao: dayjs.isDayjs(formValues.dataAprovacao) ? formValues.dataAprovacao?.format('YYYY-MM-DD') : null,
-          aprovacao: formValues.aprovado || null,
-          prazoDePagamento: dayjs.isDayjs(formValues.prazoDePagamento) ? formValues.prazoDePagamento?.format('YYYY-MM-DD') : null,
         });
-        setResponseStatus(response)
       } else {
-        const response = await axios.patch(`/propostas/${id}/atualizar/`, {
-          local: formValues.local || null,
-          total: formValues.total || 0,
-          prazoDeEntrega: dayjs.isDayjs(formValues.prazoDeEntrega) ? formValues.prazoDeEntrega?.format('YYYY-MM-DD') : null,
-          condicaoDePagamento: formValues.formaDePagamento || null,
-          transporte: formValues.transporte || null,
-          numero: formValues.numeroProposta || 0,
-          enderecoDeEntregaAdd:
-            {
-              cep: formValues.CEP || null,
-              numero: formValues.numeroEndereco || null,
-              logradouro: formValues.rua || null,
-              bairro: formValues.bairro || null,
-              cidade: formValues.cidade || null,
-              estado: formValues.estado || null,
-              complemento: formValues.complemento || null,
-            } || null,
-          validade: dayjs.isDayjs(formValues.validade) ? formValues.validade?.format('YYYY-MM-DD') : null,
-          dataAprovacao: dayjs.isDayjs(formValues.dataAprovacao) ? formValues.dataAprovacao?.format('YYYY-MM-DD') : null,
-          aprovacao: formValues.aprovado || null,
-          prazoDePagamento: dayjs.isDayjs(formValues.prazoDePagamento) ? formValues.prazoDePagamento?.format('YYYY-MM-DD') : null,
+        response = await axios.patch(`/propostas/${id}/elaborar/`, {
+          ...commonData,
+          enderecoDeEntregaAdd: {
+            cep: formValues.CEP || null,
+            numero: formValues.numeroEndereco || null,
+            logradouro: formValues.rua || null,
+            bairro: formValues.bairro || null,
+            cidade: formValues.cidade || null,
+            estado: formValues.estado || null,
+            complemento: formValues.complemento || null,
+          } || null,
         });
-        setResponseStatus(response);
       }
-      setOpenAlert(true);
-      refetch()
+      setResponseStatus({ status: response?.status, message: response?.data?.message });
     } catch (error) {
-      setResponseStatus(error.response);
-      setOpenAlert(true);
-      console.log(error);
+      console.log(error)
+      setResponseStatus({ status: error?.response?.status, message: "Ocorreu um erro ao elaborar a proposta, verifique se preencheu corretamente." });
+    }
+    setOpenAlert(true);
+    refetch()
+  };
+
+  // const { mutate: elaborateOrder, isLoading: isElaborating } = useMutation({
+  //   mutationFn: elaborate,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['propostas'] })
+  //   },
+  // })
+
+  const sendProposolByEmail = async () => {
+    try {
+      const response = await axios.get(`/propostas/${id}/enviar_email/`);
+      return { status: response?.status, message: response?.data?.message, };
+    } catch (err) {
+      console.log(err);
+      return { status: err.status, message: "Falha no envio da proposta." };
+    }
+  }
+
+
+  const aprove = async () => {
+    try {
+      const response = await axios.post(`/propostas/${id}/aprovar/`);
+      refetch()
+      return { status: response?.status, message: response?.data?.message };
+    } catch (err) {
+      console.log(err);
+      return { status: err.status, message: "Falha na aprovação da proposta." };
     }
   };
 
-  const aprovar = async () => {
+  const refuse = async () => {
     try {
-      await axios.post(`/propostas/${id}/aprovar/`);
-      navigate('/dashboard/propostas');
-      return { error: false };
+      const response = await axios.post(`/propostas/${id}/reprovar/`);
+      refetch()
+      return { status: response?.status, message: response?.data?.message };
     } catch (err) {
       console.log(err);
-      return { error: true };
-    }
-  };
-
-  const recusar = async () => {
-    try {
-      await axios.post(`/propostas/${id}/reprovar/`);
-      navigate('/dashboard/propostas');
-      return { error: false };
-    } catch (err) {
-      console.log(err);
-      return { error: true };
+      return { status: err.status, message: "Falha ao recusar a proposta." };
     }
   };
   const propostasEmAnalise = useMemo(
@@ -170,25 +212,43 @@ const useOrders = (id) => {
     [data]
   );
 
+  const getProposolPDF = async () => {
+    try {
+      const response = await axios.get(`/propostas-files/${id}`);
+      return response
+
+    } catch (error) {
+      return { status: error.status, message: "Falha ao recuperar PDF da proposta." };
+    }
+  }
+
   return {
     data,
     error,
     isLoading,
     deleteOrder,
     refetch,
-    aprovar,
-    recusar,
+    aprove,
+    refuse,
     aprovacaoProposta,
     colorAprovacaoProposta,
     propostasEmAnalise,
-    edit,
+    elaborate,
     page,
     rowsPerPage,
     handleChangePage,
     handleChangeRowsPerPage,
     formFilter,
     deleteOrderAndNavigate,
-    isDeleting
+    isDeleting,
+    statusColor,
+    statusString,
+    sendProposolByEmail,
+    getProposolPDF,
+    handleDownloadProposol,
+    pdfFile,
+    // elaborateOrder,
+    // isElaborating,
   };
 };
 
