@@ -1,5 +1,5 @@
-import { Alert, Button, Card, CardActions, CardContent, Typography, CircularProgress, Box, Grid } from '@mui/material';
-import React, { useState } from 'react';
+import { Alert, Button, Card, CardActions, CardContent, Typography, CircularProgress, Box, Divider } from '@mui/material';
+import React, { useMemo, useState } from 'react';
 import { useTheme } from '@emotion/react';
 import { useParams } from 'react-router-dom';
 import DateRangeIcon from '@mui/icons-material/DateRange';
@@ -16,12 +16,24 @@ function RevisionCard({ revisao }) {
     const { refetch } = useDocumentos(id);
     const theme = useTheme();
     const { user } = useAuth()
+    const userApproved = useMemo(() => revisao?.aprovacoes?.some(aprovacao => aprovacao?.aprovador?.id === user?.id), [user, revisao])
+    const approversIds = revisao?.aprovadores?.map((approver) => approver.id )
+
     const handleAprovel = async () => {
         try {
             setIsLoading(true);
-            await axios.post(`/documentos/${id}/aprovar/`, {
-                revisao_id: revisao?.id,
-            });
+            if (userApproved) {
+                await axios.post(`/documentos/${id}/aprovar/`, {
+                    revisao_id: revisao?.id,
+                    delete: true,
+                });
+            } else {
+                await axios.post(`/documentos/${id}/aprovar/`, {
+                    revisao_id: revisao?.id,
+                    delete: false,
+                });
+            }
+
             setIsLoading(false);
             await refetch();
             return { error: false };
@@ -32,44 +44,47 @@ function RevisionCard({ revisao }) {
         }
     };
     return (
-        <Card sx={{ my: 2, backgroundColor: theme.palette.grey[300], }}>
-            <CardContent sx={{ backgroundColor: theme.palette.background.paper }}>
+        <Card variant="outlined" sx={{ px: 4, marginBottom: 4 }}>
+            <CardContent sx={{ bgcolor: 'background.paper' }}>
                 <Typography variant="body1">
                     <strong>Revisado {fDate(revisao?.data_revisao)}</strong>
                 </Typography>
                 <Typography variant='body2' color="text.secondary">
                     Por: {revisao?.revisor.username}
                 </Typography>
+                <Typography variant='body2' color="text.secondary">
+                    Aprovadores: {revisao?.aprovadores.map((ap) => ap?.username).slice().join(", ")}
+                </Typography>
                 <Typography variant='body2' sx={{ mt: 1 }}>
                     <strong>Alteração:</strong>
-                    <br />
-                    <p dangerouslySetInnerHTML={{ __html: revisao?.alteracao }} />
+                    <p style={{ lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: revisao?.alteracao }} />
                 </Typography>
+                <Divider />
             </CardContent>
             {!!revisao?.aprovacoes?.length && (
-                <CardContent>
+                <Box sx={{ px: 2 }}>
                     <Typography variant='body2'><strong>Aprovações:</strong></Typography>
-                    <Grid container flexDirection="row">
-                        {revisao?.aprovacoes.map((aprovacao) => (<Grid key={aprovacao.id} item sx={{ backgroundColor: theme.palette.grey[400], p: 1, borderRadius: 1, mr: 2, mt: 1 }}>
+                    <Box display="flex" sx={{mt: 1}} flexDirection="row">
+                        {revisao?.aprovacoes.map((aprovacao, index) => (<Box key={aprovacao.id + index} sx={{ backgroundColor: theme.palette.grey[300], p: 0.5, borderRadius: 1, mr: 0.5 }}>
                             <Box display="flex" flexDirection="row">
-                                <PersonIcon />
+                                <PersonIcon fontSize="small" />
                                 <Typography variant='body2'>{aprovacao.aprovador.username}</Typography>
                             </Box>
                             <Box display="flex" flexDirection="row">
-                                <DateRangeIcon />
+                                <DateRangeIcon fontSize="small" />
                                 <Typography variant='body2'>
-                                    {fDate(aprovacao.data_aprovacao, 'dd MM yyyy')}
+                                    {fDate(aprovacao.data_aprovacao, 'dd/MM/yyyy')}
                                 </Typography>
                             </Box>
-                        </Grid>))}
-                    </Grid>
-                </CardContent>
+                        </Box>))}
+                    </Box>
+                </Box>
             )}
             {!!errMsg && <Alert severity="error">{errMsg}</Alert>}
             {isLoading && <CircularProgress />}
             <CardActions sx={{ display: 'flex', flexDirection: 'row', justifyContent: "flex-end" }}>
-                {revisao?.aprovadores?.includes(user.id) &&
-                    <Button size="small" onClick={handleAprovel}>Aprovar</Button>
+                {approversIds?.includes(user.id) &&
+                    <Button size="small" onClick={handleAprovel}>{userApproved ? "Retirar aprovação" : "Aprovar"}</Button>
                 }
             </CardActions>
         </Card>

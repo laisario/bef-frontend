@@ -25,7 +25,7 @@ import useOrders from '../hooks/useOrders';
 import CardInformation from '../components/orders/CardInformation';
 import Iconify from '../components/iconify';
 import { capitalizeFirstLetter as CFL } from '../utils/formatString';
-import FormElaborate from '../components/admin/order/FormElaborate';
+import FormElaborate from '../components/orders/FormElaborate';
 import { fDate } from '../utils/formatTime';
 
 
@@ -57,7 +57,7 @@ function OrderDetails({ admin }) {
     pdfFile,
   } = useOrders(id);
   const theme = useTheme();
-
+  console.log(data, !!data?.responsavel?.username)
   const handleSendEmail = async () => {
     const response = await sendProposolByEmail()
     setResponse({ status: response?.status, message: response?.message })
@@ -176,14 +176,19 @@ function OrderDetails({ admin }) {
                   Proposta criada: {dayjs(data?.data_criacao).locale('pt-BR').format('D [de] MMMM [de] YYYY')}
                 </Typography>
               }
-              {!!data?.condicao_de_pagamento &&
+              {!!data?.data_aprovacao &&
                 <Typography variant="subtitle1" fontWeight="500">
-                  Forma de pagamento: {formaPagamento[data?.condicao_de_pagamento]}
+                  Data {data?.status === "A" ? 'aprovação' : 'recusada'}: {dayjs(data?.data_aprovacao).locale('pt-BR').format('D [de] MMMM [de] YYYY')}
                 </Typography>
               }
               {!!data?.prazo_de_pagamento &&
                 <Typography variant="subtitle1" fontWeight="500">
                   Prazo de pagamento: {dayjs(data?.prazo_de_pagamento).locale('pt-BR').format('D [de] MMMM [de] YYYY')}
+                </Typography>
+              }
+              {!!data?.condicao_de_pagamento &&
+                <Typography variant="subtitle1" fontWeight="500">
+                  Forma de pagamento: {formaPagamento[data?.condicao_de_pagamento]}
                 </Typography>
               }
               {!!data?.transporte &&
@@ -199,6 +204,7 @@ function OrderDetails({ admin }) {
                   {data?.endereco_de_entrega?.bairro?.nome} - {data?.endereco_de_entrega?.cep}
                 </Typography>
               }
+              {!!data?.responsavel?.username && (<Typography variant="subtitle1" fontWeight="500">Funcionário responsável: {data?.responsavel?.username}</Typography>)}
             </Box>
             <Box display="flex" flexDirection="column" gap={1}>
               <Chip

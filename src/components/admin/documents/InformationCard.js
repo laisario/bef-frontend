@@ -2,13 +2,13 @@ import { Box, Button, Card, CardActions, CardContent, Chip, Typography } from '@
 import React from 'react'
 import titleCase from '../../../utils/formatTitle';
 import { fDate } from '../../../utils/formatTime';
-import useUsers from '../../../hooks/useUsers';
 import { useAuth } from '../../../context/Auth';
+import useDocumentos from '../../../hooks/useDocumentos';
 
 function InformationCard({ data, status, statusColor, setOpenFormRevision }) {
     const { user } = useAuth();
-    const { data: dataUser } = useUsers(data?.criador)
-    const isCreator = data?.criador === user?.id
+    const { criticalAnalysisMonths } = useDocumentos()
+    const isCreator = data?.criador?.id === user?.id
     return (
         <Card variant="outlined">
             <CardContent sx={{ bgcolor: 'background.paper', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -25,7 +25,7 @@ function InformationCard({ data, status, statusColor, setOpenFormRevision }) {
                     }
                     {data?.criador &&
                         <Typography sx={{ mt: 1.5 }} variant="body2">
-                            <strong>Elaborador:</strong> {titleCase(dataUser?.username)}
+                            <strong>Elaborador:</strong> {titleCase(data?.criador?.username)}
                         </Typography>
                     }
                     {data?.codigo?.codigo &&
@@ -35,7 +35,7 @@ function InformationCard({ data, status, statusColor, setOpenFormRevision }) {
                     }
                     {!!data?.analise_critica &&
                         <Typography sx={{ mt: 1 }} variant="body2">
-                            <strong>Análise Crítica: </strong>Em {data?.analise_critica} {+data?.analise_critica > 1 ? 'mesês' : 'mês'}
+                            <strong>Análise Crítica: </strong>Em {criticalAnalysisMonths(data?.analise_critica)}
                         </Typography>
                     }
                     {data?.data_revisao &&
@@ -43,9 +43,9 @@ function InformationCard({ data, status, statusColor, setOpenFormRevision }) {
                             <strong>Revisão: </strong>{fDate(data?.data_revisao)}
                         </Typography>
                     }
-                    {data?.validade &&
+                    {data?.data_validade &&
                         <Typography sx={{ mt: 1 }} variant="body2">
-                            <strong>Validade: </strong>{data?.data_validade}
+                            <strong>Validade: </strong>{fDate(data?.data_validade)}
                         </Typography>
                     }
                     {!!data?.frequencia &&

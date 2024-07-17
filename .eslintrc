@@ -65,6 +65,12 @@
     "react/function-component-definition": 0,
     "react/jsx-no-constructed-context-values": 0,
     "react/no-danger": 0,
+    "import/no-unresolved": [
+      "error",
+      {
+        "ignore": ["^swiper/"]
+      }
+    ],
     "no-unused-vars": [
       1,
       {

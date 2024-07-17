@@ -8,6 +8,7 @@ import { bgBlur } from '../../../utils/cssStyles';
 import Iconify from '../../../components/iconify';
 //
 import AccountPopover from './AccountPopover';
+import Searchbar from './Searchbar';
 
 
 // ----------------------------------------------------------------------
@@ -40,7 +41,8 @@ Header.propTypes = {
   onOpenNav: PropTypes.func,
 };
 
-export default function Header({ onOpenNav }) {
+export default function Header({ onOpenNav, data }) {
+  // const { placeholder, formHeader, value } = data
   return (
     <StyledRoot>
       <StyledToolbar>
@@ -54,6 +56,7 @@ export default function Header({ onOpenNav }) {
         >
           <Iconify icon="eva:menu-2-fill" />
         </IconButton>
+        {/* <Searchbar placeholder={placeholder} formHeader={formHeader} value={value} /> */}
 
         <Box sx={{ flexGrow: 1 }} />
 

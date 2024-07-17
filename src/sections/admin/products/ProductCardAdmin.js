@@ -80,44 +80,51 @@ function ProductCardAdmin({ product }) {
             </Typography>
           </Box>
         }
-        {!!product?.procedimento}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Typography variant="body2"><strong>Procedimento relacionado:</strong></Typography>
-          <Typography variant="body2">{product?.procedimento_relacionado?.codigo}</Typography>
-        </Box>
+        {!!product?.procedimento_relacionado?.codigo && (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Typography variant="body2"><strong>Procedimento relacionado:</strong></Typography>
+            <Typography variant="body2">{product?.procedimento_relacionado?.codigo}</Typography>
+          </Box>
+        )}
       </Stack>
       <Divider />
       <Stack sx={{ p: 2 }}>
-        <Typography pb={1} variant="subtitle2">
-          <strong>Preço calibração</strong>
-        </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Typography variant="body2">No cliente:</Typography>
-          <Typography variant="body2">R${product?.preco_calibracao_no_cliente}</Typography>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            mb: 2
-          }}
-        >
-          <Typography variant="body2">No laboratorio:</Typography>
-          <Typography variant="body2">R${product?.preco_calibracao_no_laboratorio}</Typography>
-        </Box>
+        {(!!product?.preco_calibracao_no_cliente || !!product?.preco_calibracao_no_laboratorio) && (
+          <Typography pb={1} variant="subtitle2">
+            <strong>Preço calibração</strong>
+          </Typography>
+        )}
+        {!!product?.preco_calibracao_no_cliente && (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Typography variant="body2">No cliente:</Typography>
+            <Typography variant="body2">R${product?.preco_calibracao_no_cliente}</Typography>
+          </Box>
+        )}
+        {!!product?.preco_calibracao_no_laboratorio && (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              mb: 2
+            }}
+          >
+            <Typography variant="body2">No laboratorio:</Typography>
+            <Typography variant="body2">R${product?.preco_calibracao_no_laboratorio}</Typography>
+          </Box>
+        )}
       </Stack>
     </Card>
   );

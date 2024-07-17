@@ -105,7 +105,7 @@ const useOrders = (id) => {
   
   const handleDownloadProposol = async () => {
     const response = await getProposolPDF()
-    if (response.data && "url" in response.data) {
+    if (response?.data && "url" in response?.data) {
       setPDFFile(response.data.url)
     } else {
       setPDFFile(null)
@@ -120,21 +120,19 @@ const useOrders = (id) => {
   const elaborate = async (form, setResponseStatus, setOpenAlert, editProposol) => {
     const formValues = form.watch()
     const formatDayjs = (date) => dayjs.isDayjs(date) ? date.format('YYYY-MM-DD') : null;
-
     const commonData = {
       total: formValues.total || 0,
       condicaoDePagamento: formValues.formaDePagamento || null,
       transporte: formValues.transporte || null,
       numero: formValues.numeroProposta || 0,
       validade: formatDayjs(formValues.validade),
-      dataAprovacao: formatDayjs(formValues.dataAprovacao),
       status: formValues.status || null,
       prazoDePagamento: formatDayjs(formValues.prazoDePagamento),
       edit: editProposol,
+      responsavel: formValues.responsavel,
     };
     try {
       if (formValues.anexo && formValues.anexo instanceof File) {
-        console.log("aaaaaaaaaaaaaaaaaaa")
         const formData = new FormData();
         formData.append('anexo', formValues.anexo);
         await axiosForFiles.patch(`/propostas/${id}/anexar/`, formData)
@@ -167,13 +165,6 @@ const useOrders = (id) => {
     setOpenAlert(true);
     refetch()
   };
-
-  // const { mutate: elaborateOrder, isLoading: isElaborating } = useMutation({
-  //   mutationFn: elaborate,
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ['propostas'] })
-  //   },
-  // })
 
   const sendProposolByEmail = async () => {
     try {
@@ -208,12 +199,20 @@ const useOrders = (id) => {
     }
   };
   const propostasEmAnalise = useMemo(
-    () => (Array.isArray(data?.results) ? data?.results?.filter((pedido) => pedido.status === 'A') : null),
+    () => (Array.isArray(data?.results) ? data?.results?.filter((pedido) => pedido.status === 'E') : null),
+    [data]
+  );
+
+  const propostasAprovar= useMemo(
+    () => (Array.isArray(data?.results) ? data?.results?.filter((pedido) => pedido.status === 'AA') : null),
     [data]
   );
 
   const getProposolPDF = async () => {
     try {
+      if (!id) {
+        return null
+      }
       const response = await axios.get(`/propostas-files/${id}`);
       return response
 
@@ -247,6 +246,7 @@ const useOrders = (id) => {
     getProposolPDF,
     handleDownloadProposol,
     pdfFile,
+    propostasAprovar,
     // elaborateOrder,
     // isElaborating,
   };

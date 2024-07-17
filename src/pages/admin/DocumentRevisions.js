@@ -22,13 +22,13 @@ function DocumentRevisions() {
             Revisões {!!data?.titulo && `do documento: ${data.titulo}`}
           </Typography>
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => setOpenFormRevision(!openFormRevision)}>
-            Nova revião
+            Nova revisão
           </Button>
         </Stack>
 
         <Grid container spacing={2}>
           {revisoes?.map((revisao) => (
-            <Grid item key={revisao?.id} xs={6}>
+            <Grid item key={revisao?.id} xs={12} sm={6}>
               <RevisionCard revisao={revisao} key={revisao.id} />
             </Grid>
           ))}

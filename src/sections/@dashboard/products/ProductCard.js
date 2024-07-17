@@ -5,13 +5,19 @@ import { useMemo } from 'react';
 
 // ----------------------------------------------------------------------
 
-const posicaoInstrumento = {
+const instrumentPosition = {
   U: 'Em uso',
   E: 'Em estoque',
   I: 'Inativo',
   F: 'Fora de uso',
 };
 
+const colorInstrumentPosition = {
+  U: 'success',
+  E: 'info',
+  I: 'warning',
+  F: 'error',
+}
 // ----------------------------------------------------------------------
 
 ProductCard.propTypes = {
@@ -22,7 +28,7 @@ export default function ProductCard({ product, setSelecionados, selecionados }) 
   const isSelected = useMemo(() => selecionados.includes(product.id), [selecionados, product])
   return (
     <Card sx={{ border: isSelected ? "3px solid #FF9E75" : 0, cursor: "pointer" }} onClick={() => setSelecionados((selecionados) => isSelected ? selecionados.filter(selecionado => selecionado !== product.id) : [...selecionados, product.id])}>
-      <Link href={`#/dashboard/produto/${product.id}`} color="inherit" underline="none">
+      <Link href={`#/dashboard/instrumento/${product.id}`} color="inherit" underline="none">
 
         <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: "center", backgroundColor: '#FF9E75' }}>
           {!!product?.tag &&
@@ -50,7 +56,7 @@ export default function ProductCard({ product, setSelecionados, selecionados }) 
         </Stack>
         {!!product?.posicao &&
           <Box sx={{ pr: 5, pb: 5, display: 'flex', justifyContent: 'flex-end' }}>
-            <Chip label={posicaoInstrumento[product?.posicao]} />
+            <Chip color={colorInstrumentPosition[product?.posicao]} label={instrumentPosition[product?.posicao]} />
           </Box>
         }
       </Link>

@@ -97,8 +97,8 @@ function FormCreateRevision({ open, setOpen, idCreator }) {
                                 id="upload-btn"
                                 name="arquivo"
                                 type="file"
-                                onChange={handleChange}
                                 {...form.register("arquivo")}
+                                onChange={handleChange}
                             />
                         </Button>
                         {!!arquivo &&

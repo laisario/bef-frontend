@@ -89,6 +89,10 @@ function ExportFilter({ open, handleClose, selecionados, handleChangeCheckbox, v
                                 control={<Checkbox checked={valueCheckbox?.dataDaProximaChecagem} onChange={handleChangeCheckbox} name="dataDaProximaChecagem" />}
                                 label="Data da Próxima Checagem"
                             />
+                            <FormControlLabel
+                                control={<Checkbox checked={valueCheckbox?.local} onChange={handleChangeCheckbox} name="local" />}
+                                label="Local"
+                            />
                         </FormGroup>
                         {error && !Object.values(valueCheckbox).includes(true) &&
                             <FormHelperText error={error && !Object.values(valueCheckbox).includes(true)}>

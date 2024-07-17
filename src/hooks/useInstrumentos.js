@@ -5,17 +5,17 @@ import { useNavigate } from 'react-router-dom';
 import { isExpired } from '../utils/formatTime';
 import { axios } from '../api';
 
-const useInstrumentos = (id) => {
+const useInstrumentos = (id, cliente) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const queryClient = useQueryClient()
-  const { data, error, isLoading, refetch } = useQuery(['instrumentos', id, debouncedSearch], async () => {
+  const { data, error, isLoading, refetch } = useQuery(['instrumentos', id, debouncedSearch, cliente?.id], async () => {
     if (id) {
       const response = await axios.get(`/instrumentos/${id}`, { params: { page_size: 9999 } });
       return response?.data;
     }
-    const response = await axios.get('/instrumentos', { params: { page_size: 9999, search: debouncedSearch } });
+    const response = await axios.get('/instrumentos', { params: { page_size: 9999, search: debouncedSearch, client: cliente?.id } });
     return response?.data?.results;
   });
 
@@ -37,7 +37,7 @@ const useInstrumentos = (id) => {
       return null;
     }
     return data?.filter((instrumento) =>
-      isExpired(instrumento?.data_ultima_calibracao, instrumento?.instrumento.tipo_de_instrumento.frequencia)
+      isExpired(instrumento?.data_ultima_calibracao, instrumento?.frequencia)
     );
   }, [id, data]);
 
@@ -47,13 +47,13 @@ const useInstrumentos = (id) => {
     }
     return data?.filter(
       (instrumento) =>
-        !isExpired(instrumento?.data_ultima_calibracao, instrumento?.instrumento.tipo_de_instrumento.frequencia)
+        !isExpired(instrumento?.data_ultima_calibracao, instrumento?.frequencia)
     );
   }, [id, data]);
 
   const deleteInstrument = async () => {
     await axios.delete(`/instrumentos/${id}`);
-    navigate('/dashboard/produtos');
+    navigate('/dashboard/instrumentos');
   };
 
   const update = async ({ idCalibration, analiseCliente }) => {
@@ -69,7 +69,7 @@ const useInstrumentos = (id) => {
   const { mutate } = useMutation({
     mutationFn: update,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['instrumentos', 'calibracoes'] })
+      queryClient.invalidateQueries({ queryKey: ['instrumentos'] })
     },
   })
 

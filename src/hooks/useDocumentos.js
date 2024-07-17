@@ -2,8 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation } from 'react-query';
 import debounce from 'lodash.debounce';
 import { useForm, useWatch } from 'react-hook-form';
+import dayjs from 'dayjs';
+import 'dayjs/locale/pt-br';
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { axios } from '../api';
-import { isExpired } from '../utils/formatTime';
+import { isPastFromToday } from '../utils/formatTime';
 
 const useDocumentos = (id) => {
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -72,12 +75,16 @@ const useDocumentos = (id) => {
     return color
   }
 
+  dayjs.extend(relativeTime);
+  dayjs.locale('pt-br')
+
   const criticalAnalysisMonths = (criticalAnalysis) => {
-    if (criticalAnalysis < 30 && criticalAnalysis > 0) {
-      return criticalAnalysis > 1 ? `${criticalAnalysis} dias` : `${criticalAnalysis} dia` 
+    if (criticalAnalysis > 0) {
+      const date = dayjs(new Date()).add(criticalAnalysis, 'days')
+      return dayjs(new Date()).to(date)
     }
-    const months = Math.floor(criticalAnalysis / 30)
-    return months > 1 ? `${months} meses` : `${months} mês`
+    const date = dayjs(new Date()).subtract(criticalAnalysis, 'days')
+    return dayjs(new Date()).from(date)
   }
 
   const { mutate: deleteDocumento, isLoading: isDeleting } = useMutation(async (ids) => Promise.all(ids?.map((id) => axios.delete(`/documentos/${id}`))), {
@@ -99,10 +106,9 @@ const useDocumentos = (id) => {
       return null;
     }
     return data?.results?.filter((document) =>
-      isExpired(document?.data_validade, document?.frequencia, "year")
+      isPastFromToday(document?.data_validade)
     );
   }, [id, data]);
-
   return {
     data,
     error,

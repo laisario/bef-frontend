@@ -106,7 +106,7 @@ function CardInformation({ instrumento, proposta }) {
           Capacidade de medição
         </Typography>
         <Typography fontWeight="400" color={'grey'} variant="body1">
-          {instrumento?.valor} {instrumento?.unidadeMedicao}
+          {instrumento?.capacidadeDeMedicao?.valor} {instrumento?.capacidadeDeMedicao?.unidade}
         </Typography>
       </Box>)}
       {!!instrumento?.local && (<Box display="flex" justifyContent="space-between">
@@ -165,7 +165,7 @@ function CardInformation({ instrumento, proposta }) {
                 </IconButton>
               </Box>
               : <Typography fontWeight="400" color={'grey'} variant="body1">
-                R$ {!!instrumento?.precoAlternativoCalibracao ? instrumento?.precoAlternativoCalibracao : priceOptions[proposta?.local]}
+                R$ {instrumento?.precoAlternativoCalibracao ? instrumento?.precoAlternativoCalibracao : priceOptions[proposta?.local]}
               </Typography>
             }
             {pathname.includes('/admin') && !editPrice && (

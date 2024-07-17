@@ -75,7 +75,7 @@ function InstrumentDetails() {
               {!!instrumento?.laboratorio && <Typography variant="subtitle1" fontWeight="500">
                 Laboratório: {instrumento?.laboratorio}
               </Typography>}
-              {!!instrumento?.instrumento?.procedimento_relacionado && <Typography variant="subtitle1" fontWeight="500">
+              {!!instrumento?.instrumento?.procedimento_relacionado?.codigo && <Typography variant="subtitle1" fontWeight="500">
                 Procedimento relacionado: {instrumento?.instrumento?.procedimento_relacionado.codigo}
               </Typography>}
             </Box>

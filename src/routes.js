@@ -1,13 +1,11 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 // layouts
 import DashboardLayout from './layouts/dashboard';
-import AdminLayout from './layouts/admin';
 import SimpleLayout from './layouts/simple';
 import AuthLayout from './layouts/auth';
 // pages
 import Documents from './pages/admin/Documents';
 import DocumentsDetails from './pages/admin/DocumentsDetails';
-import Orders from './pages/Orders';
 import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import Instruments from './pages/Instruments';
@@ -15,7 +13,7 @@ import DashboardApp from './pages/DashboardApp';
 import RegisterAuthPage from './pages/register/auth';
 import RegisterBasicsPage from './pages/register/basics';
 import RegisterLocationPage from './pages/register/location';
-import OrdersAdmin from './pages/admin/Orders';
+import Orders from './pages/Orders';
 import OrderDetails from './pages/OrderDetails';
 import InstrumentDetails from './pages/InstrumentDetails';
 import ProductsPageAdmin from './pages/admin/ProductsPageAdmin';
@@ -25,14 +23,14 @@ export default function Router() {
   const routes = useRoutes([
     {
       path: '/dashboard',
-      element: <DashboardLayout />,
+      element: <DashboardLayout admin={false} />,
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardApp /> },
         { path: 'propostas', element: <Orders /> },
         { path: 'proposta/:id', element: <OrderDetails /> },
-        { path: 'produtos', element: <Instruments /> },
-        { path: 'produto/:id', element: <InstrumentDetails /> },
+        { path: 'instrumentos', element: <Instruments /> },
+        { path: 'instrumento/:id', element: <InstrumentDetails /> },
       ],
     },
     {
@@ -67,15 +65,15 @@ export default function Router() {
     },
     {
       path: '/admin',
-      element: <AdminLayout />,
+      element: <DashboardLayout admin/>,
       children: [
         { element: <Navigate to="/admin/app" />, index: true },
         { path: 'app', element: <DashboardApp admin/> },
-        { path: 'propostas', element: <OrdersAdmin /> },
+        { path: 'propostas', element: <Orders admin /> },
         { path: 'proposta/:id', element: <OrderDetails admin/> },
-        { path: 'produtos', element: <ProductsPageAdmin/> },
+        { path: 'instrumentos', element: <ProductsPageAdmin/> },
         { path: 'documentos', element: <Documents /> },
-        { path: 'documento/:id', element: <DocumentsDetails /> },
+        { path: 'documento/:id/:idRevisao', element: <DocumentsDetails /> },
         { path: 'documento/:id/revisoes', element: <DocumentRevisions />}
       ],
     },

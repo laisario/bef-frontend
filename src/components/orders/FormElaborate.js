@@ -23,9 +23,10 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import useOrders from '../../../hooks/useOrders';
-import Iconify from '../../iconify';
-import FormAdress from '../../address/FormAdress';
+import useOrders from '../../hooks/useOrders';
+import Iconify from '../iconify';
+import FormAdress from '../address/FormAdress';
+import useUsers from '../../hooks/useUsers';
 
 function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAlert, editProposol }) {
   const form = useForm({
@@ -45,8 +46,8 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
       status: data?.status || "",
       enderecoDeEntrega: data?.endereco_de_entrega ? "enderecoCadastrado" : null,
       validade: data?.validade,
-      dataAprovacao: data?.data_aprovacao,
       prazoDePagamento: data?.prazo_de_pagamento,
+      responsavel: data?.responsavel || '',
     },
   });
   const {
@@ -54,9 +55,12 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
     anexo,
     validade,
     prazoDePagamento,
-    dataAprovacao,
     formaDePagamento,
+    responsavel
   } = useWatch({ control: form.control })
+  const { data: users } = useUsers();
+  const { id } = useParams();
+  const { elaborate, isLoading } = useOrders(id);
 
   const handleClose = () => {
     setElaborate((oldValue) => !oldValue)
@@ -67,10 +71,8 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
     const { name, files } = event.target;
     if (name === 'anexo') {
       form.setValue("anexo", files[0]);
+    }
   }
-  }
-  const { id } = useParams();
-  const { elaborate, isLoading } = useOrders(id);
   return (
     <Dialog open={open} onClose={handleClose}>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
@@ -120,17 +122,20 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
 
             />
           </Box>
-          <Box display="flex" gap={2} sx={{ my: 2 }}>
-            {data?.aprovacao && (
-              <DatePicker
-                label="Data aprovação"
-                {...form.register("dataAprovacao")}
-                value={dataAprovacao ? dayjs(dataAprovacao) : null}
-                onChange={newValue => form.setValue("dataAprovacao", newValue)}
-                sx={{ width: '50%' }}
-              />
-            )}
-          </Box>
+          <FormControl sx={{ width: '50%' }}>
+            <InputLabel id="select-responsible">Responsável</InputLabel>
+            <Select
+              labelId="select-responsible"
+              id="select-responsible"
+              name="responsavel"
+              label="Responsável"
+              fullWidth
+              {...form.register("responsavel")}
+              value={responsavel}
+            >
+              {users?.map((user) => <MenuItem key={user?.id} value={user?.id}>{user?.username}</MenuItem>)}
+            </Select>
+          </FormControl>
           <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, my: 2 }}>
             <FormLabel id="aprovacao">Endereço de entrega: </FormLabel>
             <RadioGroup row aria-labelledby="aprovacao">
@@ -167,8 +172,8 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
                   id="upload-btn"
                   name="anexo"
                   type="file"
-                  onChange={handleChangeAnexo}
                   {...form.register("anexo")}
+                  onChange={handleChangeAnexo}
                 />
               </Button>
               {!!anexo && (

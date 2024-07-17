@@ -1,5 +1,5 @@
 import { Search } from '@mui/icons-material';
-import { Button, CircularProgress, FormControl, FormControlLabel, FormLabel, Grid, IconButton, InputAdornment, Radio, RadioGroup, TextField, Toolbar, Tooltip, Typography, alpha } from '@mui/material';
+import { CircularProgress, FormControl, FormControlLabel, FormLabel, Grid, IconButton, InputAdornment, Radio, RadioGroup, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
@@ -18,17 +18,10 @@ function TableToolbar(props) {
     return (
         <Toolbar
             sx={{
-                background: (theme) => theme.palette.grey[300],
-                color: (theme) => theme.palette.grey[900],
-                ...(numSelected > 0 && {
-                    bgcolor: (theme) =>
-                        alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-                }),
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                p: 2,
-                borderRadius: "4px"
+                p: isDesktop ? 1 : 2,
             }}
         >
             {numSelected > 0 && (

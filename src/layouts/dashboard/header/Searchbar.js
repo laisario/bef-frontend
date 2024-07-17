@@ -32,7 +32,7 @@ const StyledSearchbar = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function Searchbar() {
+export default function Searchbar({ placeholder, formHeader, value }) {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -58,7 +58,8 @@ export default function Searchbar() {
               autoFocus
               fullWidth
               disableUnderline
-              placeholder="Search…"
+              placeholder={placeholder}
+              {...formHeader.register(value)}
               startAdornment={
                 <InputAdornment position="start">
                   <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
@@ -67,7 +68,7 @@ export default function Searchbar() {
               sx={{ mr: 1, fontWeight: 'fontWeightBold' }}
             />
             <Button variant="contained" onClick={handleClose}>
-              Search
+              Buscar
             </Button>
           </StyledSearchbar>
         </Slide>

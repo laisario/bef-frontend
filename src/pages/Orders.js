@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import React, { useState } from 'react';
-// @mui
+import { useState } from 'react';
 import {
   Card,
   Table,
@@ -16,52 +15,57 @@ import {
   Alert,
   Snackbar,
   TablePagination,
-  Dialog,
+  Checkbox,
 } from '@mui/material';
-// components
-import Form from '../components/orders/Form';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
-// sections
-import { UserListHead } from '../sections/@dashboard/user';
-// mock
-import USERLIST from '../_mock/user';
-
-// hooks
-import useOrders from '../hooks/useOrders';
+import useOrders from '../hooks/useOrders'
 import { fDate } from '../utils/formatTime';
+import FormCreateOrder from '../components/orders/FormCreateOrder';
+import TableHeader from '../components/orders/TableHeader';
 import TableToolbar from '../components/orders/TableToolbar';
 
-// ----------------------------------------------------------------------
 
-const TABLE_HEAD = [
-  { id: 'id', label: '', alignRight: false },
-  { id: 'numero', label: 'Número', alignRight: false },
-  { id: 'data', label: 'Data', alignRight: false },
-  { id: 'total', label: 'Total', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
-];
 
-// ----------------------------------------------------------------------
-
-export default function UserPage() {
+function Orders({ admin }) {
   const [open, setOpen] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
-  const { data, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, formFilter, statusColor, statusString } = useOrders();
+  const [selectedOrders, setSelectedOrders] = useState([]);
+  const { data,
+    page,
+    rowsPerPage,
+    handleChangePage,
+    handleChangeRowsPerPage,
+    formFilter,
+    statusColor,
+    statusString,
+  } = useOrders();
   const { vertical, horizontal, propostaEnviada } = alert;
-
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
     setAlert((prevAlert) => ({ ...prevAlert, propostaEnviada: false }));
   };
-
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      const newSelected = data?.results?.map((n) => n.id);
+      setSelectedOrders(newSelected);
+      return;
+    }
+    setSelectedOrders([]);
+  };
 
+  const handleClick = (event, id) => {
+    event?.stopPropagation()
+    setSelectedOrders(selectedOrders?.includes(id) ? selectedOrders?.filter(documentId => documentId !== id) : [...selectedOrders, id]);
+  };
+
+  const isSelected = (id) => selectedOrders.indexOf(id) !== -1;
   return (
     <>
       <Helmet>
@@ -71,39 +75,54 @@ export default function UserPage() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Minhas propostas
+            {admin ? 'Propostas' : 'Minhas propostas'}
           </Typography>
+
           <Button variant="contained" onClick={handleOpen} startIcon={<Iconify icon="eva:plus-fill" />}>
             Nova proposta
           </Button>
         </Stack>
-
         <Card>
-          <TableToolbar form={formFilter} />
+          <TableToolbar form={formFilter} numSelected={selectedOrders.length} selectedOrders={selectedOrders} admin={admin} />
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <UserListHead headLabel={TABLE_HEAD} rowCount={USERLIST.length} />
+                <TableHeader
+                  numSelected={selectedOrders.length}
+                  onSelectAllClick={handleSelectAllClick}
+                  rowCount={data?.results?.length}
+                  admin={admin}
+                />
                 <TableBody>
                   {data?.results?.map((row, index) => {
-                    const { id, total, data_criacao: dataCriacao, status, numero } = row;
+                    const { id, data_criacao: dataCriacao, status, cliente, numero, total } = row;
                     const data = new Date(dataCriacao);
+                    const isItemSelected = isSelected(row.id);
                     return (
                       <TableRow
                         hover
                         key={id}
                         tabIndex={-1}
                         component={Link}
-                        href={`#/dashboard/proposta/${id}`}
+                        href={admin ? `#/admin/proposta/${id}` : `#/dashboard/proposta/${id}`}
                         underline="none"
                       >
-                        <TableCell align="left">{index + 1}</TableCell>
-
+                        {admin &&
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              color="primary"
+                              onClick={(event) => handleClick(event, row.id)}
+                              checked={isItemSelected}
+                              inputProps={{
+                                'aria-labelledby': index,
+                              }}
+                            />
+                          </TableCell>
+                        }
                         <TableCell align="left">{numero}</TableCell>
 
                         <TableCell align="left">{fDate(data)}</TableCell>
-
-                        <TableCell align="left">{+total > 0 ? `R$ ${total}` : "Aguardando resposta"}</TableCell>
+                        {admin ? (<TableCell align="left">{cliente.empresa || cliente.nome}</TableCell>) : (<TableCell align="left">{+total > 0 ? `R$ ${total}` : "Aguardando resposta"}</TableCell>)}
 
                         <TableCell align="left">
                           <Label color={statusColor[status]}>{statusString[status]}</Label>
@@ -113,28 +132,20 @@ export default function UserPage() {
                   })}
                 </TableBody>
               </Table>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, 100]}
+                component="div"
+                count={data?.count || 0}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage="Linhas por páginas"
+              />
             </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, 100]}
-              component="div"
-              count={data?.results?.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              labelRowsPerPage="Linhas por páginas"
-            />
           </Scrollbar>
         </Card>
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          PaperProps={{
-            component: 'form',
-          }}
-        >
-          <Form setOpen={setOpen} setAlert={setAlert} handleClose={handleClose} />
-        </Dialog>
+        <FormCreateOrder open={open} setOpen={setOpen} setAlert={setAlert} onClose={handleClose} admin={admin} />
 
         <Stack spacing={2} sx={{ width: '100%' }}>
           <Snackbar
@@ -143,7 +154,11 @@ export default function UserPage() {
             key={vertical + horizontal}
             onClose={handleCloseAlert}
           >
-            <Alert onClose={handleCloseAlert} severity="success" sx={{ width: '100%' }}>
+            <Alert
+              onClose={handleCloseAlert}
+              severity="success"
+              sx={{ width: '100%' }}
+            >
               Sua proposta foi enviada com sucesso!
             </Alert>
           </Snackbar>
@@ -152,3 +167,5 @@ export default function UserPage() {
     </>
   );
 }
+
+export default Orders

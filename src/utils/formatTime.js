@@ -29,3 +29,6 @@ export function isExpired(date, frequency, timeUnit ) {
   return date ? isPast(addDays(new Date(date), frequency)) : false;
 }
 
+export function isPastFromToday(date) {
+  return isPast(new Date(date))
+}

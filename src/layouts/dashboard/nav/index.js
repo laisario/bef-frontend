@@ -15,7 +15,7 @@ import { Avatar } from '../../../components/avatar'
 import Iconify from '../../../components/iconify';
 import { useAuth } from '../../../context/Auth';
 //
-import navConfig from './config';
+import {navConfig, navConfigAdmin} from './config';
 
 // ----------------------------------------------------------------------
 
@@ -34,9 +34,10 @@ const StyledAccount = styled('div')(({ theme }) => ({
 Nav.propTypes = {
   openNav: PropTypes.bool,
   onCloseNav: PropTypes.func,
+  admin: PropTypes.bool,
 };
 
-export default function Nav({ openNav, onCloseNav }) {
+export default function Nav({ openNav, onCloseNav, admin }) {
   const { pathname } = useLocation();
   const { user } = useAuth();
 
@@ -78,11 +79,10 @@ export default function Nav({ openNav, onCloseNav }) {
           </Link>
         </Box>
 
-        <NavSection data={navConfig} />
+        <NavSection data={admin ? navConfigAdmin : navConfig} />
       </Box>
 
-      <Box>
-        <Stack alignItems="center" spacing={3} px={2}>
+        {!admin && <Stack alignItems="center" spacing={3} px={2}>
           <Box
             component="img"
             src="/assets/illustrations/illustration_avatar.png"
@@ -101,10 +101,9 @@ export default function Nav({ openNav, onCloseNav }) {
           </Box>
 
           <Button href="#/dashboard/propostas" startIcon={<Iconify icon="eva:plus-fill" />} variant="contained">
-            Novo pedido
+            Nova proposta
           </Button>
-        </Stack>
-      </Box>
+        </Stack>}
     </Scrollbar>
   );
 

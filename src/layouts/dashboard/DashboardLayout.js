@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-// @mui
 import { styled } from '@mui/material/styles';
-//
 import Header from './header';
 import Nav from './nav';
 
@@ -32,14 +30,14 @@ const Main = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function DashboardLayout() {
+export default function DashboardLayout({ admin }) {
   const [open, setOpen] = useState(false);
 
   return (
     <StyledRoot>
-      <Header onOpenNav={() => setOpen(true)} />
+      <Header onOpenNav={() => setOpen(true)} data={{ placeholder: 'Instrumentos', formHeader: { register: () => {}}, value: 'instrumentos' }}/>
 
-      <Nav openNav={open} onCloseNav={() => setOpen(false)} />
+      <Nav openNav={open} onCloseNav={() => setOpen(false)} admin={admin} />
 
       <Main>
         <Outlet />

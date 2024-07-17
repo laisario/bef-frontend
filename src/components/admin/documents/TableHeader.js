@@ -15,8 +15,8 @@ const headCells = [
         label: 'Status',
     },
     {
-        id: 'revisao',
-        label: 'Data Revisão',
+        id: 'elaborador',
+        label: 'Elaborador',
     },
     {
         id: 'validade',

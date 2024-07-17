@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
-import { Box, Button, Checkbox, CircularProgress, Container, FormControlLabel, FormGroup, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Button, Checkbox, CircularProgress, Container, FormControlLabel, FormGroup, Stack, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import ExportFilter from '../components/instrumentos/ExportFilter';
@@ -67,17 +67,16 @@ export default function Instruments() {
     frequenciaDeCalibracao: true,
     dataDaProximaCalibracao: true,
     dataDaProximaChecagem: true,
+    local: true,
   });
   const [error, setError] = useState(false);
   const [selecionados, setSelecionados] = useState([])
   const [selectAll, setSelectAll] = useState(false)
-  const theme = useTheme()
 
   const handleChangeCheckbox = (event) => {
     const { name, checked } = event.target;
     setValueCheckbox({ ...valueCheckbox, [name]: checked });
   };
-  console.log(selectAll)
   useEffect(() => {
     if (selectAll) {
       setSelecionados(todosInstrumentos?.map(({ id }) => id))

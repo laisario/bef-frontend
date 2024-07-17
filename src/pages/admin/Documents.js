@@ -10,9 +10,9 @@ import Typography from '@mui/material/Typography';
 import { useNavigate } from "react-router-dom";
 import Checkbox from '@mui/material/Checkbox';
 import CircularProgress from '@mui/material/CircularProgress';
-import { Container, Stack } from '@mui/system';
+import { Container } from '@mui/system';
 import { Helmet } from 'react-helmet-async';
-import { Button, Grid } from '@mui/material';
+import { Button, Card, Grid } from '@mui/material';
 import FormCreate from '../../components/admin/documents/FormCreate';
 import Iconify from '../../components/iconify/Iconify';
 import titleCase from '../../utils/formatTitle';
@@ -24,6 +24,7 @@ import useResponsive from '../../hooks/useResponsive';
 import { axios } from '../../api';
 import CsvViewer from '../../components/instrumentos/CsvViewer';
 import Label from '../../components/label';
+
 
 export default function Documents() {
     const [open, setOpen] = useState(false);
@@ -73,7 +74,6 @@ export default function Documents() {
         try {
             const resposta = await axios.post('/documentos/exportar/', { documentos_selecionados: selectedDocuments });;
             if (resposta.status === 200) {
-                console.log('Exportação realizada com sucesso!');
                 setCsvContent(resposta?.data)
             } else {
                 console.log('Xi status não foi 200')
@@ -82,8 +82,6 @@ export default function Documents() {
             console.error('Erro ao enviar dados para o backend:', error);
         }
     };
-
-    console.log(criticalAnalysisMonths(328))
 
     return (
         <>
@@ -112,87 +110,88 @@ export default function Documents() {
                 </Grid>
 
                 <FormCreate open={open} setOpen={setOpen} form={formCreate} />
-
-                <TableToolbar
-                    numSelected={selectedDocuments.length}
-                    deleteDocuments={() => { deleteDocumento(selectedDocuments); setSelectedDocuments([]) }}
-                    isDeleting={isDeleting}
-                    form={formFilter}
-                    isLoading={isLoading}
-                    filter={filter}
-                    setFilter={setFilter}
-                />
-                <TableContainer>
-                    <Table
-                        aria-labelledby="tabelaDocumentos"
-                    >
-                        <TableHeader
-                            numSelected={selectedDocuments.length}
-                            onSelectAllClick={handleSelectAllClick}
-                            rowCount={data?.results?.length}
-                        />
-                        <TableBody>
-                            {!isLoading ? data?.results?.map((row, index) => {
-                                const isItemSelected = isSelected(row.id);
-                                return (
-                                    <TableRow
-                                        hover
-                                        role="checkbox"
-                                        aria-checked={isItemSelected}
-                                        tabIndex={-1}
-                                        key={row.id}
-                                        onClick={() => { navigate(`/admin/documento/${row?.id}`) }}
-                                        sx={{ cursor: 'pointer' }}
-                                    >
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                color="primary"
-                                                onClick={(event) => handleClick(event, row.id)}
-                                                checked={isItemSelected}
-                                                inputProps={{
-                                                    'aria-labelledby': index,
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={index}
-                                            scope="row"
-                                            padding="none"
+                <Card>
+                    <TableToolbar
+                        numSelected={selectedDocuments.length}
+                        deleteDocuments={() => { deleteDocumento(selectedDocuments); setSelectedDocuments([]) }}
+                        isDeleting={isDeleting}
+                        form={formFilter}
+                        isLoading={isLoading}
+                        filter={filter}
+                        setFilter={setFilter}
+                    />
+                    <TableContainer sx={{ minWidth: 800 }}>
+                        <Table
+                            aria-labelledby="tabelaDocumentos"
+                        >
+                            <TableHeader
+                                numSelected={selectedDocuments.length}
+                                onSelectAllClick={handleSelectAllClick}
+                                rowCount={data?.results?.length}
+                            />
+                            <TableBody>
+                                {!isLoading ? data?.results?.map((row, index) => {
+                                    const isItemSelected = isSelected(row.id);
+                                    return (
+                                        <TableRow
+                                            hover
+                                            role="checkbox"
+                                            aria-checked={isItemSelected}
+                                            tabIndex={-1}
+                                            key={row.id}
+                                            onClick={() => { navigate(`/admin/documento/${row?.id}/${row?.revisoes[0]?.id || 0}`, {replace: true}) }}
+                                            sx={{ cursor: 'pointer' }}
                                         >
-                                            {row?.codigo?.codigo?.toUpperCase()}
-                                        </TableCell>
-                                        <TableCell>{!!row?.titulo && titleCase(row?.titulo)}</TableCell>
-                                        <TableCell>
-                                            <Label color={statusColor[row?.status]}>
-                                                {status[row?.status]}
-                                            </Label>
-                                        </TableCell>
-                                        <TableCell>{!!row?.data_revisao && fDate(row?.data_revisao)}</TableCell>
-                                        <TableCell> {!!row?.data_validade && fDate(row?.data_validade)}</TableCell>
-                                        <TableCell>
-                                            {!!row?.analise_critica && (
-                                                <Label color={findCriticalAnalysisStage(row?.analise_critica)}>
-                                                    {criticalAnalysisMonths(row?.analise_critica)}
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    color="primary"
+                                                    onClick={(event) => handleClick(event, row.id)}
+                                                    checked={isItemSelected}
+                                                    inputProps={{
+                                                        'aria-labelledby': index,
+                                                    }}
+                                                />
+                                            </TableCell>
+                                            <TableCell
+                                                component="th"
+                                                id={index}
+                                                scope="row"
+                                                padding="none"
+                                            >
+                                                {row?.codigo?.codigo?.toUpperCase()}
+                                            </TableCell>
+                                            <TableCell>{!!row?.titulo && titleCase(row?.titulo)}</TableCell>
+                                            <TableCell>
+                                                <Label color={statusColor[row?.status]}>
+                                                    {status[row?.status]}
                                                 </Label>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            }) : <CircularProgress />}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25, 50, 100]}
-                    component="div"
-                    count={data?.count}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    labelRowsPerPage="Linhas por páginas"
-                />
+                                            </TableCell>
+                                            <TableCell>{!!row?.criador?.username && row?.criador?.username}</TableCell>
+                                            <TableCell> {!!row?.data_validade && fDate(row?.data_validade)}</TableCell>
+                                            <TableCell>
+                                                {!!row?.analise_critica && (
+                                                    <Label color={findCriticalAnalysisStage(row?.analise_critica)}>
+                                                        {criticalAnalysisMonths(row?.analise_critica)}
+                                                    </Label>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                }) : <CircularProgress />}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                        component="div"
+                        count={data?.count || 0}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        labelRowsPerPage="Linhas por páginas"
+                    />
+                </Card>
             </Container>
             <CsvViewer csvContent={csvContent} fileName="documentos" />
         </>

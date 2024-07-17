@@ -4,16 +4,41 @@ import { Grid, Container, CircularProgress } from '@mui/material';
 import useInstrumentos from '../hooks/useInstrumentos';
 import useOrders from '../hooks/useOrders';
 // sections
-import { AppNewsInstruments, AppOrderTimeline, AppWidgetSummary } from '../sections/@dashboard/app';
+import { AppOrderTimeline, AppWidgetSummary, AppListItems } from '../sections/@dashboard/app';
 import { isExpired } from '../utils/formatTime';
 import useDocumentos from '../hooks/useDocumentos';
+import useRevision from '../hooks/useRevision';
 
 // ----------------------------------------------------------------------
 
-export default function DashboardApp({admin}) {
+export default function DashboardApp({ admin }) {
   const { todosInstrumentos, instrumentosCalibrados, instrumentosVencidos, isLoading } = useInstrumentos();
-  const { data, propostasEmAnalise } = useOrders();
-  const { documentosVencidos } = useDocumentos()
+  const { data, propostasEmAnalise, propostasAprovar } = useOrders();
+  const { documentosVencidos } = useDocumentos();
+  const { data: revisions } = useRevision()
+  const instrumentos = todosInstrumentos?.slice(0, 5)?.map((instrumento) => ({
+    id: instrumento?.id,
+    isExpired: isExpired(
+      instrumento?.data_ultima_calibracao,
+      instrumento?.frequencia
+    ),
+    descricao: instrumento?.instrumento?.tipo_de_instrumento?.descricao,
+    tag: instrumento?.tag,
+    fabricante: instrumento?.instrumento.tipo_de_instrumento?.fabricante,
+    modelo: instrumento?.instrumento?.tipo_de_instrumento?.modelo,
+    faixaNominalMin: instrumento?.instrumento?.minimo,
+    faixaNominalMax: instrumento?.instrumento?.maximo,
+    unidade: instrumento?.instrumento?.unidades,
+    data: isExpired(
+      instrumento?.data_ultima_calibracao,
+      instrumento?.frequencia
+    )
+      ? instrumento?.data_ultima_calibracao
+      : instrumento?.data_proxima_calibracao,
+  }))
+
+  const documentos = revisions?.results
+
   return (
     <>
       <Helmet>
@@ -38,7 +63,7 @@ export default function DashboardApp({admin}) {
 
             <Grid item xs={12} sm={6} md={3}>
               <AppWidgetSummary
-                title="Instrumentos calibrados"
+                title="Instrumentos calibrados em dia"
                 color="success"
                 total={instrumentosCalibrados?.length || 0}
                 icon={'ant-design:check-outlined'}
@@ -62,57 +87,47 @@ export default function DashboardApp({admin}) {
                   icon={'fluent-mdl2:total'}
                 />
               </Grid>
+              )}
+
+            {admin ? (
+              <Grid item xs={12} sm={6} md={3}>
+                <AppWidgetSummary
+                  title="Propostas em elaboração"
+                  total={propostasEmAnalise?.length}
+                  color="warning"
+                  icon={'ant-design:file-sync-outlined'}
+                />
+              </Grid>
+            ) : (
+              <Grid item xs={12} sm={6} md={3}>
+                <AppWidgetSummary
+                  title="Propostas aguardando aprovação"
+                  total={propostasAprovar?.length}
+                  color="warning"
+                  icon={'ant-design:file-sync-outlined'}
+                />
+              </Grid>
             )}
-
-
-            <Grid item xs={12} sm={6} md={3}>
-              <AppWidgetSummary
-                title={admin ? "Pedidos esperando análise" : "Pedidos em analise"}
-                total={propostasEmAnalise?.length}
-                color="warning"
-                icon={'ant-design:file-sync-outlined'}
-              />
-            </Grid>
-
             <Grid item xs={12} md={7} lg={8}>
-              <AppNewsInstruments
-                title={admin ? "Instrumentos clientes mais recentes" : "Instrumentos mais recentes"}
-                list={todosInstrumentos?.slice(0, 5)?.map((instrumento) => ({
-                  isExpired: isExpired(
-                    instrumento?.data_ultima_calibracao,
-                    instrumento?.instrumento?.tipo_de_instrumento?.frequencia
-                  ),
-                  tag: instrumento?.tag,
-                  fabricante: instrumento?.instrumento.tipo_de_instrumento?.fabricante,
-                  modelo: instrumento?.instrumento?.tipo_de_instrumento?.modelo,
-                  faixaNominalMin: instrumento?.instrumento?.minimo,
-                  faixaNominalMax: instrumento?.instrumento?.maximo,
-                  unidade: instrumento?.instrumento?.unidade,
-                  data: isExpired(
-                    instrumento?.data_ultima_calibracao,
-                    instrumento?.instrumento?.tipo_de_instrumento?.frequencia
-                  )
-                    ? instrumento?.data_ultima_calibracao
-                    : instrumento?.data_proxima_calibracao,
-                }))}
-                admin
+              <AppListItems
+                title={admin ? "Revisões a serem aprovadas" : "Instrumentos recentes"}
+                list={admin ? documentos : instrumentos}
+                document={admin}
               />
             </Grid>
 
             <Grid item xs={12} md={5} lg={4}>
               <AppOrderTimeline
-                title="Pedidos mais recentes"
+                title="Últimas propostas"
                 list={data?.results?.slice(0, 5)?.map((proposta) => ({
                   id: proposta?.id,
-                  title: `Pedido ${proposta?.id}`,
+                  title: `Proposta ${proposta?.id}`,
                   status: proposta?.status,
                   time: new Date(proposta?.data_criacao),
+                  url: admin ? `/admin/proposta/${proposta?.id}` : `/dashboard/proposta/${proposta?.id}`,
+                  client: proposta?.cliente?.empresa?.razao_social || proposta?.cliente?.nome,
                 }))}
               />
-            </Grid>
-
-            <Grid item xs={12} md={5} lg={4}>
-              <h1>Documentos para serem analisados</h1>
             </Grid>
           </Grid>
         )}

@@ -12,10 +12,11 @@ function CalibracaoCard({ calibracao, titles, specialCases }) {
   const [open, setOpen] = useState(false);
   const [analiseCliente, setAnaliseCliete] = useState({});
   const theme = useTheme();
-  const { mutate } = useInstrumentos();
+  const { mutate, refetch } = useInstrumentos();
   const handleConfirmationAnalysis = (analiseCritica) => {
     try {
       mutate({ idCalibration: calibracao.id, analiseCliente: analiseCritica })
+      refetch()
     } catch (error) {
       console.log("Xi deu ruim", error)
     }
@@ -73,7 +74,7 @@ function CalibracaoCard({ calibracao, titles, specialCases }) {
           </Link>
         </Box>}
       </CardContent>
-      <CardActions sx={{ display: "flex", justifyContent: calibracao?.analiseCritica === "P" ? "flex-end" : "space-between", m: 1,}}>
+      <CardActions sx={{ display: "flex", justifyContent: calibracao?.analiseCritica === "P" ? "flex-end" : "space-between", m: 1, }}>
         {calibracao?.analiseCritica === "P"
           ?
           <>
@@ -91,11 +92,9 @@ function CalibracaoCard({ calibracao, titles, specialCases }) {
             <Typography fontWeight="900" color={'grey'} variant="body1">
               Sua análise crítica
             </Typography>
-            {calibracao?.analiseCritica === "R" ? <Tooltip title={calibracao?.restricaoAnaliseCritica} placement="right-start">
+            <Tooltip title={calibracao?.analiseCritica === "R" && calibracao?.restricaoAnaliseCritica} placement="right-start">
               <Typography fontWeight="600" color={'black'} variant="body1">{analises[calibracao?.analiseCritica]}</Typography>
-            </Tooltip> :
-              <Typography fontWeight="600" color={'black'} variant="body1">{analises[calibracao?.analiseCritica]}</Typography>
-            }
+            </Tooltip>
           </>
 
         }
