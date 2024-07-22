@@ -5,19 +5,30 @@ import { useNavigate } from 'react-router-dom';
 import { isExpired } from '../utils/formatTime';
 import { axios } from '../api';
 
-const useInstrumentos = (id, cliente) => {
+const useInstrumentos = (id, cliente, pageSize = 8) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(pageSize);
   const queryClient = useQueryClient()
-  const { data, error, isLoading, refetch } = useQuery(['instrumentos', id, debouncedSearch, cliente?.id], async () => {
+  const { data, error, isLoading, refetch } = useQuery(['instrumentos', id, debouncedSearch, cliente?.id, page, rowsPerPage], async () => {
     if (id) {
       const response = await axios.get(`/instrumentos/${id}`, { params: { page_size: 9999 } });
       return response?.data;
     }
-    const response = await axios.get('/instrumentos', { params: { page_size: 9999, search: debouncedSearch, client: cliente?.id } });
-    return response?.data?.results;
+    const response = await axios.get('/instrumentos', { params: { page: page + 1, page_size: rowsPerPage, search: debouncedSearch, client: cliente?.id } });
+    return response?.data;
   });
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const handleSearch = debounce((value) => setDebouncedSearch(value));
 
@@ -36,7 +47,7 @@ const useInstrumentos = (id, cliente) => {
     if (id) {
       return null;
     }
-    return data?.filter((instrumento) =>
+    return data?.results?.filter((instrumento) =>
       isExpired(instrumento?.data_ultima_calibracao, instrumento?.frequencia)
     );
   }, [id, data]);
@@ -45,7 +56,7 @@ const useInstrumentos = (id, cliente) => {
     if (id) {
       return null;
     }
-    return data?.filter(
+    return data?.results?.filter(
       (instrumento) =>
         !isExpired(instrumento?.data_ultima_calibracao, instrumento?.frequencia)
     );
@@ -73,7 +84,7 @@ const useInstrumentos = (id, cliente) => {
     },
   })
 
-  const updatePrice = async ({id, price}) => {
+  const updatePrice = async ({ id, price }) => {
     const response = await axios.patch(`/instrumentos/${id}/`, { preco_alternativo_calibracao: price });
     return response.data;
   }
@@ -84,6 +95,19 @@ const useInstrumentos = (id, cliente) => {
       queryClient.invalidateQueries({ queryKey: ['propostas'] })
     },
   })
+
+  const localLabels = {
+    "P": "Instalações permanentes",
+    "C": "Instalações cliente",
+    "T": "Terceirizado"
+  }
+
+  const positionLabels = {
+    "U": "Em uso",
+    "E": "Em estoque",
+    "I": "Inativo",
+    "F": "Fora de uso"
+  }
 
   return {
     instrumentosVencidos,
@@ -100,6 +124,12 @@ const useInstrumentos = (id, cliente) => {
     setSearch,
     mutate,
     mutatePrice,
+    handleChangePage,
+    handleChangeRowsPerPage,
+    page,
+    rowsPerPage,
+    localLabels,
+    positionLabels,
   };
 };
 

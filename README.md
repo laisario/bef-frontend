@@ -1,6 +1,6 @@
-# Frontend - B&F Laboratório de Metrologia
+# Frontend - KOMETRO Laboratório de Metrologia
 
-Este diretório contém o código-fonte do frontend para o site de gestão de instrumentos pela empresa B&F Laboratório de Metrologia.
+Este diretório contém o código-fonte do frontend para o site de gestão de instrumentos pela empresa KOMETRO Laboratório de Metrologia.
 
 ## Descrição
 

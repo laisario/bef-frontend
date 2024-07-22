@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
-import { Box, Button, Checkbox, CircularProgress, Container, FormControlLabel, FormGroup, Stack, Typography } from '@mui/material';
+import { Box, Button, Checkbox, CircularProgress, Container, FormControlLabel, FormGroup, Stack, TablePagination, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import ExportFilter from '../components/instrumentos/ExportFilter';
@@ -55,7 +55,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 
 export default function Instruments() {
-  const { todosInstrumentos, search, setSearch, isLoading } = useInstrumentos();
+  const { todosInstrumentos, search, setSearch, isLoading, page, handleChangePage, handleChangeRowsPerPage, rowsPerPage } = useInstrumentos();
   const [open, setOpen] = useState(false);
   const [valueCheckbox, setValueCheckbox] = useState({
     tag: true,
@@ -79,7 +79,7 @@ export default function Instruments() {
   };
   useEffect(() => {
     if (selectAll) {
-      setSelecionados(todosInstrumentos?.map(({ id }) => id))
+      setSelecionados(todosInstrumentos?.results?.map(({ id }) => id))
     } else {
       setSelecionados([])
     }
@@ -113,7 +113,7 @@ export default function Instruments() {
   return (
     <>
       <Helmet>
-        <title> Instrumentos | B&F </title>
+        <title> Instrumentos | KOMETRO </title>
       </Helmet>
 
       <Container>
@@ -139,7 +139,7 @@ export default function Instruments() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </Search>
-            <FormGroup sx={{mx: 1}}>
+            <FormGroup sx={{ mx: 1 }}>
               <FormControlLabel control={<Checkbox checked={selectAll} />} onChange={handleCheckboxSelectAll} label="Selecionar todos" />
             </FormGroup>
             <Button variant="contained" disabled={selecionados?.length === 0} sx={{ ml: 1 }} onClick={handleClickOpen} endIcon={<GetAppIcon />}>Exportar</Button>
@@ -154,8 +154,19 @@ export default function Instruments() {
             valueCheckbox={valueCheckbox}
             error={error}
             setError={setError}
+            selectAll={selectAll}
           />
           {isLoading ? <CircularProgress /> : <ProductList products={todosInstrumentos} setSelecionados={setSelecionados} selecionados={selecionados} />}
+          <TablePagination
+            rowsPerPageOptions={[8, 16, 32, 64, 128]}
+            component="div"
+            count={todosInstrumentos?.count || 0}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Instrumentos por página"
+          />
         </Box>
       </Container>
     </>

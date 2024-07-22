@@ -16,8 +16,9 @@ import RegisterLocationPage from './pages/register/location';
 import Orders from './pages/Orders';
 import OrderDetails from './pages/OrderDetails';
 import InstrumentDetails from './pages/InstrumentDetails';
-import ProductsPageAdmin from './pages/admin/ProductsPageAdmin';
 import DocumentRevisions from './pages/admin/DocumentRevisions';
+import ClientDetails from './pages/admin/ClientDetails';
+import Clients from './pages/admin/Clients';
 
 export default function Router() {
   const routes = useRoutes([
@@ -65,16 +66,17 @@ export default function Router() {
     },
     {
       path: '/admin',
-      element: <DashboardLayout admin/>,
+      element: <DashboardLayout/>,
       children: [
         { element: <Navigate to="/admin/app" />, index: true },
-        { path: 'app', element: <DashboardApp admin/> },
-        { path: 'propostas', element: <Orders admin /> },
-        { path: 'proposta/:id', element: <OrderDetails admin/> },
-        { path: 'instrumentos', element: <ProductsPageAdmin/> },
+        { path: 'app', element: <DashboardApp /> },
+        { path: 'propostas', element: <Orders /> },
+        { path: 'proposta/:id', element: <OrderDetails /> },
         { path: 'documentos', element: <Documents /> },
         { path: 'documento/:id/:idRevisao', element: <DocumentsDetails /> },
-        { path: 'documento/:id/revisoes', element: <DocumentRevisions />}
+        { path: 'documento/:id/revisoes', element: <DocumentRevisions />},
+        { path: 'clientes', element: <Clients />},
+        { path: 'cliente/:id', element: <ClientDetails />},
       ],
     },
   ]);

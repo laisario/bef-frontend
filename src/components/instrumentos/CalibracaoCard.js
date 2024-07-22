@@ -39,7 +39,7 @@ function CalibracaoCard({ calibracao, titles, specialCases }) {
   }
 
   return (
-    <Card sx={{ backgroundColor: theme.palette.background.default, minWidth: 400 }}>
+    <Card sx={{ backgroundColor: theme.palette.background.neutral , minWidth: 400 }}>
       <CardContent>
 
         <Box display="flex" justifyContent="space-between" gap={2} mb={1}>

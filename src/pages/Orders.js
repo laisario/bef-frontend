@@ -23,15 +23,17 @@ import Scrollbar from '../components/scrollbar';
 import useOrders from '../hooks/useOrders'
 import { fDate } from '../utils/formatTime';
 import FormCreateOrder from '../components/orders/FormCreateOrder';
-import TableHeader from '../components/orders/TableHeader';
+import TableHeader from '../components/TableHeader';
 import TableToolbar from '../components/orders/TableToolbar';
+import { useAuth } from '../context/Auth';
 
 
 
-function Orders({ admin }) {
+function Orders() {
   const [open, setOpen] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
   const [selectedOrders, setSelectedOrders] = useState([]);
+  const { user: { admin } } = useAuth();
   const { data,
     page,
     rowsPerPage,
@@ -69,7 +71,7 @@ function Orders({ admin }) {
   return (
     <>
       <Helmet>
-        <title> Propostas | B&F </title>
+        <title> Propostas | KOMETRO </title>
       </Helmet>
 
       <Container>
@@ -92,6 +94,7 @@ function Orders({ admin }) {
                   onSelectAllClick={handleSelectAllClick}
                   rowCount={data?.results?.length}
                   admin={admin}
+                  component='orders'
                 />
                 <TableBody>
                   {data?.results?.map((row, index) => {
@@ -122,7 +125,7 @@ function Orders({ admin }) {
                         <TableCell align="left">{numero}</TableCell>
 
                         <TableCell align="left">{fDate(data)}</TableCell>
-                        {admin ? (<TableCell align="left">{cliente.empresa || cliente.nome}</TableCell>) : (<TableCell align="left">{+total > 0 ? `R$ ${total}` : "Aguardando resposta"}</TableCell>)}
+                        {admin ? (<TableCell align="left">{cliente.empresa.razao_social || cliente.nome}</TableCell>) : (<TableCell align="left">{+total > 0 ? `R$ ${total}` : "Aguardando resposta"}</TableCell>)}
 
                         <TableCell align="left">
                           <Label color={statusColor[status]}>{statusString[status]}</Label>

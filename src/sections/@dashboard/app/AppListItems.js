@@ -1,18 +1,13 @@
-// @mui
 import PropTypes from 'prop-types';
 import { Box, Stack, Link, Card, Button, Divider, Typography, CardHeader } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-// utils
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { isExpired, fDate } from '../../../utils/formatTime';
-// components
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import palette from '../../../theme/palette';
 import Label from '../../../components/label';
 import useDocumentos from '../../../hooks/useDocumentos';
-
-// ----------------------------------------------------------------------
 
 AppListItems.propTypes = {
   title: PropTypes.string,
@@ -90,10 +85,10 @@ function ListItem({ data, isDocument }) {
           height: 48,
           borderRadius: 1.5,
           flexShrink: 0,
-          background: isDocument ? palette.info.light : palette[data.isExpired ? 'error' : 'success'].light,
+          background: isDocument ? palette.secondary.lighter : palette[data.isExpired ? 'error' : 'success'].light,
           backgroundImage: isDocument
             ? `linear-gradient(135deg, ${alpha(
-              palette.info.dark,
+              palette.secondary.dark,
               0
             )} 0%, ${alpha(palette[data.isExpired ? 'error' : 'success'].dark, 0.24)} 100%)`
             : `linear-gradient(135deg, ${alpha(
@@ -107,7 +102,7 @@ function ListItem({ data, isDocument }) {
       >
         <Iconify
           icon={isDocument ? 'mingcute:document-2-line' : data.isExpired ? 'ant-design:close-outlined' : 'ant-design:check-outlined'}
-          color={isDocument ? palette.info.darker : palette[data.isExpired ? 'error' : 'success'].darker}
+          color={isDocument ? palette.secondary.darker : palette[data.isExpired ? 'error' : 'success'].darker}
           width={24}
           height={24}
         />

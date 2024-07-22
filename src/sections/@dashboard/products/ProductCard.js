@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
-// @mui
 import { Box, Card, Link, Typography, Stack, Chip, Divider, Radio } from '@mui/material';
 import { useMemo } from 'react';
+import palette from '../../../theme/palette';
 
-// ----------------------------------------------------------------------
 
 const instrumentPosition = {
   U: 'Em uso',
@@ -18,7 +17,6 @@ const colorInstrumentPosition = {
   I: 'warning',
   F: 'error',
 }
-// ----------------------------------------------------------------------
 
 ProductCard.propTypes = {
   product: PropTypes.object,
@@ -27,14 +25,21 @@ ProductCard.propTypes = {
 export default function ProductCard({ product, setSelecionados, selecionados }) {
   const isSelected = useMemo(() => selecionados.includes(product.id), [selecionados, product])
   return (
-    <Card sx={{ border: isSelected ? "3px solid #FF9E75" : 0, cursor: "pointer" }} onClick={() => setSelecionados((selecionados) => isSelected ? selecionados.filter(selecionado => selecionado !== product.id) : [...selecionados, product.id])}>
+    <Card sx={{ border: isSelected ? "3px solid #555555" : 0, cursor: "pointer" }} onClick={() => setSelecionados((selecionados) => isSelected ? selecionados.filter(selecionado => selecionado !== product.id) : [...selecionados, product.id])}>
       <Link href={`#/dashboard/instrumento/${product.id}`} color="inherit" underline="none">
 
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: "center", backgroundColor: '#FF9E75' }}>
+        <Box sx={{
+          p: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: "center",
+          backgroundColor: palette.secondary.lighter,
+          color: palette.secondary.contrastText
+        }}>
           {!!product?.tag &&
             <Typography color="white" variant='subtitle1'>{product.tag}</Typography>
           }
-          <Radio sx={{ backgroundColor: "white", p: 0, border: 0, color: "white" }} checked={isSelected} />
+          <Radio color="secondary" sx={{ backgroundColor: "white", p: 0, border: 0, color: "white" }} checked={isSelected} />
         </Box>
         <Divider />
         <Stack sx={{ p: 3 }} gap={1}>
@@ -56,7 +61,7 @@ export default function ProductCard({ product, setSelecionados, selecionados }) 
         </Stack>
         {!!product?.posicao &&
           <Box sx={{ pr: 5, pb: 5, display: 'flex', justifyContent: 'flex-end' }}>
-            <Chip color={colorInstrumentPosition[product?.posicao]} label={instrumentPosition[product?.posicao]} />
+            <Chip sx={{color: palette.common.white }} color={colorInstrumentPosition[product?.posicao]} label={instrumentPosition[product?.posicao]} />
           </Box>
         }
       </Link>

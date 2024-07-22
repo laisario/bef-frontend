@@ -9,7 +9,7 @@ import { Box, Checkbox, FormControlLabel, FormGroup, FormHelperText, FormLabel }
 import { axios } from '../../api';
 import CsvViewer from './CsvViewer';
 
-function ExportFilter({ open, handleClose, selecionados, handleChangeCheckbox, valueCheckbox, error, setError }) {
+function ExportFilter({ open, handleClose, selecionados, handleChangeCheckbox, valueCheckbox, error, setError, selectAll }) {
     const [csvContent, setCsvContent] = useState(null)
     return (
         <Dialog
@@ -25,6 +25,7 @@ function ExportFilter({ open, handleClose, selecionados, handleChangeCheckbox, v
                     }
 
                     const dadosSelecionados = {
+                        selectAll,
                         instrumentosSelecionados: selecionados,
                         camposSelecionados: Object.entries(valueCheckbox).filter(([,value]) => !!value).map(([key]) => key)
                     };

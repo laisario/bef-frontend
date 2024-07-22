@@ -8,15 +8,17 @@ import { AppOrderTimeline, AppWidgetSummary, AppListItems } from '../sections/@d
 import { isExpired } from '../utils/formatTime';
 import useDocumentos from '../hooks/useDocumentos';
 import useRevision from '../hooks/useRevision';
+import { useAuth } from '../context/Auth';
 
 // ----------------------------------------------------------------------
 
-export default function DashboardApp({ admin }) {
+export default function DashboardApp() {
   const { todosInstrumentos, instrumentosCalibrados, instrumentosVencidos, isLoading } = useInstrumentos();
   const { data, propostasEmAnalise, propostasAprovar } = useOrders();
   const { documentosVencidos } = useDocumentos();
-  const { data: revisions } = useRevision()
-  const instrumentos = todosInstrumentos?.slice(0, 5)?.map((instrumento) => ({
+  const { data: revisions } = useRevision();
+  const { user: { admin } } = useAuth()
+  const instrumentos = todosInstrumentos?.results?.slice(0, 5)?.map((instrumento) => ({
     id: instrumento?.id,
     isExpired: isExpired(
       instrumento?.data_ultima_calibracao,
@@ -42,7 +44,7 @@ export default function DashboardApp({ admin }) {
   return (
     <>
       <Helmet>
-        <title>B&F</title>
+        <title>KOMETRO</title>
       </Helmet>
 
       <Container maxWidth="xl">

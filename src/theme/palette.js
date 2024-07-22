@@ -1,74 +1,73 @@
 import { alpha } from '@mui/material/styles';
 
-// ----------------------------------------------------------------------
-
-// SETUP COLORS
-const GREY = {
-  0: '#FFFFFF',
-  100: '#F9FAFB',
-  200: '#F4F6F8',
-  300: '#DFE3E8',
-  400: '#C4CDD5',
-  500: '#919EAB',
-  600: '#637381',
-  700: '#454F5B',
-  800: '#212B36',
-  900: '#161C24',
-};
 
 const PRIMARY = {
-  lighter: '#FFC5A2',
-  light: '#FF9E75',
-  main: '#E06442',
-  dark: '#B73D1B',
-  darker: '#8F2807',
-  contrastText: '#fff',
+  lighter: '#FFD9C2',  
+  light: '#FFA373',    
+  main: '#FD7622',
+  dark: '#C35519',
+  darker: '#833813',
+  contrastText: '#fff'
 };
 
 const SECONDARY = {
-  lighter: '#98F3E4',
-  light: '#7AD5D0',
-  main: '#5DB8A3',
-  dark: '#3C8B77',
-  darker: '#225E51',
-  contrastText: '#fff',
+  lighter: '#AAAAAA',  
+  light: '#777777',
+  main: '#555555',
+  dark: '#333333',
+  darker: '#111111',
+  contrastText: '#fff'
+}
+
+const GREY = {
+  0: '#FFFFFF',
+  100: '#F5F5F5',
+  200: '#E0E0E0',
+  300: '#BDBDBD',
+  400: '#9E9E9E',
+  500: '#757575',
+  600: '#616161',
+  700: '#424242',
+  800: '#303030',
+  900: '#212121',
 };
 
 const INFO = {
-  lighter: '#D0F2FF',
-  light: '#74CAFF',
-  main: '#1890FF',
-  dark: '#0C53B7',
-  darker: '#04297A',
-  contrastText: '#fff',
+  lighter: '#DCE3E8',
+  light: '#A6B3C1',
+  main: '#738A9E',
+  dark: '#4A6374',
+  darker: '#2A3E48',
+  contrastText: '#fff'
 };
 
 const SUCCESS = {
-  lighter: '#E9FCD4',
-  light: '#AAF27F',
-  main: '#54D62C',
-  dark: '#229A16',
-  darker: '#08660D',
-  contrastText: '#fff',
+  lighter: '#E3F2E5',
+  light: '#A8D4A0',
+  main: '#6EBF5A',
+  dark: '#49903A',
+  darker: '#2D5D22',
+  contrastText: '#fff'
 };
 
 const WARNING = {
-  lighter: '#FFF7CD',
-  light: '#FFE16A',
-  main: '#FFC107',
-  dark: '#B78103',
-  darker: '#7A4F01',
-  contrastText: '#212121',
+  lighter: '#FFE8D2',
+  light: '#FFB382',
+  main: '#FF7F3A',
+  dark: '#CC5C27',
+  darker: '#8A3D18',
+  contrastText: '#212121'
 };
 
 const ERROR = {
-  lighter: '#FFE7D9',
-  light: '#FFA48D',
-  main: '#FF4842',
-  dark: '#B72136',
-  darker: '#7A0C2E',
-  contrastText: '#fff',
+  lighter: '#FCE4E4',
+  light: '#F8A5A5',
+  main: '#F26363',
+  dark: '#D12F2F',
+  darker: '#8E1F1F',
+  contrastText: '#fff'
 };
+
 
 const palette = {
   common: { black: '#000', white: '#fff' },

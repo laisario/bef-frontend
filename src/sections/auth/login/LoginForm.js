@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-// @mui
 import { Stack, IconButton, InputAdornment, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-// components
 import Iconify from '../../../components/iconify';
 
 import { useAuth } from '../../../context/Auth';
 
-// ----------------------------------------------------------------------
 
 export default function LoginForm() {
   const navigate = useNavigate();

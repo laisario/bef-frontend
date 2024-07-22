@@ -1,5 +1,5 @@
 import { Box, Card, Chip, Divider, Stack, Typography } from '@mui/material';
-import React from 'react';
+import palette from  '../../../theme/palette';
 
 function ProductCardAdmin({ product }) {
   return (
@@ -10,7 +10,8 @@ function ProductCardAdmin({ product }) {
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
-          backgroundColor: '#FF9E75',
+          backgroundColor: palette.secondary.lighter,
+          color: palette.secondary.contrastText
         }}
       >
         <Box sx={{
@@ -31,7 +32,7 @@ function ProductCardAdmin({ product }) {
         <Box>
           <Chip
             label={product?.tipo_de_servico === 'A' ? 'Acreditado' : 'Não acreditado'}
-            color={product?.tipo_de_servico === 'A' ? 'primary' : 'warning'}
+            color='info'
             variant="filled"
             mb={2}
           />

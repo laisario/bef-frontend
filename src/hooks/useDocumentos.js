@@ -87,7 +87,7 @@ const useDocumentos = (id) => {
     return dayjs(new Date()).from(date)
   }
 
-  const { mutate: deleteDocumento, isLoading: isDeleting } = useMutation(async (ids) => Promise.all(ids?.map((id) => axios.delete(`/documentos/${id}`))), {
+  const { mutate: deleteDocumentos, isLoading: isDeleting } = useMutation(async (ids) => Promise.all(ids?.map((id) => axios.delete(`/documentos/${id}`))), {
     onSuccess: () => {
       refetch()
     },
@@ -115,7 +115,7 @@ const useDocumentos = (id) => {
     status,
     isLoading,
     refetch,
-    deleteDocumento,
+    deleteDocumentos,
     isDeleting,
     statusColor,
     openFormRevision,

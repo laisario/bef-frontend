@@ -1,22 +1,31 @@
 import { useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Container, Grid, Typography } from '@mui/material';
-
+import { styled } from '@mui/material/styles';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import './styles.css'
-
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import "@cyntler/react-doc-viewer/dist/index.css";
-
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, useParams } from 'react-router-dom';
 import useDocumentos from '../../hooks/useDocumentos';
 import FormCreateRevision from '../../components/admin/documents/FormCreateRevision';
 import InformationCard from '../../components/admin/documents/InformationCard';
 import RevisionCard from '../../components/admin/documents/RevisionCard';
+
+const StyledDocViewer = styled(DocViewer)(() => ({
+  overflow: 'auto',
+  '& #proxy-renderer': {
+    display: 'unset',
+    flex: 'unset',
+  },
+  '& #pdfControls': {
+    zIndex: 3,
+  }
+}))
 
 function DocumentsDetails() {
   const { id, idRevisao } = useParams();
@@ -27,7 +36,6 @@ function DocumentsDetails() {
   const fileType = !!splittedUrl?.length && splittedUrl[splittedUrl.length - 1];
   const revisoes = data?.revisoes;
   const navigate = useNavigate();
-
   useEffect(() => {
     if (idRevisao && swiper && !!revisoes?.length) {
       const ids = revisoes?.map(revisao => revisao?.id)
@@ -35,17 +43,34 @@ function DocumentsDetails() {
       swiper.slideTo(index)
     }
   }, [idRevisao, swiper, revisoes])
-
+  const fileUrl = "https://file-examples-com.github.io/uploads/2017/02/file-sample_100kB.docx"
+  
+  const viewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${fileUrl}`;
   return (
     <>
       <Helmet>
-        <title>Documento | B&F</title>
+        <title>Documento | KOMETRO</title>
       </Helmet>
       <Container>
         <Grid container spacing={4}>
           {isLoading ? <Grid item xs={12} md={8} display="flex" justifyContent="center" alignItems="center"><CircularProgress /></Grid> :
-            <Grid style={{ height: '750px' }} item xs={12} md={8}>
-              <DocViewer config={{ header: { disableFileName: true, disableHeader: true } }} style={{ maxWidth: '100%', overflow: 'scroll' }} documents={[{ uri: data?.arquivo, fileType }]} pluginRenderers={DocViewerRenderers} language='pt-br' />
+            <Grid style={{ height: '800px' }} item xs={12} md={8}>
+              <StyledDocViewer
+                config={{ header: { disableFileName: true, disableHeader: true } }}
+                style={{ maxWidth: '100%', overflow: 'scroll' }}
+                documents={[{ uri: data?.arquivo, fileType }]}
+                pluginRenderers={DocViewerRenderers}
+                language='pt-br'
+              />
+              <iframe
+                src={viewerUrl}
+                width="100%"
+                height="600px"
+                frameBorder="0"
+                title="Document Viewer"
+              >
+                This is an embedded
+              </iframe>
             </Grid>
           }
           <Grid item xs={12} md={4}>
@@ -66,7 +91,7 @@ function DocumentsDetails() {
                   pagination={
                     { dynamicBullets: true, }
                   }
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', }}
                   spaceBetween={50}
                   slidesPerView={1}
                   onSlideChange={(swiper) => navigate(`/admin/documento/${id}/${revisoes[swiper?.activeIndex]?.id}`)}

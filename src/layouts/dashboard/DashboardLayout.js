@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Header from './header';
 import Nav from './nav';
+import { useAuth } from '../../context/Auth';
 
 // ----------------------------------------------------------------------
 
@@ -30,12 +31,12 @@ const Main = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function DashboardLayout({ admin }) {
+export default function DashboardLayout() {
   const [open, setOpen] = useState(false);
-
+  const { user: { admin } } = useAuth();
   return (
     <StyledRoot>
-      <Header onOpenNav={() => setOpen(true)} data={{ placeholder: 'Instrumentos', formHeader: { register: () => {}}, value: 'instrumentos' }}/>
+      <Header onOpenNav={() => setOpen(true)} data={{ placeholder: 'Instrumentos', formHeader: { register: () => { } }, value: 'instrumentos' }} />
 
       <Nav openNav={open} onCloseNav={() => setOpen(false)} admin={admin} />
 

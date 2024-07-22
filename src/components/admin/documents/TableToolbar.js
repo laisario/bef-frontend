@@ -40,6 +40,7 @@ function TableToolbar(props) {
                             label='Busque título'
                             id='search-bar'
                             fullWidth
+                            size='small'
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">

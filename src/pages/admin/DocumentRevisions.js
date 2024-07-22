@@ -14,7 +14,7 @@ function DocumentRevisions() {
   return (
     <>
       <Helmet>
-        <title>Revisões | B&F</title>
+        <title>Revisões | KOMETRO</title>
       </Helmet>
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>

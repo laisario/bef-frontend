@@ -27,6 +27,7 @@ import Iconify from '../components/iconify';
 import { capitalizeFirstLetter as CFL } from '../utils/formatString';
 import FormElaborate from '../components/orders/FormElaborate';
 import { fDate } from '../utils/formatTime';
+import { useAuth } from '../context/Auth';
 
 
 const formaPagamento = {
@@ -37,7 +38,7 @@ const formaPagamento = {
   B: 'Boleto',
 };
 
-function OrderDetails({ admin }) {
+function OrderDetails() {
   const [edit, setEdit] = useState(false);
   const [elaborate, setElaborate] = useState(false);
   const [openAlert, setOpenAlert] = useState(false);
@@ -46,6 +47,7 @@ function OrderDetails({ admin }) {
     message: '',
   });
   const { id } = useParams();
+  const { user: { admin } } = useAuth();
   const {
     data,
     deleteOrderAndNavigate,
@@ -57,7 +59,6 @@ function OrderDetails({ admin }) {
     pdfFile,
   } = useOrders(id);
   const theme = useTheme();
-  console.log(data, !!data?.responsavel?.username)
   const handleSendEmail = async () => {
     const response = await sendProposolByEmail()
     setResponse({ status: response?.status, message: response?.message })
@@ -67,7 +68,7 @@ function OrderDetails({ admin }) {
   return (
     <>
       <Helmet>
-        <title>Proposta | B&F</title>
+        <title>Proposta | KOMETRO </title>
       </Helmet>
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>

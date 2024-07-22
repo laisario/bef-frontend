@@ -1,20 +1,13 @@
-import { useState } from 'react';
 import { Grid, IconButton, InputAdornment, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Search } from '@mui/icons-material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import useResponsive from '../../hooks/useResponsive';
-import useOrders from '../../hooks/useOrders';
-import OrderFilterSidebar from './OrderFilterSidebar';
 
-function TableToolbar({ numSelected, form, selectedOrders, admin }) {
-    const [filter, setFilter] = useState(false)
-    const { deleteOrder } = useOrders()
+function TableToolbar({ numSelected, form, selectedClients, deleteClients }) {
     const isDesktop = useResponsive('up', 'md');
-    const resetFilters = () => {
-        form.reset()
-    }
+ 
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
@@ -26,7 +19,7 @@ function TableToolbar({ numSelected, form, selectedOrders, admin }) {
                     p: isDesktop ? 1 : 2
                 }}
             >
-                {admin && numSelected > 0 ? (
+                {numSelected > 0 ? (
                     <Typography
                         sx={{ flex: '1 1 100%' }}
                         color="inherit"
@@ -36,10 +29,10 @@ function TableToolbar({ numSelected, form, selectedOrders, admin }) {
                         {numSelected.length > 1 ? `${numSelected} selecionados` : `${numSelected} selecionado`}
                     </Typography>
                 ) : (
-                    <Grid container display="flex" justifyContent="space-between" alignItems="center">
+                    <Grid container display="flex" justifyContent="center" alignItems="center">
                         <Grid item sm={6} xs={12}>
                             <TextField
-                                label={admin ? 'Procure cliente ou número da proposta' : 'Procure pelo número da proposta'}
+                                label='Procure pelo nome ou empresa'
                                 {...form.register("search")}
                                 name="search"
                                 id='search-bar'
@@ -54,20 +47,13 @@ function TableToolbar({ numSelected, form, selectedOrders, admin }) {
                                 }}
                             />
                         </Grid>
-                        <OrderFilterSidebar
-                            openFilter={filter}
-                            onOpenFilter={() => setFilter(true)}
-                            onCloseFilter={() => setFilter(false)}
-                            form={form}
-                            resetFilters={resetFilters}
-                        />
                     </Grid>
                 )}
 
-                {admin && numSelected > 0 && (
+                {numSelected > 0 && (
                     <Tooltip title="Delete">
                         <IconButton>
-                            <DeleteIcon onClick={() => deleteOrder(selectedOrders)} />
+                            <DeleteIcon onClick={() => deleteClients(selectedClients)} />
                         </IconButton>
                     </Tooltip>
                 )}

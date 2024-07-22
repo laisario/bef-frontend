@@ -16,7 +16,7 @@ import { Button, Card, Grid } from '@mui/material';
 import FormCreate from '../../components/admin/documents/FormCreate';
 import Iconify from '../../components/iconify/Iconify';
 import titleCase from '../../utils/formatTitle';
-import TableHeader from '../../components/admin/documents/TableHeader';
+import TableHeader from '../../components/TableHeader';
 import { fDate } from '../../utils/formatTime';
 import useDocumentos from '../../hooks/useDocumentos';
 import TableToolbar from '../../components/admin/documents/TableToolbar';
@@ -24,6 +24,7 @@ import useResponsive from '../../hooks/useResponsive';
 import { axios } from '../../api';
 import CsvViewer from '../../components/instrumentos/CsvViewer';
 import Label from '../../components/label';
+import { useAuth } from '../../context/Auth';
 
 
 export default function Documents() {
@@ -34,7 +35,7 @@ export default function Documents() {
     const { data,
         status,
         statusColor,
-        deleteDocumento,
+        deleteDocumentos,
         isDeleting,
         page,
         rowsPerPage,
@@ -48,7 +49,7 @@ export default function Documents() {
     } = useDocumentos(null);
     const navigate = useNavigate()
     const isMobile = useResponsive('down', 'md');
-
+    const { user } = useAuth()
     const handleOpenForm = () => {
         setOpen(true);
     };
@@ -86,7 +87,7 @@ export default function Documents() {
     return (
         <>
             <Helmet>
-                <title> Documentos | B&F </title>
+                <title> Documentos | KOMETRO </title>
             </Helmet>
             <Container>
                 <Grid container display="flex" flexDirection={isMobile ? "column" : "row"} alignItems={isMobile ? "flex-start" : "center"} justifyContent="space-between" mb={5}>
@@ -113,7 +114,7 @@ export default function Documents() {
                 <Card>
                     <TableToolbar
                         numSelected={selectedDocuments.length}
-                        deleteDocuments={() => { deleteDocumento(selectedDocuments); setSelectedDocuments([]) }}
+                        deleteDocuments={() => { deleteDocumentos(selectedDocuments); setSelectedDocuments([]) }}
                         isDeleting={isDeleting}
                         form={formFilter}
                         isLoading={isLoading}
@@ -128,6 +129,8 @@ export default function Documents() {
                                 numSelected={selectedDocuments.length}
                                 onSelectAllClick={handleSelectAllClick}
                                 rowCount={data?.results?.length}
+                                component='documents'
+                                admin={user?.admin}
                             />
                             <TableBody>
                                 {!isLoading ? data?.results?.map((row, index) => {
@@ -139,7 +142,7 @@ export default function Documents() {
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}
                                             key={row.id}
-                                            onClick={() => { navigate(`/admin/documento/${row?.id}/${row?.revisoes[0]?.id || 0}`, {replace: true}) }}
+                                            onClick={() => { navigate(`/admin/documento/${row?.id}/${row?.revisoes[0]?.id || 0}`, { replace: true }) }}
                                             sx={{ cursor: 'pointer' }}
                                         >
                                             <TableCell padding="checkbox">

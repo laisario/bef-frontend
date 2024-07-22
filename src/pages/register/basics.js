@@ -10,7 +10,7 @@ export default function RegisterBasicsPage() {
   return (
     <>
       <Helmet>
-        <title> Criar conta | B&F Metrologia </title>
+        <title> Criar conta | KOMETRO </title>
       </Helmet>
 
       <Container maxWidth="sm">

@@ -30,7 +30,7 @@ function InstrumentDetails() {
   return (
     <>
       <Helmet>
-        <title> Instrumento | B&F </title>
+        <title> Instrumento | KOMETRO </title>
       </Helmet>
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
@@ -47,7 +47,7 @@ function InstrumentDetails() {
             }
           </Box>
         </Stack>
-        <Paper sx={{ padding: 4, backgroundColor: theme.palette.background.neutral }}>
+        <Paper sx={{ padding: 4, }}>
           <Grid container flexDirection="row" justifyContent="space-between">
             <Box>
               {!!instrumento?.instrumento?.tipo_de_instrumento?.descricao &&
@@ -83,14 +83,14 @@ function InstrumentDetails() {
               <Chip
                 label={posicaoInstrumento[instrumento?.posicao]}
                 color={colorPosicaoInstrumento[instrumento?.posicao]}
-                variant="outlined"
-                sx={{backgroundColor: theme.palette.background.default}}
+                variant="filled"
+                sx={{ color: theme.palette.common.white }}
               />
               <Chip
                 label={instrumento?.instrumento?.tipo_de_servico === 'A' ? 'Acreditado' : 'Não acreditado'}
-                variant="outlined"
+                variant="filled"
                 color={instrumento?.instrumento?.tipo_de_servico === 'A' ? 'info' : 'primary'}
-                sx={{backgroundColor: theme.palette.background.default}}
+                sx={{ color: theme.palette.common.white }}
               />
             </Box>
           </Grid>
