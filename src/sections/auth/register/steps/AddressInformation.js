@@ -47,7 +47,7 @@ export default function AddressInformation() {
       cep: cepInfo?.cep || CEP,
       complemento,
     });
-    if (response?.status === 400) {
+    if (response?.status !== 201) {
       setError({ ...response?.response?.data })
       return null
     };

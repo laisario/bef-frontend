@@ -27,12 +27,19 @@ const MSDocFTMaps = {
         "xlsx",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ],
+    ppt: ["ppt", "application/vnd.ms-powerpoint"],
+    pptx: [
+        "pptx",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    ],
 };
 
 MSDocRenderer.fileTypes = [
     ...MSDocFTMaps.xls,
     ...MSDocFTMaps.xlsx,
     ...MSDocFTMaps.xlsm,
+    ...MSDocFTMaps.ppt,
+    ...MSDocFTMaps.pptx,
 ];
 MSDocRenderer.weight = 0;
 MSDocRenderer.fileLoader = ({ fileLoaderComplete }) => fileLoaderComplete();

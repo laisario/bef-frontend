@@ -45,7 +45,6 @@ function DocumentsDetails() {
       swiper.slideTo(index)
     }
   }, [idRevisao, swiper, revisoes])
-  
   return (
     <>
       <Helmet>

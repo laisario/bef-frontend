@@ -125,7 +125,7 @@ function Orders() {
                         <TableCell align="left">{numero}</TableCell>
 
                         <TableCell align="left">{fDate(data)}</TableCell>
-                        {admin ? (<TableCell align="left">{cliente.empresa.razao_social || cliente.nome}</TableCell>) : (<TableCell align="left">{+total > 0 ? `R$ ${total}` : "Aguardando resposta"}</TableCell>)}
+                        {admin ? (<TableCell align="left">{cliente?.empresa?.razao_social || cliente?.nome}</TableCell>) : (<TableCell align="left">{+total > 0 ? `R$ ${total}` : "Aguardando resposta"}</TableCell>)}
 
                         <TableCell align="left">
                           <Label color={statusColor[status]}>{statusString[status]}</Label>

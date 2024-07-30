@@ -28,19 +28,12 @@ const GoogleFTMaps = {
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "application/octet-stream",
     ],
-    ppt: ["ppt", "application/vnd.ms-powerpoint"],
-    pptx: [
-        "pptx",
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    ],
 };
 
 GoogleRenderer.fileTypes = [
     ...GoogleFTMaps.odt,
     ...GoogleFTMaps.doc,
     ...GoogleFTMaps.docx,
-    ...GoogleFTMaps.ppt,
-    ...GoogleFTMaps.pptx,
 ];
 GoogleRenderer.weight = 0;
 GoogleRenderer.fileLoader = ({ fileLoaderComplete }) => fileLoaderComplete();

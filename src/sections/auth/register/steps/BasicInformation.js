@@ -50,7 +50,7 @@ export default function BasicInformation() {
       nomeFantasia,
       filial,
     });
-    if (response?.status === 400) {
+    if (response?.status !== 201) {
       setError(response?.response?.data)
       return null
     };
