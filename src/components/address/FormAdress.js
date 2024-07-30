@@ -69,8 +69,9 @@ function FormAdress({ form }) {
               <TextField
                 fullWidth
                 name="numero"
-                label="Numero"
-                {...form.register("numeroEndereco")}
+                label="Número"
+                type='number'
+                {...form.register("numero")}
               />
             </FormControl>
           </Box>

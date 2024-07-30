@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogActions,
   Dialog,
+  Typography,
   Autocomplete,
 } from '@mui/material';
 import { useForm, useWatch } from 'react-hook-form';
@@ -19,27 +20,29 @@ import useOrders from '../../hooks/useOrders';
 import useClients from '../../hooks/useClients';
 
 function FormCreateOrder({ setOpen, setAlert, onClose, open, admin }) {
-  const form = useForm({defaultValues: {
-    cliente: '',
-    informacoesAdicionais: '',
-    instrumentos: [],
-  }})
+  const form = useForm({
+    defaultValues: {
+      cliente: '',
+      informacoesAdicionais: '',
+      instrumentos: [],
+    }
+  })
   const [errMsg, setErrMsg] = useState('');
   const [loading, setIsLoading] = useState(false);
   const { refetch } = useOrders();
   const { clientes, isLoading: isLoadingClients } = useClients();
-  const { 
+  const {
     cliente,
     instrumentos,
   } = useWatch({ control: form.control })
   const { todosInstrumentos, isLoading } = useInstrumentos(null, cliente);
-  
+
   const { handleSubmit, setValue } = form;
   const submit = async () => {
     try {
       setIsLoading(true);
-      const {instrumentos, cliente, ...rest} = form.watch()
-      await axios.post('/propostas/', {instrumentos: instrumentos?.map(instrumento => instrumento?.id), cliente: cliente?.id, ...rest});
+      const { instrumentos, cliente, ...rest } = form.watch()
+      await axios.post('/propostas/', { instrumentos: instrumentos?.map(instrumento => instrumento?.id), cliente: cliente?.id, ...rest });
       setIsLoading(false);
       setAlert((prevAlert) => ({ ...prevAlert, propostaEnviada: true }));
       setOpen(false);
@@ -82,44 +85,46 @@ function FormCreateOrder({ setOpen, setAlert, onClose, open, admin }) {
                 placeholder="Pesquisar cliente"
               />
             )}
-            sx={{my: 2}}
+            sx={{ my: 2 }}
           />
         )}
-        <Autocomplete
-          multiple
-          autoHighlight
-          options={todosInstrumentos || []}
-          isOptionEqualToValue={(option, value) => option?.id === value?.id}
-          getOptionLabel={(instrumento) => `${instrumento.tag}: ${instrumento.numero_de_serie} - ${instrumento.instrumento.tipo_de_instrumento.descricao} - ${instrumento.instrumento.minimo} - ${instrumento.instrumento.maximo}`}
-          disableCloseOnSelect
-          loading={isLoading}
-          renderTags={(value, getTagProps) => value.map((tag, index)=> <Chip {...getTagProps({index})} key={tag.tag} label={tag.tag} />)}
-          name="instrumentos"
-          value={instrumentos}
-          loadingText="Carregando..."
-          noOptionsText="Sem resultados"
-          onChange={(event, newValue) => setValue('instrumentos', newValue)}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label={admin ? "Instrumentos do cliente" : "Instrumentos"}
-              placeholder="Pesquisar instrumento"
-            />
-          )}
-          renderOption={(props, instrumento, { selected }) => {
-            const { ...optionProps } = props;
-            return (
-              <li key={instrumento?.id} {...optionProps}>
-                <Checkbox
-                  style={{ marginRight: 8 }}
-                  checked={selected}
-                />
-                {instrumento.tag}: {instrumento.numero_de_serie} - {instrumento.instrumento.tipo_de_instrumento.descricao} - {instrumento.instrumento.minimo} - {instrumento.instrumento.maximo}
-              </li>
-            );
-          }}
-          sx={{my: 2}}
-        />
+        {todosInstrumentos?.length >= 1 ? (
+          <Autocomplete
+            multiple
+            autoHighlight
+            options={todosInstrumentos || []}
+            isOptionEqualToValue={(option, value) => option?.id === value?.id}
+            getOptionLabel={(instrumento) => `${instrumento?.tag}: ${instrumento?.numero_de_serie} - ${instrumento?.instrumento?.tipo_de_instrumento?.descricao} - ${instrumento?.instrumento?.minimo} - ${instrumento?.instrumento?.maximo}`}
+            disableCloseOnSelect
+            loading={isLoading}
+            renderTags={(value, getTagProps) => value?.map((tag, index) => <Chip {...getTagProps({ index })} key={tag?.tag} label={tag?.tag} />)}
+            name="instrumentos"
+            value={instrumentos || null}
+            loadingText="Carregando..."
+            noOptionsText="Sem resultados"
+            onChange={(event, newValue) => setValue('instrumentos', newValue)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={admin ? "Instrumentos do cliente" : "Instrumentos"}
+                placeholder="Pesquisar instrumento"
+              />
+            )}
+            renderOption={(props, instrumento, { selected }) => {
+              const { ...optionProps } = props;
+              return (
+                <li key={instrumento?.id} {...optionProps}>
+                  <Checkbox
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {instrumento?.tag}: {instrumento?.numero_de_serie} - {instrumento?.instrumento?.tipo_de_instrumento?.descricao} - {instrumento?.instrumento?.minimo} - {instrumento?.instrumento?.maximo}
+                </li>
+              );
+            }}
+            sx={{ my: 2 }}
+          />
+        ) : (<Typography textAlign="center" mb={1}>Nenhum instrumento cadastrado</Typography>)}
 
         <TextField
           type="text"

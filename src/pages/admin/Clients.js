@@ -39,7 +39,6 @@ function Clients() {
     event?.stopPropagation()
     setSelectedClients(selectedClients?.includes(id) ? selectedClients?.filter(clientId => clientId !== id) : [...selectedClients, id]);
   };
-
   return (
     <>
       <Helmet>

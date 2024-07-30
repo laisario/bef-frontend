@@ -59,8 +59,8 @@ function FormCreateRevision({ open, setOpen, idCreator }) {
                             await axiosForFiles.patch(`/documentos/${id}/alterar_anexo/`, formData)
                         }
                         setIsLoading(false);
-                        handleClose()
                         await refetch();
+                        handleClose()
                         return { error: false };
                     } catch (err) {
                         setIsLoading(false);

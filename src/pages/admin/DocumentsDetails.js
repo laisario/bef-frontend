@@ -7,7 +7,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import './styles.css'
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
+import DocViewer, { PDFRenderer } from "@cyntler/react-doc-viewer";
 import "@cyntler/react-doc-viewer/dist/index.css";
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -15,16 +15,18 @@ import useDocumentos from '../../hooks/useDocumentos';
 import FormCreateRevision from '../../components/admin/documents/FormCreateRevision';
 import InformationCard from '../../components/admin/documents/InformationCard';
 import RevisionCard from '../../components/admin/documents/RevisionCard';
+import MSDocRenderer from '../renderers/MSDocRenderer';
+import GoogleRenderer from '../renderers/GoogleRenderer';
 
 const StyledDocViewer = styled(DocViewer)(() => ({
   overflow: 'auto',
-  '& #proxy-renderer': {
-    display: 'unset',
-    flex: 'unset',
-  },
-  '& #pdfControls': {
+  '#pdf-controls': {
+    backgroundColor: "rgba(255, 217, 194, 0.8)",
+    width: '160px',
     zIndex: 3,
-  }
+    justifyContent: 'center',
+    borderRadius: '0 0 8px 0'
+  },
 }))
 
 function DocumentsDetails() {
@@ -43,9 +45,7 @@ function DocumentsDetails() {
       swiper.slideTo(index)
     }
   }, [idRevisao, swiper, revisoes])
-  const fileUrl = "https://file-examples-com.github.io/uploads/2017/02/file-sample_100kB.docx"
   
-  const viewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${fileUrl}`;
   return (
     <>
       <Helmet>
@@ -57,20 +57,10 @@ function DocumentsDetails() {
             <Grid style={{ height: '800px' }} item xs={12} md={8}>
               <StyledDocViewer
                 config={{ header: { disableFileName: true, disableHeader: true } }}
-                style={{ maxWidth: '100%', overflow: 'scroll' }}
                 documents={[{ uri: data?.arquivo, fileType }]}
-                pluginRenderers={DocViewerRenderers}
+                pluginRenderers={[PDFRenderer, MSDocRenderer, GoogleRenderer]}
                 language='pt-br'
               />
-              <iframe
-                src={viewerUrl}
-                width="100%"
-                height="600px"
-                frameBorder="0"
-                title="Document Viewer"
-              >
-                This is an embedded
-              </iframe>
             </Grid>
           }
           <Grid item xs={12} md={4}>

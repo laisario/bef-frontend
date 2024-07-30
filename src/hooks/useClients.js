@@ -50,6 +50,8 @@ function useClients(id) {
     handleChangeRowsPerPage,
     deleteClients,
     isDeleting,
+    rowsPerPage,
+    page
   }
 }
 

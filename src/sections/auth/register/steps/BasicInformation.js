@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 // @mui
-import { Link, Box, TextField, Typography } from '@mui/material';
+import { Link, Box, TextField, Typography, Alert, Grid } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
 import Radio from '@mui/material/Radio';
@@ -23,15 +23,15 @@ export default function BasicInformation() {
   const [CNPJ, setCNPJ] = useState('');
   const [razaoSocial, setRazaoSocial] = useState('');
   const [IE, setIE] = useState('');
+  const [nomeFantasia, setNomeFantasia] = useState('');
+  const [filial, setFilial] = useState('');
   const [CPF, setCPF] = useState('');
   const [nome, setNome] = useState('');
   const [telefone, setTelefone] = useState('');
+  const [error, setError] = useState({});
   const { loading, registerBasics } = useAuth();
 
-  const [error, setError] = useState(null);
   const {
-    razaoSocial: razaoSocialFromApi,
-    inscricaoEstadual,
     cnpj: cnpjFormatado,
     isValid: cnpjValido,
   } = useCNPJ(CNPJ);
@@ -39,18 +39,27 @@ export default function BasicInformation() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await registerBasics({
+    const response = await registerBasics({
       nome,
       telefone,
       cpf: cpfFormatado || CPF,
       empresa: tipo === 'E',
-      razaoSocial: razaoSocialFromApi || razaoSocial,
-      cnpj: cnpjFormatado || CNPJ,
-      ie: inscricaoEstadual || IE || null,
+      razaoSocial,
+      cnpj: CNPJ,
+      ie: IE || null,
+      nomeFantasia,
+      filial,
     });
-    navigate('/register/location')
+    if (response?.status === 400) {
+      setError(response?.response?.data)
+      return null
+    };
+    return navigate('/register/location', { replace: true })
   };
-
+  useEffect(() => {
+    setError({})
+  }, [CNPJ])
+  const erros = !!error && Object.keys(error)
   return (
     <form onSubmit={handleSubmit}>
       <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, mb: 4 }}>
@@ -59,12 +68,12 @@ export default function BasicInformation() {
           <FormControlLabel
             value="E"
             control={<Radio checked={tipo === 'E'} onChange={(e) => setTipo(e.target.checked ? 'E' : 'P')} />}
-            label="Pessoa juridica"
+            label="Pessoa jurídica"
           />
           <FormControlLabel
             value="P"
             control={<Radio checked={tipo === 'P'} onChange={(e) => setTipo(e.target.checked ? 'P' : 'E')} />}
-            label="Pessoa fisica"
+            label="Pessoa física"
           />
         </RadioGroup>
       </FormControl>
@@ -73,16 +82,14 @@ export default function BasicInformation() {
         <FormControl sx={{ width: '100%', gap: 3, mb: 4 }}>
           <TextField
             fullWidth
-            helperText={!cnpjValido && CNPJ?.length >= 14 && 'Por favor, digite um CNPJ valido'}
-            error={!cnpjValido && CNPJ?.length >= 14}
+            required
+            helperText={(!cnpjValido || CNPJ?.length > 18) && 'Por favor, digite um CNPJ válido'}
+            error={!cnpjValido && CNPJ?.length > 18}
             name="CNPJ"
             label="CNPJ"
             placeholder="Digite o CNPJ da empresa"
             value={cnpjFormatado || CNPJ}
             onChange={(e) => {
-              if (error) {
-                setError(null);
-              }
               setCNPJ(e.target.value);
             }}
           />
@@ -90,30 +97,50 @@ export default function BasicInformation() {
             <>
               <TextField
                 fullWidth
+                required
                 name="razaoSocial"
-                label="Razao Social"
-                disabled={!!razaoSocialFromApi}
-                value={razaoSocialFromApi || razaoSocial}
+                label="Razão Social"
+                value={razaoSocial}
                 onChange={(e) => {
-                  if (error) {
-                    setError(null);
-                  }
                   setRazaoSocial(e.target.value);
                 }}
               />
-              <TextField
-                fullWidth
-                name="IE"
-                label="Inscricao Estadual"
-                disabled={!!inscricaoEstadual}
-                value={inscricaoEstadual || IE}
-                onChange={(e) => {
-                  if (error) {
-                    setError(null);
-                  }
-                  setIE(e.target.value);
-                }}
-              />
+              <Grid container spacing={1}>
+                <Grid item sm={4} xs={12}>
+                  <TextField
+                    fullWidth
+                    name="IE"
+                    label="Inscrição Estadual"
+                    value={IE}
+                    onChange={(e) => {
+                      setIE(e.target.value);
+                    }}
+                  />
+                </Grid>
+                <Grid item sm={4} xs={12}>
+                  <TextField
+                    fullWidth
+                    name="nomeFantasia"
+                    label="Nome Fantasia"
+                    value={nomeFantasia}
+                    onChange={(e) => {
+                      setNomeFantasia(e.target.value);
+                    }}
+                  />
+                </Grid>
+                <Grid item sm={4} xs={12}>
+                  <TextField
+                    fullWidth
+                    name="filial"
+                    label="Filial"
+                    value={filial}
+                    onChange={(e) => {
+                      setFilial(e.target.value);
+                    }}
+                  />
+
+                </Grid>
+              </Grid>
             </>
           )}
         </FormControl>
@@ -140,7 +167,7 @@ export default function BasicInformation() {
               <TextField
                 fullWidth
                 name="nome"
-                label="Nome Completo"
+                label="Nome"
                 value={nome}
                 onChange={(e) => {
                   if (error) {
@@ -165,10 +192,11 @@ export default function BasicInformation() {
           )}
         </FormControl>
       )}
+      {!!erros?.length && erros?.map((key, i) => (<Alert key={key + i} severity="error">{`${error[key]}: ${key}`}</Alert>))}
 
       <Box display="flex" alignItems="center" justifyContent="space-between" mt={4}>
         <Typography variant="body2">
-          Ja tem uma conta? {''}
+          Já tem uma conta? {''}
           <Link
             to="/login"
             component={RouterLink}

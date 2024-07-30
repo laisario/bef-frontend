@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { useNavigate } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
 
-import {axios} from '../api';
+import { axios } from '../api';
 
 const AuthContext = createContext();
 
@@ -33,10 +33,10 @@ const AuthProvider = ({ children }) => {
     if (user?.admin === false && adminRoutes.some((route) => window.location.hash.includes(route))) {
       return navigate('/dashboard');
     }
-   
+
     return null
   }, [navigate])
-  
+
   useEffect(() => {
     redirectUsers(user)
   }, [user, redirectUsers]);
@@ -94,17 +94,20 @@ export const useAuth = () => {
     }
   };
 
-  const registerBasics = async ({ nome, telefone, cpf, empresa, razaoSocial, cnpj, ie }) => {
+  const registerBasics = async ({ nome, telefone, cpf, empresa, razaoSocial, cnpj, ie, nomeFantasia, filial }) => {
     setLoading(true);
     try {
-      const payload = !empresa ? { nome, telefone, cpf } : { empresa, razaoSocial, cnpj, ie };
+      const payload = !empresa ? { nome, telefone, cpf } : { empresa, razaoSocial, cnpj, ie, nomeFantasia, filial };
       const response = await axios.post('/register/basics/', payload);
       setClienteId(response?.data);
       window.localStorage.setItem('clienteId', response?.data);
-      return response?.data;
+      return response;
     } catch (err) {
-      console.error(err);
-      return null;
+      console.log(err);
+      if (!err?.response) {
+        return { error: 'Sem resposta do server' };
+      }
+      return err;
     } finally {
       setLoading(false);
     }
@@ -115,24 +118,27 @@ export const useAuth = () => {
     try {
       const payload = { clienteId, uf, cidade, bairro, logradouro, numero, cep };
       const response = await axios.post('/register/location/', payload);
-      return response?.data;
+      return response;
     } catch (err) {
       console.error(err);
-      return null;
+      if (!err?.response) {
+        return { error: 'Sem resposta do server' };
+      }
+      return err
     } finally {
       setLoading(false);
     }
   };
 
-  const registerAuth = async ({ email, password }) => {
+  const registerAuth = async ({ email, password, username }) => {
     setLoading(true);
     try {
-      const payload = { clienteId, email, password };
+      const payload = { clienteId, email, password, username };
       const response = await axios.post('/register/auth/', payload);
-      return response?.data;
+      return response;
     } catch (err) {
       console.error(err);
-      return null;
+      return err;
     } finally {
       setLoading(false);
     }
