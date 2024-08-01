@@ -85,7 +85,7 @@ function Orders() {
           </Button>
         </Stack>
         <Card>
-          <TableToolbar form={formFilter} numSelected={selectedOrders.length} selectedOrders={selectedOrders} admin={admin} />
+          <TableToolbar form={formFilter} numSelected={selectedOrders.length} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders} admin={admin} />
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>

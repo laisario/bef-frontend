@@ -8,7 +8,7 @@ import useResponsive from '../../hooks/useResponsive';
 import useOrders from '../../hooks/useOrders';
 import OrderFilterSidebar from './OrderFilterSidebar';
 
-function TableToolbar({ numSelected, form, selectedOrders, admin }) {
+function TableToolbar({ numSelected, form, selectedOrders, admin, setSelectedOrders }) {
     const [filter, setFilter] = useState(false)
     const { deleteOrder } = useOrders()
     const isDesktop = useResponsive('up', 'md');
@@ -67,7 +67,7 @@ function TableToolbar({ numSelected, form, selectedOrders, admin }) {
                 {admin && numSelected > 0 && (
                     <Tooltip title="Delete">
                         <IconButton>
-                            <DeleteIcon onClick={() => deleteOrder(selectedOrders)} />
+                            <DeleteIcon onClick={() => {deleteOrder(selectedOrders); setSelectedOrders([])}} />
                         </IconButton>
                     </Tooltip>
                 )}

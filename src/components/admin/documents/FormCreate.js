@@ -56,6 +56,7 @@ export default function FormCreate({ open, setOpen, form }) {
         frequencia,
         arquivo,
     } = useWatch({ control: form.control })
+    console.log(arquivo)
 
     return (
         <>

@@ -19,7 +19,7 @@ function TableToolbar(props) {
         <Toolbar
             sx={{
                 display: 'flex',
-                justifyContent: 'center',
+                justifyContent: 'space-between',
                 alignItems: 'center',
                 p: isDesktop ? 1 : 2,
             }}
