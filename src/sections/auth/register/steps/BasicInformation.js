@@ -47,8 +47,8 @@ export default function BasicInformation() {
       razaoSocial,
       cnpj: CNPJ,
       ie: IE || null,
-      nomeFantasia,
-      filial,
+      nomeFantasia: nomeFantasia || null,
+      filial: filial || null,
     });
     if (response?.status !== 201) {
       setError(response?.response?.data)

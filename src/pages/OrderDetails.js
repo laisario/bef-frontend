@@ -255,7 +255,7 @@ function OrderDetails() {
               </Tooltip>}
               {!isMobile && !!data?.anexo && (
                 <Tooltip placement="right-end" title="Clique para ver documento anexado">
-                  <Button startIcon={<DownloadIcon/>} href={data?.anexo} color='secondary'>
+                  <Button startIcon={<DownloadIcon/>} href={data?.anexo} target="_blank" color='secondary'>
                     Anexo
                   </Button>
                 </Tooltip>

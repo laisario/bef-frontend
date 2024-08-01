@@ -130,7 +130,7 @@ const useOrders = (id) => {
       status: formValues.status || null,
       prazoDePagamento: formatDayjs(formValues.prazoDePagamento),
       edit: editProposol,
-      responsavel: formValues.responsavel,
+      responsavel: formValues.responsavel || null,
     };
     try {
       if (formValues.anexo && formValues.anexo instanceof File) {
@@ -159,13 +159,13 @@ const useOrders = (id) => {
         });
       }
       setResponseStatus({ status: response?.status, message: response?.data?.message });
-      handleDownloadProposol()
     } catch (error) {
       console.log(error)
       setResponseStatus({ status: error?.response?.status, message: "Ocorreu um erro ao elaborar a proposta, verifique se preencheu corretamente." });
     }
+    await handleDownloadProposol()
     setOpenAlert(true);
-    refetch()
+    await refetch()
   };
 
   const sendProposolByEmail = async () => {

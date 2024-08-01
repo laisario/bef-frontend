@@ -47,7 +47,7 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
       enderecoDeEntrega: data?.endereco_de_entrega ? "enderecoCadastrado" : null,
       validade: data?.validade,
       prazoDePagamento: data?.prazo_de_pagamento,
-      responsavel: data?.responsavel || '',
+      responsavel: data?.responsavel?.id || null,
     },
   });
   const {
