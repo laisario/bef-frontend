@@ -59,8 +59,8 @@ function FormCreateRevision({ open, setOpen, idCreator }) {
                             await axiosForFiles.patch(`/documentos/${id}/alterar_anexo/`, formData)
                         }
                         setIsLoading(false);
-                        await refetch();
                         handleClose()
+                        await refetch();
                         return { error: false };
                     } catch (err) {
                         setIsLoading(false);
@@ -71,82 +71,84 @@ function FormCreateRevision({ open, setOpen, idCreator }) {
             }}
         >
             <DialogTitle>Revise o documento</DialogTitle>
-            <DialogContent>
-                <Grid container display="flex" flexDirection="column" spacing={2}>
-                    <Grid item>
-                        <FormLabel id="alteracao">Alterações realizadas: </FormLabel>
-                        <TextField
-                            autoFocus
-                            required
-                            margin="dense"
-                            id="alteracao"
-                            name="alteracao"
-                            multiline
-                            type="text"
-                            fullWidth
-                            variant="standard"
-                            {...form.register("alteracao")}
-                        />
-                    </Grid>
-                    <Grid item>
-                        <FormLabel id="upload-btn">Documento alterado: </FormLabel>
-                        <Button component="label" size="small" variant="contained" startIcon={<CloudUploadIcon />}>
-                            Enviar arquivo
-                            <input
-                                style={{ display: 'none' }}
-                                id="upload-btn"
-                                name="arquivo"
-                                type="file"
-                                {...form.register("arquivo")}
-                                onChange={handleChange}
-                            />
-                        </Button>
-                        {!!arquivo &&
-                            <Button
-                                component="a"
-                                size="small"
-                                href={
-                                    !!arquivo && arquivo instanceof File
-                                        ? URL.createObjectURL(arquivo)
-                                        : arquivo
-                                }
-                                target="_blank"
-                                variant="outlined"
-                            >
-                                Ver arquivo
-                            </Button>
-                        }
-                    </Grid>
-                    <Grid item>
-                        <FormControl fullWidth>
-                            <InputLabel id="aprovadores">Aprovadores</InputLabel>
-                            <Select
+            <DialogContent sx={{display: 'flex', justifyContent: 'center', alignItems: "center", flexDirection: "column"}}>
+                {isLoading
+                    ? <CircularProgress />
+                    : (<Grid container display="flex" flexDirection="column" spacing={2}>
+                        <Grid item>
+                            <FormLabel id="alteracao">Alterações realizadas: </FormLabel>
+                            <TextField
                                 autoFocus
                                 required
-                                multiple
-                                {...form.register("aprovadores")}
-                                value={aprovadores}
                                 margin="dense"
-                                id="aprovadores"
-                                name="aprovadores"
-                                label="Aprovadores"
+                                id="alteracao"
+                                name="alteracao"
+                                multiline
+                                type="text"
                                 fullWidth
-                            >
-                                {usersWithoutCreator?.map(({ username, id }) => (
-                                    <MenuItem key={id} value={id}>
-                                        {username}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                </Grid>
+                                variant="standard"
+                                {...form.register("alteracao")}
+                            />
+                        </Grid>
+                        <Grid item>
+                            <FormLabel id="upload-btn">Documento alterado: </FormLabel>
+                            <Button component="label" size="small" variant="contained" startIcon={<CloudUploadIcon />}>
+                                Enviar arquivo
+                                <input
+                                    style={{ display: 'none' }}
+                                    id="upload-btn"
+                                    name="arquivo"
+                                    type="file"
+                                    {...form.register("arquivo")}
+                                    onChange={handleChange}
+                                />
+                            </Button>
+                            {!!arquivo &&
+                                <Button
+                                    component="a"
+                                    size="small"
+                                    href={
+                                        !!arquivo && arquivo instanceof File
+                                            ? URL.createObjectURL(arquivo)
+                                            : arquivo
+                                    }
+                                    target="_blank"
+                                    variant="outlined"
+                                >
+                                    Ver arquivo
+                                </Button>
+                            }
+                        </Grid>
+                        <Grid item>
+                            <FormControl fullWidth>
+                                <InputLabel id="aprovadores">Aprovadores</InputLabel>
+                                <Select
+                                    autoFocus
+                                    required
+                                    multiple
+                                    {...form.register("aprovadores")}
+                                    value={aprovadores}
+                                    margin="dense"
+                                    id="aprovadores"
+                                    name="aprovadores"
+                                    label="Aprovadores"
+                                    fullWidth
+                                >
+                                    {usersWithoutCreator?.map(({ username, id }) => (
+                                        <MenuItem key={id} value={id}>
+                                            {username}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </Grid>)
+                }
                 {!!errMsg && <Alert severity="error">{errMsg}</Alert>}
-                {isLoading && <CircularProgress />}
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancelar</Button>
-                <Button type="submit">Criar revisão</Button>
+                {!isLoading && <Button type="submit">Criar revisão</Button>}
             </DialogActions>
         </Dialog>
     );
