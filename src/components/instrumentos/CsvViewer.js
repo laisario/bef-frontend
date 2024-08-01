@@ -31,7 +31,6 @@ export default function CsvViewer({ csvContent, fileName }) {
     }, [csvContent])
 
     if (!parsedCsv) return null
-
     return (
         <Dialog fullScreen PaperProps={{ sx: { width: '100%' } }} onClose={() => setParsedCsv(null)} open={!!parsedCsv}>
 
@@ -49,10 +48,10 @@ export default function CsvViewer({ csvContent, fileName }) {
                                 const values = Object.values(row)
                                 return (
                                     <TableRow
-                                        key={index}
+                                        key={index + 1}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
-                                        {values.map(value => <TableCell key={value} align="left">{value}</TableCell>)}
+                                        {values.map((value, i) => <TableCell key={value + i} align="left">{value}</TableCell>)}
                                     </TableRow>
                                 )
                             })}

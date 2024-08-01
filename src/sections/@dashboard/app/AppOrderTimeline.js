@@ -12,7 +12,7 @@ import useOrders from '../../../hooks/useOrders';
 AppOrderTimeline.propTypes = {
   title: PropTypes.string,
   subheader: PropTypes.string,
-  list: PropTypes.array.isRequired,
+  list: PropTypes.array,
 };
 
 export default function AppOrderTimeline({ title, subheader, list, ...other }) {
@@ -26,11 +26,10 @@ export default function AppOrderTimeline({ title, subheader, list, ...other }) {
       navigate('/dashboard/propostas');
     }
   };
-  
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
-
+      
       <CardContent
         sx={{
           '& .MuiTimelineItem-missingOppositeContent:before': {
@@ -41,7 +40,7 @@ export default function AppOrderTimeline({ title, subheader, list, ...other }) {
       >
         <Timeline sx={{ p: 0 }}>
           {list?.map((item, index) => (
-            <OrderItem key={item.id} item={item} isLast={index === list.length - 1} />
+            <OrderItem key={item?.id} item={item} isLast={index === list?.length - 1} />
           ))}
         </Timeline>
       </CardContent>

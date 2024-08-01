@@ -7,7 +7,7 @@ import Groups2Icon from '@mui/icons-material/Groups2';
 
 export const navConfig = [
   {
-    title: 'pagina inicial',
+    title: 'página inicial',
     path: '/dashboard/app',
     icon: <HomeIcon />,
   },
@@ -25,7 +25,7 @@ export const navConfig = [
 
 export const navConfigAdmin = [
   {
-    title: 'pagina inicial',
+    title: 'Página inicial',
     path: '/admin/app',
     icon: <HomeIcon />,
   },

@@ -30,12 +30,12 @@ const headCellsDocuments = [
 
 const headCellsClients = [
     {
-        id: 'nome',
-        label: 'Nome',
-    },
-    {
         id: 'empresa',
         label: 'Empresa',
+    },
+    {
+        id: 'email',
+        label: 'Email',
     },
     {
         id: 'filial',

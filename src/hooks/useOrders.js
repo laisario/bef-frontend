@@ -50,7 +50,6 @@ const useOrders = (id) => {
       });
     return response?.data;
   });
-
   const handleSearchFilter = debounce((value) => setDebouncedSearchFilter(value));
 
   useEffect(() => { handleSearchFilter(search) }, [search, handleSearchFilter])
@@ -105,11 +104,13 @@ const useOrders = (id) => {
   
   const handleDownloadProposol = async () => {
     const response = await getProposolPDF()
-    if (response?.data && "url" in response?.data) {
-      setPDFFile(response.data.url)
+    if (response?.status === 200) {
+      const url = window.URL.createObjectURL(new Blob([response?.data], { type: 'application/pdf' }));
+      setPDFFile(url)
     } else {
       setPDFFile(null)
     }
+
   }
 
   useEffect(() => {
@@ -141,7 +142,7 @@ const useOrders = (id) => {
       if (formValues.enderecoDeEntrega === 'enderecoCadastrado') {
         response = await axios.patch(`/propostas/${id}/elaborar/`, {
           ...commonData,
-          enderecoDeEntrega: data?.cliente?.endereco || null,
+          enderecoDeEntrega: data?.cliente?.endereco?.id || null,
         });
       } else {
         response = await axios.patch(`/propostas/${id}/elaborar/`, {
@@ -158,6 +159,7 @@ const useOrders = (id) => {
         });
       }
       setResponseStatus({ status: response?.status, message: response?.data?.message });
+      handleDownloadProposol()
     } catch (error) {
       console.log(error)
       setResponseStatus({ status: error?.response?.status, message: "Ocorreu um erro ao elaborar a proposta, verifique se preencheu corretamente." });
@@ -213,11 +215,13 @@ const useOrders = (id) => {
       if (!id) {
         return null
       }
-      const response = await axios.get(`/propostas-files/${id}`);
+      const response = await axios.get(`/propostas-files/${id}`, {
+        responseType: 'blob',
+      });
       return response
 
     } catch (error) {
-      return { status: error.status, message: "Falha ao recuperar PDF da proposta." };
+      return { status: error?.response?.status, message: "Falha ao recuperar PDF da proposta." };
     }
   }
 
@@ -247,8 +251,6 @@ const useOrders = (id) => {
     handleDownloadProposol,
     pdfFile,
     propostasAprovar,
-    // elaborateOrder,
-    // isElaborating,
   };
 };
 

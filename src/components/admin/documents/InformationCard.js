@@ -35,7 +35,7 @@ function InformationCard({ data, status, statusColor, setOpenFormRevision }) {
                     }
                     {!!data?.analise_critica &&
                         <Typography sx={{ mt: 1 }} variant="body2">
-                            <strong>Análise Crítica: </strong>Em {criticalAnalysisMonths(data?.analise_critica)}
+                            <strong>Análise Crítica: </strong>{titleCase(criticalAnalysisMonths(data?.analise_critica))}
                         </Typography>
                     }
                     {data?.data_revisao &&

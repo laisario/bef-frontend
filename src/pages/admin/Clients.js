@@ -7,11 +7,12 @@ import useResponsive from '../../hooks/useResponsive';
 import TableToolbar from '../../components/clients/TableToolbar';
 import TableHeader from '../../components/TableHeader';
 import { useAuth } from '../../context/Auth';
+import Scrollbar from '../../components/scrollbar/Scrollbar';
 
 function Clients() {
   const [selectedClients, setSelectedClients] = useState([]);
   const navigate = useNavigate();
-  const {user} = useAuth();
+  const { user } = useAuth();
   const isMobile = useResponsive('down', 'md');
   const {
     data,
@@ -23,9 +24,8 @@ function Clients() {
     rowsPerPage,
     page
   } = useClients()
-
   const isSelected = (id) => selectedClients.indexOf(id) !== -1;
-  
+
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       const newSelected = data?.results?.map((n) => n.id);
@@ -33,7 +33,7 @@ function Clients() {
       return;
     }
     setSelectedClients([]);
-  };  
+  };
 
   const handleClick = (event, id) => {
     event?.stopPropagation()
@@ -60,58 +60,60 @@ function Clients() {
             form={formFilter}
             isLoading={isLoading}
           />
-          <TableContainer sx={{ minWidth: 800 }}>
-            <Table
-              aria-labelledby="tabelaClientes"
-            >
-              <TableHeader
-                numSelected={selectedClients.length}
-                onSelectAllClick={handleSelectAllClick}
-                rowCount={data?.results?.length}
-                component="clients"
-                admin={user?.admin}
-              />
-              <TableBody>
-                {!isLoading ? data?.results?.map((row, index) => {
-                  const isItemSelected = isSelected(row.id);
-                  return (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      onClick={() => { navigate(`/admin/cliente/${row?.id}`, { replace: true }) }}
-                      sx={{ cursor: 'pointer' }}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          color="primary"
-                          onClick={(event) => handleClick(event, row.id)}
-                          checked={isItemSelected}
-                          inputProps={{
-                            'aria-labelledby': index,
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell
-                        component="th"
-                        id={index}
-                        scope="row"
-                        padding="none"
+          <Scrollbar>
+            <TableContainer sx={{ minWidth: 800 }}>
+              <Table
+                aria-labelledby="tabelaClientes"
+              >
+                <TableHeader
+                  numSelected={selectedClients.length}
+                  onSelectAllClick={handleSelectAllClick}
+                  rowCount={data?.results?.length}
+                  component="clients"
+                  admin={user?.admin}
+                />
+                <TableBody>
+                  {!isLoading ? data?.results?.map((row, index) => {
+                    const isItemSelected = isSelected(row.id);
+                    return (
+                      <TableRow
+                        hover
+                        role="checkbox"
+                        aria-checked={isItemSelected}
+                        tabIndex={-1}
+                        key={row.id}
+                        onClick={() => { navigate(`/admin/cliente/${row?.id}`, { replace: true }) }}
+                        sx={{ cursor: 'pointer' }}
                       >
-                        {row?.nome}
-                      </TableCell>
-                      <TableCell>
-                        {row?.empresa?.razao_social}
-                      </TableCell>
-                      <TableCell>{row?.empresa?.filial}</TableCell>
-                    </TableRow>
-                  );
-                }) : <CircularProgress />}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            color="primary"
+                            onClick={(event) => handleClick(event, row.id)}
+                            checked={isItemSelected}
+                            inputProps={{
+                              'aria-labelledby': index,
+                            }}
+                            />
+                        </TableCell>
+                        <TableCell>
+                          {row?.empresa?.razao_social}
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          id={index}
+                          scope="row"
+                          padding="none"
+                        >
+                          {row?.usuario?.email}
+                        </TableCell>
+                        <TableCell>{row?.empresa?.filial}</TableCell>
+                      </TableRow>
+                    );
+                  }) : <CircularProgress />}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Scrollbar>
           <TablePagination
             rowsPerPageOptions={[5, 10, 25, 50, 100]}
             component="div"

@@ -29,6 +29,19 @@ const StyledDocViewer = styled(DocViewer)(() => ({
   },
 }))
 
+const StyledSwiper = styled(Swiper)`
+  width: 100%;
+  .swiper-button-next {
+    color: #FD7622;
+  };
+  .swiper-button-prev {
+    color: #FD7622;
+  };
+  .swiper-pagination-bullet-active {
+    background: #FD7622;
+  }
+`;
+
 function DocumentsDetails() {
   const { id, idRevisao } = useParams();
   const [swiper, setSwiper] = useState(null)
@@ -74,13 +87,12 @@ function DocumentsDetails() {
                     <Button size='small' onClick={() => navigate(`/admin/documento/${id}/revisoes`)}>Ver todas</Button>
                   )}
                 </Box>
-                <Swiper
+                <StyledSwiper
                   modules={[Navigation, Pagination]}
                   navigation
                   pagination={
                     { dynamicBullets: true, }
                   }
-                  style={{ width: '100%', }}
                   spaceBetween={50}
                   slidesPerView={1}
                   onSlideChange={(swiper) => navigate(`/admin/documento/${id}/${revisoes[swiper?.activeIndex]?.id}`)}
@@ -89,7 +101,7 @@ function DocumentsDetails() {
                   {revisoes.map(revisao => (<SwiperSlide key={revisao.id}>
                     <RevisionCard revisao={revisao} />
                   </SwiperSlide>))}
-                </Swiper>
+                </StyledSwiper>
               </Box>
             }
           </Grid>

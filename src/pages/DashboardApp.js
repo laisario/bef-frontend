@@ -58,7 +58,7 @@ export default function DashboardApp() {
               <AppWidgetSummary
                 title="Instrumentos vencidos"
                 color="error"
-                total={instrumentosVencidos?.length}
+                total={instrumentosVencidos?.length || 0}
                 icon={'ant-design:close-outlined'}
               />
             </Grid>
@@ -95,7 +95,7 @@ export default function DashboardApp() {
               <Grid item xs={12} sm={6} md={3}>
                 <AppWidgetSummary
                   title="Propostas em elaboração"
-                  total={propostasEmAnalise?.length}
+                  total={propostasEmAnalise?.length || 0}
                   color="warning"
                   icon={'ant-design:file-sync-outlined'}
                 />
@@ -104,7 +104,7 @@ export default function DashboardApp() {
               <Grid item xs={12} sm={6} md={3}>
                 <AppWidgetSummary
                   title="Propostas aguardando aprovação"
-                  total={propostasAprovar?.length}
+                  total={propostasAprovar?.length || 0}
                   color="warning"
                   icon={'ant-design:file-sync-outlined'}
                 />

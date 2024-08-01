@@ -11,6 +11,7 @@ import {
   Dialog,
   Typography,
   Autocomplete,
+  Alert,
 } from '@mui/material';
 import { useForm, useWatch } from 'react-hook-form';
 import { useState } from 'react';
@@ -27,16 +28,15 @@ function FormCreateOrder({ setOpen, setAlert, onClose, open, admin }) {
       instrumentos: [],
     }
   })
-  const [errMsg, setErrMsg] = useState('');
+  const [errMsg, setErrMsg] = useState({});
   const [loading, setIsLoading] = useState(false);
   const { refetch } = useOrders();
-  const { clientes, isLoading: isLoadingClients } = useClients();
+  const { data, isLoading: isLoadingClients } = useClients();
   const {
     cliente,
     instrumentos,
   } = useWatch({ control: form.control })
   const { todosInstrumentos, isLoading } = useInstrumentos(null, cliente);
-
   const { handleSubmit, setValue } = form;
   const submit = async () => {
     try {
@@ -50,8 +50,9 @@ function FormCreateOrder({ setOpen, setAlert, onClose, open, admin }) {
       await refetch();
       return { error: false };
     } catch (err) {
+      console.log(err)
       setIsLoading(false);
-      setErrMsg(err.message);
+      setErrMsg(err?.response?.data);
       return { error: true };
     }
   };
@@ -67,10 +68,10 @@ function FormCreateOrder({ setOpen, setAlert, onClose, open, admin }) {
         {admin && (
           <Autocomplete
             autoHighlight
-            options={clientes || []}
+            options={data?.results || []}
             isOptionEqualToValue={(option, value) => option?.id === value?.id}
             getOptionLabel={
-              (cliente) => cliente?.empresa || cliente?.nome
+              (cliente) => cliente?.empresa?.razao_social || cliente?.nome
             }
             loading={isLoadingClients}
             name="cliente"
@@ -88,11 +89,11 @@ function FormCreateOrder({ setOpen, setAlert, onClose, open, admin }) {
             sx={{ my: 2 }}
           />
         )}
-        {todosInstrumentos?.length >= 1 ? (
+        {todosInstrumentos?.results?.length >= 1 ? (
           <Autocomplete
             multiple
             autoHighlight
-            options={todosInstrumentos || []}
+            options={todosInstrumentos?.results || []}
             isOptionEqualToValue={(option, value) => option?.id === value?.id}
             getOptionLabel={(instrumento) => `${instrumento?.tag}: ${instrumento?.numero_de_serie} - ${instrumento?.instrumento?.tipo_de_instrumento?.descricao} - ${instrumento?.instrumento?.minimo} - ${instrumento?.instrumento?.maximo}`}
             disableCloseOnSelect
@@ -134,9 +135,9 @@ function FormCreateOrder({ setOpen, setAlert, onClose, open, admin }) {
           placeholder="Informações adicionais"
           fullWidth
           {...form.register("informacoesAdicionais")}
-          error={errMsg}
-          helperText={errMsg}
+        
         />
+        {!!errMsg && Object.keys(errMsg)?.map((errKey, i) => <Alert severity="error" key={i}>{errKey}: {errMsg[errKey]}</Alert>)}
       </DialogContent>
       <DialogActions sx={{ mt: 3, mb: 2 }} >
         <Button onClick={() => { onClose(); form.reset() }}>Cancelar</Button>

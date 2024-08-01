@@ -25,6 +25,7 @@ import { axios } from '../../api';
 import CsvViewer from '../../components/instrumentos/CsvViewer';
 import Label from '../../components/label';
 import { useAuth } from '../../context/Auth';
+import Scrollbar from '../../components/scrollbar/Scrollbar';
 
 
 export default function Documents() {
@@ -121,69 +122,72 @@ export default function Documents() {
                         filter={filter}
                         setFilter={setFilter}
                     />
-                    <TableContainer sx={{ minWidth: 800 }}>
-                        <Table
-                            aria-labelledby="tabelaDocumentos"
-                        >
-                            <TableHeader
-                                numSelected={selectedDocuments.length}
-                                onSelectAllClick={handleSelectAllClick}
-                                rowCount={data?.results?.length}
-                                component='documents'
-                                admin={user?.admin}
-                            />
-                            <TableBody>
-                                {!isLoading ? data?.results?.map((row, index) => {
-                                    const isItemSelected = isSelected(row.id);
-                                    return (
-                                        <TableRow
-                                            hover
-                                            role="checkbox"
-                                            aria-checked={isItemSelected}
-                                            tabIndex={-1}
-                                            key={row.id}
-                                            onClick={() => { navigate(`/admin/documento/${row?.id}/${row?.revisoes[0]?.id || 0}`, { replace: true }) }}
-                                            sx={{ cursor: 'pointer' }}
-                                        >
-                                            <TableCell padding="checkbox">
-                                                <Checkbox
-                                                    color="primary"
-                                                    onClick={(event) => handleClick(event, row.id)}
-                                                    checked={isItemSelected}
-                                                    inputProps={{
-                                                        'aria-labelledby': index,
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell
-                                                component="th"
-                                                id={index}
-                                                scope="row"
-                                                padding="none"
+                    <Scrollbar>
+
+                        <TableContainer sx={{ minWidth: 800 }}>
+                            <Table
+                                aria-labelledby="tabelaDocumentos"
+                            >
+                                <TableHeader
+                                    numSelected={selectedDocuments?.length}
+                                    onSelectAllClick={handleSelectAllClick}
+                                    rowCount={data?.results?.length}
+                                    component='documents'
+                                    admin={user?.admin}
+                                />
+                                <TableBody>
+                                    {!isLoading ? data?.results?.map((row, index) => {
+                                        const isItemSelected = isSelected(row.id);
+                                        return (
+                                            <TableRow
+                                                hover
+                                                role="checkbox"
+                                                aria-checked={isItemSelected}
+                                                tabIndex={-1}
+                                                key={row.id}
+                                                onClick={() => { navigate(`/admin/documento/${row?.id}/${row?.revisoes[0]?.id || 0}`, { replace: true }) }}
+                                                sx={{ cursor: 'pointer' }}
                                             >
-                                                {row?.codigo?.codigo?.toUpperCase()}
-                                            </TableCell>
-                                            <TableCell>{!!row?.titulo && titleCase(row?.titulo)}</TableCell>
-                                            <TableCell>
-                                                <Label color={statusColor[row?.status]}>
-                                                    {status[row?.status]}
-                                                </Label>
-                                            </TableCell>
-                                            <TableCell>{!!row?.criador?.username && row?.criador?.username}</TableCell>
-                                            <TableCell> {!!row?.data_validade && fDate(row?.data_validade)}</TableCell>
-                                            <TableCell>
-                                                {!!row?.analise_critica && (
-                                                    <Label color={findCriticalAnalysisStage(row?.analise_critica)}>
-                                                        {criticalAnalysisMonths(row?.analise_critica)}
+                                                <TableCell padding="checkbox">
+                                                    <Checkbox
+                                                        color="primary"
+                                                        onClick={(event) => handleClick(event, row.id)}
+                                                        checked={isItemSelected}
+                                                        inputProps={{
+                                                            'aria-labelledby': index,
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell
+                                                    component="th"
+                                                    id={index}
+                                                    scope="row"
+                                                    padding="none"
+                                                >
+                                                    {row?.codigo?.codigo?.toUpperCase()}
+                                                </TableCell>
+                                                <TableCell>{!!row?.titulo && titleCase(row?.titulo)}</TableCell>
+                                                <TableCell>
+                                                    <Label color={statusColor[row?.status]}>
+                                                        {status[row?.status]}
                                                     </Label>
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                }) : <CircularProgress />}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                                </TableCell>
+                                                <TableCell>{!!row?.criador?.username && row?.criador?.username}</TableCell>
+                                                <TableCell> {!!row?.data_validade && fDate(row?.data_validade)}</TableCell>
+                                                <TableCell>
+                                                    {!!row?.analise_critica && (
+                                                        <Label color={findCriticalAnalysisStage(row?.analise_critica)}>
+                                                            {criticalAnalysisMonths(row?.analise_critica)}
+                                                        </Label>
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    }) : <CircularProgress />}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Scrollbar>
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, 50, 100]}
                         component="div"

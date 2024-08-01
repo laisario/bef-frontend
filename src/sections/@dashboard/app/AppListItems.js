@@ -68,7 +68,7 @@ const formatData = (data, isDocument) => {
 
   return {
     title: `${data?.tag} - ${data?.descricao}`,
-    subtitle: `${data?.fabricante} | ${data?.modelo} | ${data?.faixaNominalMin} - ${data?.faixaNominalMax} ${data?.unidade?.map((u) => u.unidade)}`,
+    subtitle: `${data?.fabricante ? data?.fabricante : 'Fabricante não informado'} | ${data?.modelo ? data?.modelo : 'Modelo não informado'} | ${data?.faixaNominalMin? data?.faixaNominalMin : 'Fai. nominal mínima não informado'} - ${data?.faixaNominalMax ? data?.faixaNominalMax : "Fai. nominal máxima não informada"} ${data?.unidade?.map((u) => u.unidade)}`,
     url: `/dashboard/instrumento/${data?.id}`,
     ...data,
   }
@@ -129,13 +129,13 @@ function ListItem({ data, isDocument }) {
             </Typography>
           )}
         </Box>
-        {isDocument && data?.documento ? (
+        {isDocument && data?.documento?.analise_critica ? (
           <Label color={findCriticalAnalysisStage(data?.documento?.analise_critica)} sx={{ mr: 3 }}>
             <Typography variant="caption">
               Análise Crítica: <b style={{ color: findCriticalAnalysisStage(data?.documento?.analise_critica) }}>{criticalAnalysisMonths(data?.documento?.analise_critica)}</b>
             </Typography>
           </Label>)
-          : (
+          : !!formatData?.data && (
             <Label color={isExpired ? 'error' : 'success'} sx={{ mr: 3 }}>
               <Typography variant="caption">
                 {isExpired ? "Data última calibração " : "Data próxima calibração "}{fDate(data?.data, "dd/MM/yy")}

@@ -37,9 +37,9 @@ function TableToolbar({ numSelected, form, selectedOrders, admin }) {
                     </Typography>
                 ) : (
                     <Grid container display="flex" justifyContent="space-between" alignItems="center">
-                        <Grid item sm={6} xs={12}>
+                        <Grid item sm={6} xs={9}>
                             <TextField
-                                label={admin ? 'Procure cliente ou número da proposta' : 'Procure pelo número da proposta'}
+                                label={admin ? 'Busque cliente ou número' : 'Busque número'}
                                 {...form.register("search")}
                                 name="search"
                                 id='search-bar'

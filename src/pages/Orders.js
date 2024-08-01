@@ -11,12 +11,12 @@ import {
   Container,
   Typography,
   TableContainer,
-  Link,
   Alert,
   Snackbar,
   TablePagination,
   Checkbox,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
@@ -26,7 +26,6 @@ import FormCreateOrder from '../components/orders/FormCreateOrder';
 import TableHeader from '../components/TableHeader';
 import TableToolbar from '../components/orders/TableToolbar';
 import { useAuth } from '../context/Auth';
-
 
 
 function Orders() {
@@ -43,6 +42,7 @@ function Orders() {
     statusColor,
     statusString,
   } = useOrders();
+  const navigate = useNavigate()
   const { vertical, horizontal, propostaEnviada } = alert;
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
@@ -90,7 +90,7 @@ function Orders() {
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
                 <TableHeader
-                  numSelected={selectedOrders.length}
+                  numSelected={selectedOrders?.length}
                   onSelectAllClick={handleSelectAllClick}
                   rowCount={data?.results?.length}
                   admin={admin}
@@ -106,9 +106,7 @@ function Orders() {
                         hover
                         key={id}
                         tabIndex={-1}
-                        component={Link}
-                        href={admin ? `#/admin/proposta/${id}` : `#/dashboard/proposta/${id}`}
-                        underline="none"
+                        onClick={() => { navigate(admin ? `/admin/proposta/${id}` : `/dashboard/proposta/${id}`, { replace: true }) }}
                       >
                         {admin &&
                           <TableCell padding="checkbox">
