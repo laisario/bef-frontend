@@ -71,7 +71,7 @@ function Orders() {
   return (
     <>
       <Helmet>
-        <title> Propostas | KOMETRO </title>
+        <title> Propostas | Kometro </title>
       </Helmet>
 
       <Container>

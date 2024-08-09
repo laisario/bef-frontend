@@ -30,7 +30,7 @@ function InstrumentDetails() {
   return (
     <>
       <Helmet>
-        <title> Instrumento | KOMETRO </title>
+        <title> Instrumento | Kometro </title>
       </Helmet>
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>

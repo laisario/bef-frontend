@@ -44,7 +44,7 @@ export default function DashboardApp() {
   return (
     <>
       <Helmet>
-        <title>KOMETRO</title>
+        <title>Kometro</title>
       </Helmet>
 
       <Container maxWidth="xl">

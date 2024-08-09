@@ -10,7 +10,7 @@ export default function RegisterLocationPage() {
   return (
     <>
       <Helmet>
-        <title> Localizacao | KOMETRO </title>
+        <title> Localizacao | Kometro </title>
       </Helmet>
 
       <Container maxWidth="sm">

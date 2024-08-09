@@ -113,7 +113,7 @@ export default function Instruments() {
   return (
     <>
       <Helmet>
-        <title> Instrumentos | KOMETRO </title>
+        <title> Instrumentos | Kometro </title>
       </Helmet>
 
       <Container>

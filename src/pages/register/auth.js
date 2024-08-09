@@ -10,7 +10,7 @@ export default function RegisterAuthPage() {
   return (
     <>
       <Helmet>
-        <title> Configurar acesso | KOMETRO </title>
+        <title> Configurar acesso | Kometro </title>
       </Helmet>
 
       <Container maxWidth="sm">

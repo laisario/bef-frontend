@@ -105,16 +105,13 @@ const useOrders = (id) => {
   const handleDownloadProposol = async () => {
     const response = await getProposolPDF()
     if (response?.status === 200) {
-      const url = window.URL.createObjectURL(new Blob([response?.data], { type: 'application/pdf' }));
-      setPDFFile(url)
-    } else {
-      setPDFFile(null)
+      return window.URL.createObjectURL(new Blob([response?.data], { type: 'application/pdf' }));
     }
-
+    return null
   }
 
   useEffect(() => {
-    (async () => handleDownloadProposol())()
+    (async () => setPDFFile(await handleDownloadProposol()))()
   }, [])
 
 
@@ -163,7 +160,7 @@ const useOrders = (id) => {
       console.log(error)
       setResponseStatus({ status: error?.response?.status, message: "Ocorreu um erro ao elaborar a proposta, verifique se preencheu corretamente." });
     }
-    await handleDownloadProposol()
+    setPDFFile(await handleDownloadProposol())
     setOpenAlert(true);
     await refetch()
   };

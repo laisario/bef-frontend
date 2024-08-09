@@ -61,7 +61,7 @@ function DocumentsDetails() {
   return (
     <>
       <Helmet>
-        <title>Documento | KOMETRO</title>
+        <title>Documento | Kometro</title>
       </Helmet>
       <Container>
         <Grid container spacing={4}>

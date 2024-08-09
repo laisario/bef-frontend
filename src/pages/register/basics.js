@@ -10,7 +10,7 @@ export default function RegisterBasicsPage() {
   return (
     <>
       <Helmet>
-        <title> Criar conta | KOMETRO </title>
+        <title> Criar conta | Kometro </title>
       </Helmet>
 
       <Container maxWidth="sm">

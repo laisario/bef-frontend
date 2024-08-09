@@ -15,7 +15,7 @@ function ClientDetails() {
   return (
     <>
       <Helmet>
-        <title>Cliente | KOMETRO </title>
+        <title>Cliente | Kometro </title>
       </Helmet>
       <Container>
         <Stack direction="column" alignItems="flex-start" justifyContent="center" mb={5}>

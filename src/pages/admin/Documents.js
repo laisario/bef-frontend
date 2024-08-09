@@ -88,7 +88,7 @@ export default function Documents() {
     return (
         <>
             <Helmet>
-                <title> Documentos | KOMETRO </title>
+                <title> Documentos | Kometro </title>
             </Helmet>
             <Container>
                 <Grid container display="flex" flexDirection={isMobile ? "column" : "row"} alignItems={isMobile ? "flex-start" : "center"} justifyContent="space-between" mb={5}>

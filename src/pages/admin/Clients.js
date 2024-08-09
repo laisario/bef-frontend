@@ -42,7 +42,7 @@ function Clients() {
   return (
     <>
       <Helmet>
-        <title> Clientes | KOMETRO </title>
+        <title> Clientes | Kometro  </title>
       </Helmet>
       <Container>
         <Grid container display="flex" flexDirection={isMobile ? "column" : "row"} alignItems={isMobile ? "flex-start" : "center"} justifyContent="space-between" mb={5}>

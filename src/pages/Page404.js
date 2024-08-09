@@ -21,7 +21,7 @@ export default function Page404() {
   return (
     <>
       <Helmet>
-        <title> 404 Página não encontrada | KOMETRO </title>
+        <title> 404 Página não encontrada | Kometro </title>
       </Helmet>
 
       <Container>
