@@ -71,7 +71,7 @@ export default function Router() {
         { element: <Navigate to="/admin/app" />, index: true },
         { path: 'app', element: <DashboardApp /> },
         { path: 'propostas', element: <Orders /> },
-        { path: 'proposta/:id', element: <OrderDetails /> },
+        { path: 'proposta/:id/:idClient', element: <OrderDetails /> },
         { path: 'documentos', element: <Documents /> },
         { path: 'documento/:id/:idRevisao', element: <DocumentsDetails /> },
         { path: 'documento/:id/revisoes', element: <DocumentRevisions />},

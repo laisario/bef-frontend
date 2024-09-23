@@ -7,7 +7,7 @@ import useUsers from '../../../hooks/useUsers';
 import { axios, axiosForFiles } from '../../../api';
 import useDocumentos from '../../../hooks/useDocumentos';
 
-function FormCreateRevision({ open, setOpen, idCreator }) {
+function FormCreateRevision({ open, setOpen, idCreator, setRevisions }) {
     const [isLoading, setIsLoading] = useState(false);
     const [errMsg, setErrMsg] = useState('');
     const form = useForm({
@@ -58,6 +58,7 @@ function FormCreateRevision({ open, setOpen, idCreator }) {
                             formData.append("arquivo", arquivo)
                             await axiosForFiles.patch(`/documentos/${id}/alterar_anexo/`, formData)
                         }
+                        setRevisions((oldRev) => [...oldRev, response?.data?.revisao])
                         setIsLoading(false);
                         handleClose()
                         await refetch();

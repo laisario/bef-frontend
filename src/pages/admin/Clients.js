@@ -9,8 +9,27 @@ import TableHeader from '../../components/TableHeader';
 import { useAuth } from '../../context/Auth';
 import Scrollbar from '../../components/scrollbar/Scrollbar';
 
+// ---------------------------------------------------------------------------------------
+
+const headCells = [
+  {
+      id: 'empresa',
+      label: 'Empresa',
+  },
+  {
+      id: 'email',
+      label: 'Email',
+  },
+  {
+      id: 'filial',
+      label: 'Filial',
+  },
+];
+
+// ------------------------------------------------------------------------------------------
 function Clients() {
   const [selectedClients, setSelectedClients] = useState([]);
+
   const navigate = useNavigate();
   const { user } = useAuth();
   const isMobile = useResponsive('down', 'md');
@@ -39,6 +58,7 @@ function Clients() {
     event?.stopPropagation()
     setSelectedClients(selectedClients?.includes(id) ? selectedClients?.filter(clientId => clientId !== id) : [...selectedClients, id]);
   };
+
   return (
     <>
       <Helmet>
@@ -69,8 +89,9 @@ function Clients() {
                   numSelected={selectedClients.length}
                   onSelectAllClick={handleSelectAllClick}
                   rowCount={data?.results?.length}
-                  component="clients"
+                  headCells={headCells}
                   admin={user?.admin}
+                  checkbox
                 />
                 <TableBody>
                   {!isLoading ? data?.results?.map((row, index) => {

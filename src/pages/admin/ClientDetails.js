@@ -7,11 +7,12 @@ import useClients from '../../hooks/useClients';
 import ClientInformation from '../../components/clients/ClientInformation';
 import useInstrumentos from '../../hooks/useInstrumentos';
 import ClientInstrumentInformation from '../../components/instrumentos/ClientInstrumentInformation';
+import { localLabels, positionLabels } from '../../utils/instruments'
 
 function ClientDetails() {
   const { id } = useParams();
   const { data } = useClients(id);
-  const { todosInstrumentos, handleChangePage, page, isLoading, handleChangeRowsPerPage, rowsPerPage, search, setSearch, localLabels, positionLabels } = useInstrumentos(null, data?.id, 5);
+  const { todosInstrumentos, handleChangePage, page, isLoading, handleChangeRowsPerPage, rowsPerPage, search, setSearch} = useInstrumentos(null, data?.id, 5);
   return (
     <>
       <Helmet>

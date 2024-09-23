@@ -1,5 +1,6 @@
 import React from "react";
-import styled from "styled-components";
+
+import { Container, IFrame } from './GoogleRenderer'
 
 const MSDocRenderer = ({ mainState: { currentDocument } }) => {
     if (!currentDocument) return null;
@@ -36,12 +37,3 @@ MSDocRenderer.fileTypes = [
 ];
 MSDocRenderer.weight = 0;
 MSDocRenderer.fileLoader = ({ fileLoaderComplete }) => fileLoaderComplete();
-
-const Container = styled.div`
-  width: 100%;
-`;
-const IFrame = styled.iframe`
-  width: 100%;
-  height: 100%;
-  border: 0;
-`;

@@ -26,13 +26,54 @@ import FormCreateOrder from '../components/orders/FormCreateOrder';
 import TableHeader from '../components/TableHeader';
 import TableToolbar from '../components/orders/TableToolbar';
 import { useAuth } from '../context/Auth';
+// -------------------------------------------------------------------------------------------
+
+const headCellsAdmin = [
+  {
+      id: 'numero',
+      label: 'Número',
+  },
+  {
+      id: 'data',
+      label: 'Data',
+  },
+  {
+      id: 'cliente',
+      label: 'Cliente',
+  },
+  {
+      id: 'status',
+      label: 'Status',
+  },
+];
+
+const headCells = [
+  {
+      id: 'numero',
+      label: 'Número',
+  },
+  {
+      id: 'data',
+      label: 'Data',
+  },
+  {
+      id: 'total',
+      label: 'Total',
+  },
+  {
+      id: 'status',
+      label: 'Status',
+  },
+];
 
 
 function Orders() {
   const [open, setOpen] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
   const [selectedOrders, setSelectedOrders] = useState([]);
+
   const { user: { admin } } = useAuth();
+
   const { data,
     page,
     rowsPerPage,
@@ -41,16 +82,24 @@ function Orders() {
     formFilter,
     statusColor,
     statusString,
+    refetch,
+    deleteOrder,
+    isLoading
   } = useOrders();
+
   const navigate = useNavigate()
+
   const { vertical, horizontal, propostaEnviada } = alert;
+
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
     setAlert((prevAlert) => ({ ...prevAlert, propostaEnviada: false }));
   };
+
   const handleOpen = () => setOpen(true);
+
   const handleClose = () => setOpen(false);
 
   const handleSelectAllClick = (event) => {
@@ -68,6 +117,7 @@ function Orders() {
   };
 
   const isSelected = (id) => selectedOrders.indexOf(id) !== -1;
+  
   return (
     <>
       <Helmet>
@@ -85,7 +135,7 @@ function Orders() {
           </Button>
         </Stack>
         <Card>
-          <TableToolbar form={formFilter} numSelected={selectedOrders.length} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders} admin={admin} />
+          <TableToolbar form={formFilter} numSelected={selectedOrders.length} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders} admin={admin} deleteOrder={deleteOrder} />
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
@@ -93,11 +143,11 @@ function Orders() {
                   numSelected={selectedOrders?.length}
                   onSelectAllClick={handleSelectAllClick}
                   rowCount={data?.results?.length}
-                  admin={admin}
-                  component='orders'
+                  checkbox={admin}
+                  headCells={admin ? headCellsAdmin : headCells}
                 />
                 <TableBody>
-                  {data?.results?.map((row, index) => {
+                  {isLoading ? <Typography variant='subtitle1'>Carregando...</Typography> : data?.results?.map((row, index) => {
                     const { id, data_criacao: dataCriacao, status, cliente, numero, total } = row;
                     const data = new Date(dataCriacao);
                     const isItemSelected = isSelected(row.id);
@@ -106,7 +156,7 @@ function Orders() {
                         hover
                         key={id}
                         tabIndex={-1}
-                        onClick={() => { navigate(admin ? `/admin/proposta/${id}` : `/dashboard/proposta/${id}`, { replace: true }) }}
+                        onClick={() => { navigate(admin ? `/admin/proposta/${id}/${cliente?.id}` : `/dashboard/proposta/${id}`, { replace: true }) }}
                       >
                         {admin &&
                           <TableCell padding="checkbox">
@@ -146,7 +196,8 @@ function Orders() {
             </TableContainer>
           </Scrollbar>
         </Card>
-        <FormCreateOrder open={open} setOpen={setOpen} setAlert={setAlert} onClose={handleClose} admin={admin} />
+
+        <FormCreateOrder open={open} setOpen={setOpen} setAlert={setAlert} onClose={handleClose} admin={admin} refetch={refetch} />
 
         <Stack spacing={2} sx={{ width: '100%' }}>
           <Snackbar

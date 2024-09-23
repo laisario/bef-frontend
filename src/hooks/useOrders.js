@@ -1,17 +1,18 @@
 /* eslint-disable camelcase */
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import dayjs from 'dayjs';
 import debounce from 'lodash.debounce';
-import { axios, axiosForFiles } from '../api';
+import { axios } from '../api';
 
-const useOrders = (id) => {
+const useOrders = (id, cliente) => {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [pdfFile, setPDFFile] = useState(null);
+  const [debouncedSearchFilter, setDebouncedSearchFilter] = useState('')
+
   const formFilter = useForm({
     defaultValues: {
       search: "",
@@ -21,19 +22,24 @@ const useOrders = (id) => {
       filterByDate: false,
     }
   })
-  const [debouncedSearchFilter, setDebouncedSearchFilter] = useState('')
 
   const {
     search,
     status,
     dateStart,
     dateStop,
-    filterByDate
+    filterByDate,
   } = useWatch({ control: formFilter.control })
+
   const queryClient = useQueryClient()
+
   const { data, error, isLoading, refetch } = useQuery(['propostas', id, page, rowsPerPage, debouncedSearchFilter, status, filterByDate], async () => {
     if (id) {
-      const response = await axios.get(`/propostas/${id}`, { params: { page_size: rowsPerPage } });
+      let params = { page_size: rowsPerPage}
+      if (cliente !== null) {
+        params = { ...params, cliente, }
+      }
+      const response = await axios.get(`/propostas/${id}`, { params });
       return response?.data;
     }
     const response = await axios.get('/propostas',
@@ -50,6 +56,7 @@ const useOrders = (id) => {
       });
     return response?.data;
   });
+
   const handleSearchFilter = debounce((value) => setDebouncedSearchFilter(value));
 
   useEffect(() => { handleSearchFilter(search) }, [search, handleSearchFilter])
@@ -89,8 +96,24 @@ const useOrders = (id) => {
 
   const deleteOrderAndNavigate = async () => {
     deleteOrder([id])
+    await refetch()
     navigate('/admin/propostas');
   };
+
+  const removeInstrument = async (instrumentId) => {
+    try {
+      await axios.post(`/propostas/${id}/remover_instrumento/`, { instrumento_id: instrumentId });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const { mutate: removeInstrumentProposal, isLoading: isRemoving } = useMutation({
+    mutationFn: removeInstrument,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['propostas'] })
+    },
+  })
 
 
   const handleChangePage = (event, newPage) => {
@@ -101,21 +124,8 @@ const useOrders = (id) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  
-  const handleDownloadProposol = async () => {
-    const response = await getProposolPDF()
-    if (response?.status === 200) {
-      return window.URL.createObjectURL(new Blob([response?.data], { type: 'application/pdf' }));
-    }
-    return null
-  }
 
-  useEffect(() => {
-    (async () => setPDFFile(await handleDownloadProposol()))()
-  }, [])
-
-
-  const elaborate = async (form, setResponseStatus, setOpenAlert, editProposol) => {
+  const elaborate = async (form, editProposol, setResponse, setOpenAlert) => {
     const formValues = form.watch()
     const formatDayjs = (date) => dayjs.isDayjs(date) ? date.format('YYYY-MM-DD') : null;
     const commonData = {
@@ -123,18 +133,15 @@ const useOrders = (id) => {
       condicaoDePagamento: formValues.formaDePagamento || null,
       transporte: formValues.transporte || null,
       numero: formValues.numeroProposta || 0,
-      validade: formatDayjs(formValues.validade),
+      validade: formatDayjs(formValues.validade) || null,
       status: formValues.status || null,
-      prazoDePagamento: formatDayjs(formValues.prazoDePagamento),
+      prazoDePagamento: formatDayjs(formValues.prazoDePagamento) || null,
       edit: editProposol,
       responsavel: formValues.responsavel || null,
+      diasUteis: formValues.diasUteis || null,
     };
+
     try {
-      if (formValues.anexo && formValues.anexo instanceof File) {
-        const formData = new FormData();
-        formData.append('anexo', formValues.anexo);
-        await axiosForFiles.patch(`/propostas/${id}/anexar/`, formData)
-      }
       let response;
       if (formValues.enderecoDeEntrega === 'enderecoCadastrado') {
         response = await axios.patch(`/propostas/${id}/elaborar/`, {
@@ -155,12 +162,11 @@ const useOrders = (id) => {
           } || null,
         });
       }
-      setResponseStatus({ status: response?.status, message: response?.data?.message });
+      setResponse({ status: response?.status, message: response?.data?.message });
     } catch (error) {
       console.log(error)
-      setResponseStatus({ status: error?.response?.status, message: "Ocorreu um erro ao elaborar a proposta, verifique se preencheu corretamente." });
+      setResponse({ status: error?.response?.status, message: "Ocorreu um erro ao elaborar a proposta, verifique se preencheu corretamente." });
     }
-    setPDFFile(await handleDownloadProposol())
     setOpenAlert(true);
     await refetch()
   };
@@ -197,30 +203,7 @@ const useOrders = (id) => {
       return { status: err.status, message: "Falha ao recusar a proposta." };
     }
   };
-  const propostasEmAnalise = useMemo(
-    () => (Array.isArray(data?.results) ? data?.results?.filter((pedido) => pedido.status === 'E') : null),
-    [data]
-  );
 
-  const propostasAprovar= useMemo(
-    () => (Array.isArray(data?.results) ? data?.results?.filter((pedido) => pedido.status === 'AA') : null),
-    [data]
-  );
-
-  const getProposolPDF = async () => {
-    try {
-      if (!id) {
-        return null
-      }
-      const response = await axios.get(`/propostas-files/${id}`, {
-        responseType: 'blob',
-      });
-      return response
-
-    } catch (error) {
-      return { status: error?.response?.status, message: "Falha ao recuperar PDF da proposta." };
-    }
-  }
 
   return {
     data,
@@ -232,7 +215,6 @@ const useOrders = (id) => {
     refuse,
     aprovacaoProposta,
     colorAprovacaoProposta,
-    propostasEmAnalise,
     elaborate,
     page,
     rowsPerPage,
@@ -244,10 +226,8 @@ const useOrders = (id) => {
     statusColor,
     statusString,
     sendProposolByEmail,
-    getProposolPDF,
-    handleDownloadProposol,
-    pdfFile,
-    propostasAprovar,
+    removeInstrumentProposal,
+    isRemoving
   };
 };
 

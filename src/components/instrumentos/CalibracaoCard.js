@@ -1,18 +1,15 @@
 /* eslint-disable react/prop-types */
-import { useTheme } from '@emotion/react';
 import { Box, Button, Card, CardActions, CardContent, Chip, Link, Tooltip, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import titleCase from '../../utils/formatTitle';
 import { fDate } from '../../utils/formatTime';
-import useInstrumentos from '../../hooks/useInstrumentos';
 import CriticalAnalysisDialog from './CriticalAnalysisDialog';
 
-function CalibracaoCard({ calibracao, titles, specialCases }) {
+function CalibracaoCard({ calibracao, titles, specialCases, mutate, refetch, theme }) {
   const [open, setOpen] = useState(false);
   const [analiseCliente, setAnaliseCliete] = useState({});
-  const theme = useTheme();
-  const { mutate, refetch } = useInstrumentos();
+
   const handleConfirmationAnalysis = (analiseCritica) => {
     try {
       mutate({ idCalibration: calibracao.id, analiseCliente: analiseCritica })
@@ -41,7 +38,6 @@ function CalibracaoCard({ calibracao, titles, specialCases }) {
   return (
     <Card sx={{ backgroundColor: theme.palette.background.neutral , minWidth: 400 }}>
       <CardContent>
-
         <Box display="flex" justifyContent="space-between" gap={2} mb={1}>
           <Typography fontWeight="900" color={'grey'} variant="body1">
             {fDate(calibracao?.data)}

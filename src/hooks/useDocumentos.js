@@ -2,9 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation } from 'react-query';
 import debounce from 'lodash.debounce';
 import { useForm, useWatch } from 'react-hook-form';
-import dayjs from 'dayjs';
-import 'dayjs/locale/pt-br';
-import relativeTime from 'dayjs/plugin/relativeTime'
+
 import { axios } from '../api';
 import { isPastFromToday } from '../utils/formatTime';
 
@@ -62,31 +60,6 @@ const useDocumentos = (id) => {
     'V': 'success',
   };
 
-
-  const findCriticalAnalysisStage = (criticalAnalysis) => {
-    let color = ''
-    if (criticalAnalysis > 30) {
-      color = 'success'
-    } else if (criticalAnalysis < 1) {
-      color = 'error'
-    } else {
-      color = 'warning'
-    }
-    return color
-  }
-
-  dayjs.extend(relativeTime);
-  dayjs.locale('pt-br')
-
-  const criticalAnalysisMonths = (criticalAnalysis) => {
-    if (criticalAnalysis > 0) {
-      const date = dayjs(new Date()).add(criticalAnalysis, 'days')
-      return dayjs(new Date()).to(date)
-    }
-    const date = dayjs(new Date()).subtract(criticalAnalysis, 'days')
-    return dayjs(new Date()).from(date)
-  }
-
   const { mutate: deleteDocumentos, isLoading: isDeleting } = useMutation(async (ids) => Promise.all(ids?.map((id) => axios.delete(`/documentos/${id}`))), {
     onSuccess: () => {
       refetch()
@@ -128,8 +101,6 @@ const useDocumentos = (id) => {
     formFilter,
     formCreate,
     isError,
-    findCriticalAnalysisStage,
-    criticalAnalysisMonths,
   }
 }
 

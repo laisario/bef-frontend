@@ -1,16 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async';
 import { Button, Container, Grid, Stack, Typography } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Iconify from '../../components/iconify/Iconify';
-import useDocumentos from '../../hooks/useDocumentos';
 import RevisionCard from '../../components/admin/documents/RevisionCard';
 import FormCreateRevision from '../../components/admin/documents/FormCreateRevision';
 
 function DocumentRevisions() {
-  const { id } = useParams();
-  const { data, openFormRevision, setOpenFormRevision } = useDocumentos(id);
-  const revisoes = data?.revisoes;
+  const { state } = useLocation()
+  const revisoes = state?.data?.revisoes
+  const user = state?.data?.user
+  const titulo = state?.data?.titulo
+  const [revisions, setRevisions] = useState([...revisoes])
+  const [open, setOpen] = useState(false)
   return (
     <>
       <Helmet>
@@ -19,22 +21,22 @@ function DocumentRevisions() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Revisões {!!data?.titulo && `do documento: ${data.titulo}`}
+            Revisões {!!titulo && `do documento: ${titulo}`}
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => setOpenFormRevision(!openFormRevision)}>
+          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={() => setOpen(!open)}>
             Nova revisão
           </Button>
         </Stack>
 
         <Grid container spacing={2}>
-          {revisoes?.map((revisao) => (
+          {revisions?.map((revisao) => (
             <Grid item key={revisao?.id} xs={12} sm={6}>
-              <RevisionCard revisao={revisao} key={revisao.id} />
+              <RevisionCard revisao={revisao} key={revisao.id} user={user} />
             </Grid>
           ))}
         </Grid>
 
-        {openFormRevision && <FormCreateRevision open={openFormRevision} setOpen={setOpenFormRevision} />}
+        {open && <FormCreateRevision open={open} setOpen={setOpen} setRevisions={setRevisions} />}
       </Container>
     </>
   )

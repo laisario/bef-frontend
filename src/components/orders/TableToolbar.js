@@ -5,12 +5,10 @@ import { Search } from '@mui/icons-material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import useResponsive from '../../hooks/useResponsive';
-import useOrders from '../../hooks/useOrders';
 import OrderFilterSidebar from './OrderFilterSidebar';
 
-function TableToolbar({ numSelected, form, selectedOrders, admin, setSelectedOrders }) {
+function TableToolbar({ numSelected, form, selectedOrders, admin, setSelectedOrders, deleteOrder }) {
     const [filter, setFilter] = useState(false)
-    const { deleteOrder } = useOrders()
     const isDesktop = useResponsive('up', 'md');
     const resetFilters = () => {
         form.reset()
@@ -37,7 +35,7 @@ function TableToolbar({ numSelected, form, selectedOrders, admin, setSelectedOrd
                     </Typography>
                 ) : (
                     <Grid container display="flex" justifyContent="space-between" alignItems="center">
-                        <Grid item sm={6} xs={9}>
+                        <Grid item sm={6} xs={8}>
                             <TextField
                                 label={admin ? 'Busque cliente ou número' : 'Busque número'}
                                 {...form.register("search")}

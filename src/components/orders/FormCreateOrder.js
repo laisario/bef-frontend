@@ -9,7 +9,6 @@ import {
   DialogContent,
   DialogActions,
   Dialog,
-  Typography,
   Autocomplete,
   Alert,
 } from '@mui/material';
@@ -17,10 +16,9 @@ import { useForm, useWatch } from 'react-hook-form';
 import { useState } from 'react';
 import { axios } from '../../api';
 import useInstrumentos from '../../hooks/useInstrumentos';
-import useOrders from '../../hooks/useOrders';
 import useClients from '../../hooks/useClients';
 
-function FormCreateOrder({ setOpen, setAlert, onClose, open, admin }) {
+function FormCreateOrder({ setOpen, setAlert, onClose, open, admin, refetch }) {
   const form = useForm({
     defaultValues: {
       cliente: '',
@@ -30,14 +28,14 @@ function FormCreateOrder({ setOpen, setAlert, onClose, open, admin }) {
   })
   const [errMsg, setErrMsg] = useState({});
   const [loading, setIsLoading] = useState(false);
-  const { refetch } = useOrders();
   const { data, isLoading: isLoadingClients } = useClients();
   const {
     cliente,
     instrumentos,
   } = useWatch({ control: form.control })
-  const { todosInstrumentos, isLoading } = useInstrumentos(null, cliente);
+  const { todosInstrumentos, isLoading } = useInstrumentos(null, cliente?.id);
   const { handleSubmit, setValue } = form;
+
   const submit = async () => {
     try {
       setIsLoading(true);
@@ -89,44 +87,42 @@ function FormCreateOrder({ setOpen, setAlert, onClose, open, admin }) {
             sx={{ my: 2 }}
           />
         )}
-        {todosInstrumentos?.results?.length >= 1 ? (
-          <Autocomplete
-            multiple
-            autoHighlight
-            options={todosInstrumentos?.results || []}
-            isOptionEqualToValue={(option, value) => option?.id === value?.id}
-            getOptionLabel={(instrumento) => `${instrumento?.tag}: ${instrumento?.numero_de_serie} - ${instrumento?.instrumento?.tipo_de_instrumento?.descricao} - ${instrumento?.instrumento?.minimo} - ${instrumento?.instrumento?.maximo}`}
-            disableCloseOnSelect
-            loading={isLoading}
-            renderTags={(value, getTagProps) => value?.map((tag, index) => <Chip {...getTagProps({ index })} key={tag?.tag} label={tag?.tag} />)}
-            name="instrumentos"
-            value={instrumentos || null}
-            loadingText="Carregando..."
-            noOptionsText="Sem resultados"
-            onChange={(event, newValue) => setValue('instrumentos', newValue)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={admin ? "Instrumentos do cliente" : "Instrumentos"}
-                placeholder="Pesquisar instrumento"
-              />
-            )}
-            renderOption={(props, instrumento, { selected }) => {
-              const { ...optionProps } = props;
-              return (
-                <li key={instrumento?.id} {...optionProps}>
-                  <Checkbox
-                    style={{ marginRight: 8 }}
-                    checked={selected}
-                  />
-                  {instrumento?.tag}: {instrumento?.numero_de_serie} - {instrumento?.instrumento?.tipo_de_instrumento?.descricao} - {instrumento?.instrumento?.minimo} - {instrumento?.instrumento?.maximo}
-                </li>
-              );
-            }}
-            sx={{ my: 2 }}
-          />
-        ) : (<Typography textAlign="center" mb={1}>Nenhum instrumento cadastrado</Typography>)}
 
+        {!!cliente?.id && <Autocomplete
+          multiple
+          autoHighlight
+          options={todosInstrumentos?.results || []}
+          isOptionEqualToValue={(option, value) => option?.id === value?.id}
+          getOptionLabel={(instrumento) => `${instrumento?.tag}: ${instrumento?.numero_de_serie} - ${instrumento?.instrumento?.tipo_de_instrumento?.descricao} - ${instrumento?.instrumento?.minimo} - ${instrumento?.instrumento?.maximo}`}
+          disableCloseOnSelect
+          loading={isLoading}
+          renderTags={(value, getTagProps) => value?.map((tag, index) => <Chip {...getTagProps({ index })} key={tag?.tag} label={tag?.tag} />)}
+          name="instrumentos"
+          value={instrumentos || null}
+          loadingText="Carregando..."
+          noOptionsText="Sem resultados"
+          onChange={(event, newValue) => setValue('instrumentos', newValue)}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={admin ? "Instrumentos do cliente" : "Instrumentos"}
+              placeholder="Pesquisar instrumento"
+            />
+          )}
+          renderOption={(props, instrumento, { selected }) => {
+            const { ...optionProps } = props;
+            return (
+              <li key={instrumento?.id} {...optionProps}>
+                <Checkbox
+                  style={{ marginRight: 8 }}
+                  checked={selected}
+                />
+                {instrumento?.tag}: {instrumento?.numero_de_serie} - {instrumento?.instrumento?.tipo_de_instrumento?.descricao} - {instrumento?.instrumento?.minimo} - {instrumento?.instrumento?.maximo}
+              </li>
+            );
+          }}
+          sx={{ my: 2 }}
+        />}
         <TextField
           type="text"
           multiline
@@ -135,12 +131,12 @@ function FormCreateOrder({ setOpen, setAlert, onClose, open, admin }) {
           placeholder="Informações adicionais"
           fullWidth
           {...form.register("informacoesAdicionais")}
-        
+
         />
         {!!errMsg && Object.keys(errMsg)?.map((errKey, i) => <Alert severity="error" key={i}>{errKey}: {errMsg[errKey]}</Alert>)}
       </DialogContent>
       <DialogActions sx={{ mt: 3, mb: 2 }} >
-        <Button onClick={() => { onClose(); form.reset() }}>Cancelar</Button>
+        <Button onClick={() => { onClose(); form.reset(); setErrMsg({}) }}>Cancelar</Button>
         <Button onClick={handleSubmit(submit)} type="submit" contained color="primary">
           Enviar proposta
         </Button>

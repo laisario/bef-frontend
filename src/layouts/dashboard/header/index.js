@@ -8,7 +8,6 @@ import { bgBlur } from '../../../utils/cssStyles';
 import Iconify from '../../../components/iconify';
 //
 import AccountPopover from './AccountPopover';
-import Searchbar from './Searchbar';
 
 
 // ----------------------------------------------------------------------
@@ -41,7 +40,7 @@ Header.propTypes = {
   onOpenNav: PropTypes.func,
 };
 
-export default function Header({ onOpenNav, data }) {
+export default function Header({ onOpenNav }) {
   // const { placeholder, formHeader, value } = data
   return (
     <StyledRoot>

@@ -9,7 +9,6 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import Typography from '@mui/material/Typography';
 import { useNavigate } from "react-router-dom";
 import Checkbox from '@mui/material/Checkbox';
-import CircularProgress from '@mui/material/CircularProgress';
 import { Container } from '@mui/system';
 import { Helmet } from 'react-helmet-async';
 import { Button, Card, Grid } from '@mui/material';
@@ -26,13 +25,47 @@ import CsvViewer from '../../components/instrumentos/CsvViewer';
 import Label from '../../components/label';
 import { useAuth } from '../../context/Auth';
 import Scrollbar from '../../components/scrollbar/Scrollbar';
+import { criticalAnalysisMonths, findCriticalAnalysisStage } from '../../utils/documents';
 
+// -----------------------------------------------------------------------------------
+
+const headCells = [
+    {
+        id: 'codigo',
+        label: 'Código',
+    },
+    {
+        id: 'titulo',
+        label: 'Título',
+    },
+    {
+        id: 'status',
+        label: 'Status',
+    },
+    {
+        id: 'elaborador',
+        label: 'Elaborador',
+    },
+    {
+        id: 'validade',
+        label: 'Data Validade',
+    },
+    {
+        id: 'analise_critica',
+        label: 'Análise Critica',
+    },
+];
+
+// --------------------------------------------------------------------------
 
 export default function Documents() {
     const [open, setOpen] = useState(false);
     const [selectedDocuments, setSelectedDocuments] = useState([]);
     const [csvContent, setCsvContent] = useState(null)
     const [filter, setFilter] = useState(false)
+    const navigate = useNavigate()
+    const isMobile = useResponsive('down', 'md');
+    const { user } = useAuth()
     const { data,
         status,
         statusColor,
@@ -45,16 +78,11 @@ export default function Documents() {
         isLoading,
         formFilter,
         formCreate,
-        findCriticalAnalysisStage,
-        criticalAnalysisMonths,
     } = useDocumentos(null);
-    const navigate = useNavigate()
-    const isMobile = useResponsive('down', 'md');
-    const { user } = useAuth()
+
     const handleOpenForm = () => {
         setOpen(true);
     };
-
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
@@ -84,6 +112,8 @@ export default function Documents() {
             console.error('Erro ao enviar dados para o backend:', error);
         }
     };
+
+    const documentsExists = data?.results?.length
 
     return (
         <>
@@ -123,7 +153,6 @@ export default function Documents() {
                         setFilter={setFilter}
                     />
                     <Scrollbar>
-
                         <TableContainer sx={{ minWidth: 800 }}>
                             <Table
                                 aria-labelledby="tabelaDocumentos"
@@ -132,59 +161,62 @@ export default function Documents() {
                                     numSelected={selectedDocuments?.length}
                                     onSelectAllClick={handleSelectAllClick}
                                     rowCount={data?.results?.length}
-                                    component='documents'
+                                    headCells={headCells}
                                     admin={user?.admin}
+                                    checkbox
                                 />
-                                <TableBody>
-                                    {!isLoading ? data?.results?.map((row, index) => {
-                                        const isItemSelected = isSelected(row.id);
-                                        return (
-                                            <TableRow
-                                                hover
-                                                role="checkbox"
-                                                aria-checked={isItemSelected}
-                                                tabIndex={-1}
-                                                key={row.id}
-                                                onClick={() => { navigate(`/admin/documento/${row?.id}/${row?.revisoes[0]?.id || 0}`, { replace: true }) }}
-                                                sx={{ cursor: 'pointer' }}
-                                            >
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox
-                                                        color="primary"
-                                                        onClick={(event) => handleClick(event, row.id)}
-                                                        checked={isItemSelected}
-                                                        inputProps={{
-                                                            'aria-labelledby': index,
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell
-                                                    component="th"
-                                                    id={index}
-                                                    scope="row"
-                                                    padding="none"
+                                {isLoading ? <Typography variant='subtitle1'>Carregando...</Typography> : (
+                                    <TableBody>
+                                        {documentsExists ? data?.results?.map((row, index) => {
+                                            const isItemSelected = isSelected(row.id);
+                                            return (
+                                                <TableRow
+                                                    hover
+                                                    role="checkbox"
+                                                    aria-checked={isItemSelected}
+                                                    tabIndex={-1}
+                                                    key={row.id}
+                                                    onClick={() => { navigate(`/admin/documento/${row?.id}/${row?.revisoes[0]?.id || 0}`, { replace: true }) }}
+                                                    sx={{ cursor: 'pointer' }}
                                                 >
-                                                    {row?.codigo?.codigo?.toUpperCase()}
-                                                </TableCell>
-                                                <TableCell>{!!row?.titulo && titleCase(row?.titulo)}</TableCell>
-                                                <TableCell>
-                                                    <Label color={statusColor[row?.status]}>
-                                                        {status[row?.status]}
-                                                    </Label>
-                                                </TableCell>
-                                                <TableCell>{!!row?.criador?.username && row?.criador?.username}</TableCell>
-                                                <TableCell> {!!row?.data_validade && fDate(row?.data_validade)}</TableCell>
-                                                <TableCell>
-                                                    {!!row?.analise_critica && (
-                                                        <Label color={findCriticalAnalysisStage(row?.analise_critica)}>
-                                                            {criticalAnalysisMonths(row?.analise_critica)}
+                                                    <TableCell padding="checkbox">
+                                                        <Checkbox
+                                                            color="primary"
+                                                            onClick={(event) => handleClick(event, row.id)}
+                                                            checked={isItemSelected}
+                                                            inputProps={{
+                                                                'aria-labelledby': index,
+                                                            }}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell
+                                                        component="th"
+                                                        id={index}
+                                                        scope="row"
+                                                        padding="none"
+                                                    >
+                                                        {row?.codigo?.codigo?.toUpperCase()}
+                                                    </TableCell>
+                                                    <TableCell>{!!row?.titulo && titleCase(row?.titulo)}</TableCell>
+                                                    <TableCell>
+                                                        <Label color={statusColor[row?.status]}>
+                                                            {status[row?.status]}
                                                         </Label>
-                                                    )}
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    }) : <CircularProgress />}
-                                </TableBody>
+                                                    </TableCell>
+                                                    <TableCell>{!!row?.criador?.username && row?.criador?.username}</TableCell>
+                                                    <TableCell> {!!row?.data_validade && fDate(row?.data_validade)}</TableCell>
+                                                    <TableCell>
+                                                        {!!row?.analise_critica && (
+                                                            <Label color={findCriticalAnalysisStage(row?.analise_critica)}>
+                                                                {criticalAnalysisMonths(row?.analise_critica)}
+                                                            </Label>
+                                                        )}
+                                                    </TableCell>
+                                                </TableRow>
+                                            )
+                                        }) : <TableRow><TableCell align='center'>Nenhum documento cadastrado.</TableCell></TableRow>}
+                                    </TableBody>
+                                )}
                             </Table>
                         </TableContainer>
                     </Scrollbar>

@@ -7,15 +7,13 @@ import PersonIcon from '@mui/icons-material/Person';
 import useDocumentos from '../../../hooks/useDocumentos';
 import { fDate } from '../../../utils/formatTime';
 import { axios } from '../../../api';
-import { useAuth } from '../../../context/Auth';
 
-function RevisionCard({ revisao }) {
+function RevisionCard({ revisao, user }) {
     const [errMsg, setErrMsg] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { id } = useParams();
     const { refetch } = useDocumentos(id);
     const theme = useTheme();
-    const { user } = useAuth()
     const userApproved = useMemo(() => revisao?.aprovacoes?.some(aprovacao => aprovacao?.aprovador?.id === user?.id), [user, revisao])
     const approversIds = revisao?.aprovadores?.map((approver) => approver.id )
 

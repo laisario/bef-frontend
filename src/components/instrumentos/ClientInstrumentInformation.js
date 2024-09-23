@@ -19,7 +19,7 @@ function ClientInstrumentInformation({ instrument, localLabels, positionLabels }
                         <Typography variant='body2' fontWeight="500">
                             {instrument?.instrumento?.maximo !== null ? `${instrument?.instrumento?.minimo} - ${instrument?.instrumento?.maximo}` : `${instrument?.instrumento?.minimo}`}
                             {'   '}
-                            {instrument?.instrumento?.unidades?.map((uni) => uni.unidade).slice().join(", ")}
+                            {instrument?.instrumento?.unidade}
                         </Typography>
                     )}
                 </Box>

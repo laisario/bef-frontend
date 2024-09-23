@@ -7,6 +7,7 @@ import { useTheme } from '@emotion/react';
 import { fDate } from '../utils/formatTime';
 import useInstrumentos from '../hooks/useInstrumentos';
 import CalibracaoCard from '../components/instrumentos/CalibracaoCard';
+import useResponsive from '../hooks/useResponsive';
 
 const posicaoInstrumento = {
   U: 'Em uso',
@@ -24,9 +25,11 @@ const colorPosicaoInstrumento = {
 
 function InstrumentDetails() {
   const { id } = useParams();
-  const { todosInstrumentos: instrumento } = useInstrumentos(id);
   const theme = useTheme();
+  const { todosInstrumentos: instrumento, mutate, refetch } = useInstrumentos(id);
   const unidades = instrumento?.instrumento?.unidades;
+  const isMobile = useResponsive('down', 'md');
+  
   return (
     <>
       <Helmet>
@@ -48,7 +51,7 @@ function InstrumentDetails() {
           </Box>
         </Stack>
         <Paper sx={{ padding: 4, }}>
-          <Grid container flexDirection="row" justifyContent="space-between">
+          <Grid container flexDirection={isMobile ? "column-reverse" : 'row'} justifyContent="space-between">
             <Box>
               {!!instrumento?.instrumento?.tipo_de_instrumento?.descricao &&
                 <Typography variant="h6">{instrumento?.instrumento.tipo_de_instrumento.descricao}</Typography>
@@ -79,7 +82,7 @@ function InstrumentDetails() {
                 Procedimento relacionado: {instrumento?.instrumento?.procedimento_relacionado.codigo}
               </Typography>}
             </Box>
-            <Box display="flex" gap={1} flexDirection="column">
+            <Box display="flex" gap={1} flexDirection={isMobile ? 'row' : "column"} justifyContent="flex-start">
               <Chip
                 label={posicaoInstrumento[instrumento?.posicao]}
                 color={colorPosicaoInstrumento[instrumento?.posicao]}
@@ -156,6 +159,9 @@ function InstrumentDetails() {
                         'observacoes',
                         'numeroDoCertificado',
                       ]}
+                      mutate={mutate}
+                      refetch={refetch}
+                      theme={theme}
                     />
                   )
                 )}

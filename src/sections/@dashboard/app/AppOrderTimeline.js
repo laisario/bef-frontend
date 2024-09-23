@@ -6,7 +6,6 @@ import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom';
 // utils
 import { fDate } from '../../../utils/formatTime';
 import Iconify from '../../../components/iconify';
-import useOrders from '../../../hooks/useOrders';
 // ----------------------------------------------------------------------
 
 AppOrderTimeline.propTypes = {
@@ -71,9 +70,15 @@ OrderItem.propTypes = {
   }),
 };
 
+const statusColor = {
+  "E": 'info',
+  "AA": 'warning',
+  "A": 'success',
+  "R": 'error',
+}
+
 function OrderItem({ item, isLast }) {
   const { status, title, time, url, client } = item;
-  const { statusColor } = useOrders();
   return (
     <TimelineItem>
       <TimelineSeparator>

@@ -2,12 +2,9 @@ import { Box, Button, Card, CardActions, CardContent, Chip, Typography } from '@
 import React from 'react'
 import titleCase from '../../../utils/formatTitle';
 import { fDate } from '../../../utils/formatTime';
-import { useAuth } from '../../../context/Auth';
-import useDocumentos from '../../../hooks/useDocumentos';
+import { criticalAnalysisMonths } from '../../../utils/documents';
 
-function InformationCard({ data, status, statusColor, setOpenFormRevision }) {
-    const { user } = useAuth();
-    const { criticalAnalysisMonths } = useDocumentos()
+function InformationCard({ data, status, statusColor, setOpenFormRevision, user }) {
     const isCreator = data?.criador?.id === user?.id
     return (
         <Card variant="outlined">

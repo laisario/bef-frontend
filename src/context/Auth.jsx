@@ -130,10 +130,10 @@ export const useAuth = () => {
     }
   };
 
-  const registerAuth = async ({ email, password, username }) => {
+  const registerAuth = async ({ password, email }) => {
     setLoading(true);
     try {
-      const payload = { clienteId, email, password, username };
+      const payload = { clienteId, password, username: email };
       const response = await axios.post('/register/auth/', payload);
       return response;
     } catch (err) {

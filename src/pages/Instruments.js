@@ -8,6 +8,7 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import ExportFilter from '../components/instrumentos/ExportFilter';
 import { ProductList } from '../sections/@dashboard/products';
 import useInstrumentos from '../hooks/useInstrumentos';
+import useResponsive from '../hooks/useResponsive';
 
 // ----------------------------------------------------------------------
 
@@ -72,11 +73,12 @@ export default function Instruments() {
   const [error, setError] = useState(false);
   const [selecionados, setSelecionados] = useState([])
   const [selectAll, setSelectAll] = useState(false)
-
+  const isMobile = useResponsive('down', 'md');
   const handleChangeCheckbox = (event) => {
     const { name, checked } = event.target;
     setValueCheckbox({ ...valueCheckbox, [name]: checked });
   };
+  
   useEffect(() => {
     if (selectAll) {
       setSelecionados(todosInstrumentos?.results?.map(({ id }) => id))
@@ -118,16 +120,15 @@ export default function Instruments() {
 
       <Container>
         <Stack
-          direction="row"
+          direction={isMobile? "column" : "row"}
           alignItems="center"
           justifyContent="space-between"
           mb={5}
-          flexWrap="wrap"
         >
           <Typography variant="h4" gutterBottom>
             Meus Instrumentos
           </Typography>
-          <Box sx={{ display: "flex", flexDirection: "row" }}>
+          <Box sx={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "center", alignItems: 'center'}}>
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
@@ -142,7 +143,7 @@ export default function Instruments() {
             <FormGroup sx={{ mx: 1 }}>
               <FormControlLabel control={<Checkbox checked={selectAll} />} onChange={handleCheckboxSelectAll} label="Selecionar todos" />
             </FormGroup>
-            <Button variant="contained" disabled={selecionados?.length === 0} sx={{ ml: 1 }} onClick={handleClickOpen} endIcon={<GetAppIcon />}>Exportar</Button>
+            <Button variant="contained" fullWidth={isMobile} disabled={selecionados?.length === 0} sx={{ ml: 1 }} onClick={handleClickOpen} endIcon={<GetAppIcon />}>Exportar</Button>
           </Box>
         </Stack>
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>

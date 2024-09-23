@@ -1,9 +1,12 @@
+import { useEffect, useRef, useState } from 'react';
 import {
+  Dialog,
+  DialogContent,
   Box,
-  Button,
   FormControl,
   InputLabel,
   MenuItem,
+  Button,
   Select,
   TextField,
   FormLabel,
@@ -11,31 +14,40 @@ import {
   RadioGroup,
   FormControlLabel,
   Typography,
-  Dialog,
-  DialogContent,
+  Paper,
+  Link,
+  CircularProgress
 } from '@mui/material';
-import { useForm, useWatch } from "react-hook-form";
-import { LoadingButton } from '@mui/lab';
-import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
-import { useParams } from 'react-router-dom';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import useOrders from '../../hooks/useOrders';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import DescriptionIcon from '@mui/icons-material/Description';
+import { useForm, useWatch } from 'react-hook-form';
+import dayjs from 'dayjs';
+import { LoadingButton } from '@mui/lab';
+import CloseIcon from '@mui/icons-material/Close';
+import { axiosForFiles } from '../../api';
 import Iconify from '../iconify';
-import FormAdress from '../address/FormAdress';
 import useUsers from '../../hooks/useUsers';
+import FormAdress from '../address/FormAdress';
 
-function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAlert, editProposol }) {
+function truncateString(str, num) {
+  if (str.length > num) {
+    return `${str.slice(0, num)}...`
+  }
+  return str;
+}
+
+function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAlert, editProposol, elaborate, isLoading }) {
+  const [anexos, setAnexos] = useState([])
+  const [loading, setLoading] = useState(false)
   const form = useForm({
     defaultValues: {
       numeroProposta: data?.numero || 0,
       transporte: data?.transporte || '',
       total: data?.total || '',
       formaDePagamento: data?.condicao_de_pagamento || '',
-      anexo: data?.anexo || null,
       CEP: data?.endereco_de_entrega?.cep || "",
       rua: data?.endereco_de_entrega?.logradouro || "",
       numeroEndereco: data?.endereco_de_entrega?.numero || "",
@@ -45,40 +57,65 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
       complemento: data?.endereco_de_entrega?.complemento || "",
       status: data?.status || "",
       enderecoDeEntrega: data?.endereco_de_entrega ? "enderecoCadastrado" : null,
-      validade: data?.validade,
-      prazoDePagamento: data?.prazo_de_pagamento,
+      validade: data?.validade || null,
+      prazoDePagamento: data?.prazo_de_pagamento || null,
       responsavel: data?.responsavel?.id || null,
+      diasUteis: data?.dias_uteis || null,
     },
   });
+
   const {
     enderecoDeEntrega,
-    anexo,
     validade,
     prazoDePagamento,
     formaDePagamento,
     responsavel
   } = useWatch({ control: form.control })
+
   const { data: users } = useUsers();
-  const { id } = useParams();
-  const { elaborate, isLoading } = useOrders(id);
+  const ref = useRef(null)
+
+  const handleChangeAnexo = (event) => {
+    if (!event.target.files.length) return
+    Array.from(event.target.files).forEach(async file => {
+      const formData = new FormData()
+      formData.append('anexo', file)
+      setLoading(true)
+      const { data, status } = await axiosForFiles.patch(`/propostas/${data?.id}/anexar/`, formData)
+      setLoading(false)
+      if (status === 201) {
+        setAnexos(oldAnexos => [...oldAnexos, data])
+      }
+    })
+  }
+
+  const handleRemoveAttachment = async (anexo) => {
+    const attachmentToRemove = anexos?.find(att => att.id === anexo?.id)
+    const formData = new FormData()
+    formData.append('anexo', attachmentToRemove?.id)
+    setLoading(true)
+    const { status } = await axiosForFiles.patch(`/propostas/${data?.id}/desanexar/`, formData)
+    setLoading(false)
+    if (status === 200) {
+      setAnexos((oldAnexos) => oldAnexos.filter((an) => an?.id !== anexo?.id))
+    }
+  }
 
   const handleClose = () => {
-    setElaborate((oldValue) => !oldValue)
+    setElaborate(false)
     form.reset()
   }
 
-  const handleChangeAnexo = (event) => {
-    const { name, files } = event.target;
-    if (name === 'anexo') {
-      form.setValue("anexo", files[0]);
-    }
-  }
+  useEffect(() => {
+    setAnexos(data?.anexos?.map((anexo) => anexo))
+  }, [])
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
         <DialogContent>
           <Box display="flex" gap={2}>
-            <FormControl sx={{ width: '50%' }}>
+            <FormControl sx={{ width: '50%' }} size="small">
               <InputLabel id="select-pagamento">Forma de pagamento</InputLabel>
               <Select
                 labelId="select-pagamento"
@@ -103,6 +140,7 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
               variant="outlined"
               sx={{ width: '50%' }}
               {...form.register("transporte")}
+              size="small"
             />
           </Box>
           <Box display="flex" gap={2} sx={{ my: 2 }}>
@@ -122,21 +160,33 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
 
             />
           </Box>
-          <FormControl sx={{ width: '50%' }}>
-            <InputLabel id="select-responsible">Responsável</InputLabel>
-            <Select
-              labelId="select-responsible"
-              id="select-responsible"
-              name="responsavel"
-              label="Responsável"
-              fullWidth
-              {...form.register("responsavel")}
-              value={responsavel}
-            >
-              {users?.map((user) => <MenuItem key={user?.id} value={user?.id}>{user?.username}</MenuItem>)}
-            </Select>
-          </FormControl>
-          <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, my: 2 }}>
+          <Box display="flex" gap={2}>
+            <FormControl sx={{ width: '50%' }} size="small">
+              <InputLabel id="select-responsible">Responsável</InputLabel>
+              <Select
+                labelId="select-responsible"
+                id="select-responsible"
+                name="responsavel"
+                label="Responsável"
+                fullWidth
+                {...form.register("responsavel")}
+                value={responsavel}
+              >
+                {users?.map((user) => <MenuItem key={user?.id} value={user?.id}>{user?.username}</MenuItem>)}
+              </Select>
+            </FormControl>
+            {data?.show_business_days && (<TextField
+              id="diasUteis"
+              label="Dias Úteis"
+              name="diasUteis"
+              type="number"
+              variant="outlined"
+              sx={{ width: '50%' }}
+              {...form.register("diasUteis")}
+              size="small"
+            />)}
+          </Box>
+          <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, my: 1 }}>
             <FormLabel id="aprovacao">Endereço de entrega: </FormLabel>
             <RadioGroup row aria-labelledby="aprovacao">
               <FormControlLabel
@@ -162,45 +212,39 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
             </RadioGroup>
           </FormControl>
           {enderecoDeEntrega === 'novoEndereco' && <FormAdress form={form} />}
-          <Box display="flex" gap={1}>
-            <FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-              <FormLabel id="anexo">Anexo: </FormLabel>
-              <Button component="label" color="info" variant="contained" startIcon={<CloudUploadIcon />}>
-                anexo
+          <Box>
+            <Typography>Anexos</Typography>
+            <Box display="flex" gap={2} flexWrap="nowrap" overflow="auto" flexShrink={0}>
+              <Paper onClick={() => ref?.current?.click()} sx={{ cursor: 'pointer', display: 'flex', flexShrink: 0, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: 100, width: 100 }} elevation={4}>
+                {loading ? <CircularProgress /> : <Typography color="gray" fontSize={72} lineHeight={0.75} mb={0} fontWeight={300}>+</Typography>}
+                <Typography color="gray" variant='caption'>Novo anexo</Typography>
                 <input
                   style={{ display: 'none' }}
                   id="upload-btn"
-                  name="anexo"
+                  name="anexos"
                   type="file"
-                  {...form.register("anexo")}
+                  ref={ref}
                   onChange={handleChangeAnexo}
                 />
-              </Button>
-              {!!anexo && (
-                <Button
-                  size="small"
-                  href={
-                    !!anexo && anexo instanceof File
-                      ? URL.createObjectURL(anexo)
-                      : anexo
-                  }
-                  target="_blank"
-                  variant="outlined"
-                  component="a"
-                >
-                  Ver anexo
-                </Button>
-              )}
-            </FormControl>
+              </Paper>
+              {anexos?.map((anexo, i) => <Paper key={i + 1} sx={{ textDecoration: "none", display: 'flex', flexShrink: 0, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: 100, width: 100 }} elevation={4}>
+                <Link href={anexo?.anexo} target="_blank" rel='noreferrer' style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                  <DescriptionIcon color='gray' fontSize="large" />
+                  <Typography color="gray" variant='caption'>{truncateString(new URL(anexo?.anexo).pathname?.split('/').reverse()[0], 12)}</Typography>
+                </Link>
+                <CloseIcon fontSize='small' color='gray' onClick={() => handleRemoveAttachment(anexo)} />
+              </Paper>)}
+
+            </Box>
+          </Box>
+          <Box display="flex" gap={1} >
             {+data?.total !== 0 && (<FormControl sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, mt: 1 }}>
               <FormLabel id="total">Total: </FormLabel>
               <Typography variant="subtitle1">R$ {data?.total}</Typography>
             </FormControl>)}
           </Box>
           <Box display="flex" alignItems="center" justifyContent="space-between" mt={4}>
-            <Button variant="text" onClick={handleClose}>
-              Cancelar
-            </Button>
+            <Button onClick={handleClose}>Cancelar</Button>
             <LoadingButton
               endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}
               loading={isLoading}
@@ -210,7 +254,7 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
               size="large"
               variant="contained"
               onClick={async () => {
-                form.handleSubmit(elaborate(form, setResponseStatus, setOpenAlert, editProposol))
+                form.handleSubmit(elaborate(form, editProposol, setResponseStatus, setOpenAlert))
                 handleClose();
               }}
             >

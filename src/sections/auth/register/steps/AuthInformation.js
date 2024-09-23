@@ -13,7 +13,6 @@ import PasswordStrengthMeter from './components/PasswordStrengthMeter';
 export default function AuthInformation() {
   const navigate = useNavigate();
   const { registerAuth, loading } = useAuth()
-  const [username, setUser] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null)
@@ -21,7 +20,7 @@ export default function AuthInformation() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const response = await registerAuth({ email, password, username })
+    const response = await registerAuth({ email, password})
     if (response?.status !== 201) {
       setError({ ...response?.response?.data })
       return null
@@ -33,7 +32,6 @@ export default function AuthInformation() {
   return (
     <form onSubmit={handleSubmit}>
       <Stack spacing={3}>
-        <TextField error={!!error} name="username" label="Usuario" value={username} onChange={(e) => { if (error) { setError(null) } setUser(e.target.value) }} />
         <TextField error={!!error} name="email" label="Email" value={email} onChange={(e) => { if (error) { setError(null) } setEmail(e.target.value) }} />
         <TextField
           fullWidth

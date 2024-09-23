@@ -47,10 +47,10 @@ GoogleRenderer.fileTypes = [
 GoogleRenderer.weight = 0;
 GoogleRenderer.fileLoader = ({ fileLoaderComplete }) => fileLoaderComplete();
 
-const Container = styled.div`
+export const Container = styled.div`
   width: 100%;
 `;
-const IFrame = styled.iframe`
+export const IFrame = styled.iframe`
   width: 100%;
   height: 100%;
   border: 0;

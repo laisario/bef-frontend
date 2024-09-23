@@ -1,8 +1,8 @@
 import debounce from 'lodash.debounce';
-import { useMemo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { isExpired } from '../utils/formatTime';
+import dayjs from 'dayjs';
 import { axios } from '../api';
 
 const useInstrumentos = (id, cliente, pageSize = 8) => {
@@ -12,12 +12,13 @@ const useInstrumentos = (id, cliente, pageSize = 8) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pageSize);
   const queryClient = useQueryClient()
-  const { data, error, isLoading, refetch } = useQuery(['instrumentos', id, debouncedSearch, cliente?.id, page, rowsPerPage], async () => {
+
+  const { data, error, isLoading, refetch } = useQuery(['instrumentos', id, debouncedSearch, cliente, page, rowsPerPage], async () => {
     if (id) {
       const response = await axios.get(`/instrumentos/${id}`, { params: { page_size: 9999 } });
       return response?.data;
     }
-    const response = await axios.get('/instrumentos', { params: { page: page + 1, page_size: rowsPerPage, search: debouncedSearch, client: cliente?.id } });
+    const response = await axios.get('/instrumentos', { params: { page: page + 1, page_size: rowsPerPage, search: debouncedSearch, client: cliente } });
     return response?.data;
   });
 
@@ -34,33 +35,7 @@ const useInstrumentos = (id, cliente, pageSize = 8) => {
 
   useEffect(() => { handleSearch(search) }, [search, handleSearch])
 
-  const {
-    data: instrumentosEmpresa,
-    error: errorInstrumentosEmpresa,
-    isLoading: isLoadingInstrumentosEmpresa,
-  } = useQuery(['instrumentos-empresa'], async () => {
-    const response = await axios.get('/instrumentos-empresa', { params: { page_size: 9999 } });
-    return response?.data?.results;
-  });
 
-  const instrumentosVencidos = useMemo(() => {
-    if (id) {
-      return null;
-    }
-    return data?.results?.filter((instrumento) =>
-      isExpired(instrumento?.data_ultima_calibracao, instrumento?.frequencia)
-    );
-  }, [id, data]);
-
-  const instrumentosCalibrados = useMemo(() => {
-    if (id) {
-      return null;
-    }
-    return data?.results?.filter(
-      (instrumento) =>
-        !isExpired(instrumento?.data_ultima_calibracao, instrumento?.frequencia)
-    );
-  }, [id, data]);
 
   const deleteInstrument = async () => {
     await axios.delete(`/instrumentos/${id}`);
@@ -84,52 +59,56 @@ const useInstrumentos = (id, cliente, pageSize = 8) => {
     },
   })
 
-  const updatePrice = async ({ id, price }) => {
-    const response = await axios.patch(`/instrumentos/${id}/`, { preco_alternativo_calibracao: price });
+  const updateInstrument = async (form) => {
+    const modifiedData = {
+      tag: form?.tag,
+      numero_de_serie: form?.numeroDeSerie,
+      data_ultima_calibracao: form?.dataUltimaCalibracao && dayjs(form?.dataUltimaCalibracao)?.format('YYYY-MM-DD'),
+      local: form?.local,
+      instrumento: {
+        maximo: form?.maximo,
+        minimo: form?.minimo,
+        unidade: form?.unidade,
+        preco_calibracao_no_laboratorio: form?.precoCalibracao,
+        preco_calibracao_no_cliente: form?.precoCalibracao,
+        capacidade_de_medicao: {
+          valor: form?.capacidadeMedicao,
+          unidade: form?.unidadeMedicao,
+        },
+      },
+      preco_alternativo_calibracao: form?.precoAlternativoCalibracao,
+      dias_uteis: form?.diasUteis,
+      pontos_de_calibracao: form?.pontosCalibracao?.length ? form?.pontosCalibracao?.map(ponto => ({ nome: ponto })) : [],
+      posicao: form?.posicao,
+    }
+
+    const response = await axios.patch(`/instrumentos/${id}/`, modifiedData);
     return response.data;
   }
 
-  const { mutate: mutatePrice } = useMutation({
-    mutationFn: updatePrice,
+  const { mutate: mutateInstrument, isLoading: isUpdatingInstrument } = useMutation({
+    mutationFn: updateInstrument,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['propostas'] })
     },
   })
 
-  const localLabels = {
-    "P": "Instalações permanentes",
-    "C": "Instalações cliente",
-    "T": "Terceirizado"
-  }
-
-  const positionLabels = {
-    "U": "Em uso",
-    "E": "Em estoque",
-    "I": "Inativo",
-    "F": "Fora de uso"
-  }
 
   return {
-    instrumentosVencidos,
-    instrumentosCalibrados,
     todosInstrumentos: data,
     error,
     isLoading,
     deleteInstrument,
-    instrumentosEmpresa,
-    errorInstrumentosEmpresa,
-    isLoadingInstrumentosEmpresa,
     refetch,
     search,
     setSearch,
     mutate,
-    mutatePrice,
+    mutateInstrument,
     handleChangePage,
     handleChangeRowsPerPage,
     page,
     rowsPerPage,
-    localLabels,
-    positionLabels,
+    isUpdatingInstrument
   };
 };
 

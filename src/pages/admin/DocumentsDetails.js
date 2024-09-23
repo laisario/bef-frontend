@@ -17,6 +17,7 @@ import InformationCard from '../../components/admin/documents/InformationCard';
 import RevisionCard from '../../components/admin/documents/RevisionCard';
 import MSDocRenderer from '../renderers/MSDocRenderer';
 import GoogleRenderer from '../renderers/GoogleRenderer';
+import { useAuth } from '../../context/Auth';
 
 const StyledDocViewer = styled(DocViewer)(() => ({
   overflow: 'auto',
@@ -46,11 +47,17 @@ function DocumentsDetails() {
   const { id, idRevisao } = useParams();
   const [swiper, setSwiper] = useState(null)
   const { data, status, statusColor, openFormRevision, setOpenFormRevision, isLoading } = useDocumentos(id);
+  const { user } = useAuth()
   const url = !!data?.arquivo && new URL(`${data?.arquivo}`);
+
   const splittedUrl = url?.pathname?.split('.');
+
   const fileType = !!splittedUrl?.length && splittedUrl[splittedUrl.length - 1];
+
   const revisoes = data?.revisoes;
+
   const navigate = useNavigate();
+
   useEffect(() => {
     if (idRevisao && swiper && !!revisoes?.length) {
       const ids = revisoes?.map(revisao => revisao?.id)
@@ -58,6 +65,7 @@ function DocumentsDetails() {
       swiper.slideTo(index)
     }
   }, [idRevisao, swiper, revisoes])
+
   return (
     <>
       <Helmet>
@@ -76,7 +84,7 @@ function DocumentsDetails() {
             </Grid>
           }
           <Grid item xs={12} md={4}>
-            <InformationCard data={data} status={status} statusColor={statusColor} setOpenFormRevision={setOpenFormRevision} />
+            <InformationCard data={data} status={status} statusColor={statusColor} setOpenFormRevision={setOpenFormRevision} user={user} />
             {!!revisoes?.length &&
               <Box>
                 <Box display="flex" flexDirection="row" justifyContent="space-between">
@@ -84,7 +92,7 @@ function DocumentsDetails() {
                     Revisões
                   </Typography>
                   {revisoes?.length > 1 && (
-                    <Button size='small' onClick={() => navigate(`/admin/documento/${id}/revisoes`)}>Ver todas</Button>
+                    <Button size='small' onClick={() => navigate(`/admin/documento/${id}/revisoes`, { state: { data: {revisoes, user, titulo: data?.titulo} }})}>Ver todas</Button>
                   )}
                 </Box>
                 <StyledSwiper
@@ -99,7 +107,7 @@ function DocumentsDetails() {
                   onSwiper={(swiper) => setSwiper(swiper)}
                 >
                   {revisoes.map(revisao => (<SwiperSlide key={revisao.id}>
-                    <RevisionCard revisao={revisao} />
+                    <RevisionCard revisao={revisao} user={user}/>
                   </SwiperSlide>))}
                 </StyledSwiper>
               </Box>

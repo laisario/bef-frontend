@@ -7,7 +7,7 @@ import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 import palette from '../../../theme/palette';
 import Label from '../../../components/label';
-import useDocumentos from '../../../hooks/useDocumentos';
+import { criticalAnalysisMonths, findCriticalAnalysisStage } from '../../../utils/documents';
 
 AppListItems.propTypes = {
   title: PropTypes.string,
@@ -68,15 +68,15 @@ const formatData = (data, isDocument) => {
 
   return {
     title: `${data?.tag} - ${data?.descricao}`,
-    subtitle: `${data?.fabricante ? data?.fabricante : 'Fabricante não informado'} | ${data?.modelo ? data?.modelo : 'Modelo não informado'} | ${data?.faixaNominalMin? data?.faixaNominalMin : 'Fai. nominal mínima não informado'} - ${data?.faixaNominalMax ? data?.faixaNominalMax : "Fai. nominal máxima não informada"} ${data?.unidade?.map((u) => u.unidade)}`,
+    subtitle: `${data?.fabricante ? data?.fabricante : 'Fabricante não informado'} | ${data?.modelo ? data?.modelo : 'Modelo não informado'} | ${data?.faixaNominalMin? data?.faixaNominalMin : 'Fai. nominal mínima não informado'} - ${data?.faixaNominalMax ? data?.faixaNominalMax : "Fai. nominal máxima não informada"} ${data?.unidade}`,
     url: `/dashboard/instrumento/${data?.id}`,
     ...data,
   }
 }
 
+
 function ListItem({ data, isDocument }) {
   const formattedData = formatData(data, isDocument)
-  const { findCriticalAnalysisStage, criticalAnalysisMonths } = useDocumentos()
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
       <Box
