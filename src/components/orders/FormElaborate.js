@@ -39,9 +39,11 @@ function truncateString(str, num) {
   return str;
 }
 
-function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAlert, editProposol, elaborate, isLoading }) {
+function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAlert, editProposol, elaborate }) {
   const [anexos, setAnexos] = useState([])
+  const [loadingAnexo, setLoadingAnexo] = useState(false)
   const [loading, setLoading] = useState(false)
+
   const form = useForm({
     defaultValues: {
       numeroProposta: data?.numero || 0,
@@ -80,9 +82,9 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
     Array.from(event.target.files).forEach(async file => {
       const formData = new FormData()
       formData.append('anexo', file)
-      setLoading(true)
+      setLoadingAnexo(true)
       const { data, status } = await axiosForFiles.patch(`/propostas/${data?.id}/anexar/`, formData)
-      setLoading(false)
+      setLoadingAnexo(false)
       if (status === 201) {
         setAnexos(oldAnexos => [...oldAnexos, data])
       }
@@ -93,9 +95,9 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
     const attachmentToRemove = anexos?.find(att => att.id === anexo?.id)
     const formData = new FormData()
     formData.append('anexo', attachmentToRemove?.id)
-    setLoading(true)
+    setLoadingAnexo(true)
     const { status } = await axiosForFiles.patch(`/propostas/${data?.id}/desanexar/`, formData)
-    setLoading(false)
+    setLoadingAnexo(false)
     if (status === 200) {
       setAnexos((oldAnexos) => oldAnexos.filter((an) => an?.id !== anexo?.id))
     }
@@ -216,7 +218,7 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
             <Typography>Anexos</Typography>
             <Box display="flex" gap={2} flexWrap="nowrap" overflow="auto" flexShrink={0}>
               <Paper onClick={() => ref?.current?.click()} sx={{ cursor: 'pointer', display: 'flex', flexShrink: 0, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: 100, width: 100 }} elevation={4}>
-                {loading ? <CircularProgress /> : <Typography color="gray" fontSize={72} lineHeight={0.75} mb={0} fontWeight={300}>+</Typography>}
+                {loadingAnexo ? <CircularProgress /> : <Typography color="gray" fontSize={72} lineHeight={0.75} mb={0} fontWeight={300}>+</Typography>}
                 <Typography color="gray" variant='caption'>Novo anexo</Typography>
                 <input
                   style={{ display: 'none' }}
@@ -245,21 +247,20 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
           </Box>
           <Box display="flex" alignItems="center" justifyContent="space-between" mt={4}>
             <Button onClick={handleClose}>Cancelar</Button>
-            <LoadingButton
+            {loading ? <CircularProgress /> : <Button
               endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}
-              loading={isLoading}
               sx={{ maxWidth: '45%' }}
               type="submit"
               fullWidth
               size="large"
               variant="contained"
-              onClick={async () => {
-                form.handleSubmit(elaborate(form, editProposol, setResponseStatus, setOpenAlert))
-                handleClose();
+              onClick={() => {
+                setLoading(true)
+                form.handleSubmit(elaborate(form, editProposol, setResponseStatus, setOpenAlert, setLoading, handleClose))
               }}
             >
               Salvar
-            </LoadingButton>
+            </Button>}
           </Box>
         </DialogContent>
       </LocalizationProvider>

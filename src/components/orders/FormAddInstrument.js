@@ -8,7 +8,7 @@ function FormAddInstrument({ open, handleClose, data, isLoading, proposalInstrum
     const submit = async () => {
         try {
             setLoading(true)
-            await axios.patch(`/propostas/${idProposal}/`, { instrumentos: [...proposalInstruments, ...instruments?.map(instrument => instrument?.id)]});
+            await axios.post(`/propostas/${idProposal}/adicionar_instrumento/`, { instrumentos: [...proposalInstruments, ...instruments?.map(instrument => instrument?.id)]});
             await refetch();
             return { error: false };
         } catch (err) {

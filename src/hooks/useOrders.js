@@ -125,7 +125,7 @@ const useOrders = (id, cliente) => {
     setPage(0);
   };
 
-  const elaborate = async (form, editProposol, setResponse, setOpenAlert) => {
+  const elaborate = async (form, editProposol, setResponse, setOpenAlert, setLoading, handleClose) => {
     const formValues = form.watch()
     const formatDayjs = (date) => dayjs.isDayjs(date) ? date.format('YYYY-MM-DD') : null;
     const commonData = {
@@ -166,9 +166,14 @@ const useOrders = (id, cliente) => {
     } catch (error) {
       console.log(error)
       setResponse({ status: error?.response?.status, message: "Ocorreu um erro ao elaborar a proposta, verifique se preencheu corretamente." });
+    } finally {
+      if (setLoading && handleClose) {
+        setLoading(false)
+        handleClose()
+      }
+      setOpenAlert(true);
+      await refetch()
     }
-    setOpenAlert(true);
-    await refetch()
   };
 
   const sendProposolByEmail = async () => {

@@ -12,7 +12,6 @@ import { axios } from '../api';
 export default function DashboardApp() {
   const [data, setData] = useState(null)
   const { user } = useAuth()
-
   useEffect(() => {
     (async () => {
       const response = await axios.get('/dashboard')
@@ -123,7 +122,7 @@ export default function DashboardApp() {
                   title: `Proposta ${proposta?.numero}`,
                   status: proposta?.status,
                   time: new Date(proposta?.data_criacao),
-                  url: user?.admin ? `/admin/proposta/${proposta?.id}` : `/dashboard/proposta/${proposta?.id}`,
+                  url: user?.admin ? `/admin/proposta/${proposta?.id}/${proposta?.cliente?.id}` : `/dashboard/proposta/${proposta?.id}`,
                   client: proposta?.cliente?.empresa?.razao_social || proposta?.cliente?.nome,
                 }))}
               />

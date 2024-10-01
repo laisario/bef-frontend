@@ -154,7 +154,6 @@ function OrderDetails() {
             setOpenAlert={setOpenAlert}
             editProposol={edit}
             elaborate={elaborate}
-            isLoading={isLoading}
           />
         )}
 
