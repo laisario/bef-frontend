@@ -6,10 +6,10 @@ import Box from '@mui/material/Box';
 
 function LinearProgressWithLabel(props) {
     const getLevel = (value) => {
-        if (value <= 25) return 'fraca'
-        if (value > 25 && value <= 50) return "media"
-        if (value > 50 && value <= 75) return "forte"
-        return "muito forte"
+        if (value <= 25) return 'Fraca'
+        if (value > 25 && value <= 50) return "Média"
+        if (value > 50 && value <= 75) return "Forte"
+        return "Muito forte"
     }
 
     return (
@@ -63,7 +63,7 @@ export default function PasswordStrengthMeter({ password }) {
                     all_uppercase_doesnt_help: 'Todas as letras maiúsculas são quase tão fáceis de adivinhar quanto todas as letras minúsculas',
                     reverse_doesnt_help: 'Palavras invertidas não são muito mais difíceis de adivinhar',
                     substitution_doesnt_help: 'Substituições previsíveis como \'@\' em vez de \'a\' não ajudam muito',
-                    user_dictionary: 'This password is on the blacklist',
+                    user_dictionary: 'Esta senha está na lista negra',
                 }
             })
             setProgress((result?.score / 4) * 100)

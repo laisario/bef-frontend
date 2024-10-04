@@ -27,9 +27,7 @@ function InstrumentDetails() {
   const { id } = useParams();
   const theme = useTheme();
   const { todosInstrumentos: instrumento, mutate, refetch } = useInstrumentos(id);
-  const unidades = instrumento?.instrumento?.unidades;
   const isMobile = useResponsive('down', 'md');
-  
   return (
     <>
       <Helmet>
@@ -57,11 +55,16 @@ function InstrumentDetails() {
                 <Typography variant="h6">{instrumento?.instrumento.tipo_de_instrumento.descricao}</Typography>
               }
               {(instrumento?.instrumento?.minimo || instrumento?.instrumento?.maximo) && <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
-                Faixa de medição: {instrumento?.instrumento?.minimo} {!!instrumento?.instrumento?.maximo && `/ ${instrumento?.instrumento?.maximo}`}
+                Faixa de medição: {instrumento?.instrumento?.minimo} {!!instrumento?.instrumento?.maximo && `/ ${instrumento?.instrumento?.maximo}`} {instrumento?.instrumento?.unidade}
               </Typography>}
-              {!!unidades?.length && <Typography>{unidades?.length > 1 ? "Unidades: " : "Unidade: "} {unidades.map(({ unidade }) => `${unidade} `)}</Typography>}
               {!!instrumento?.data_ultima_calibracao && <Typography variant="subtitle1" fontWeight="500">
                 Última calibração: {fDate(instrumento?.data_ultima_calibracao)}
+              </Typography>}
+              {!!instrumento?.data_proxima_calibracao && <Typography variant="subtitle1" fontWeight="500">
+                Próxima calibração: {fDate(instrumento?.data_proxima_calibracao)}
+              </Typography>}
+              {!!instrumento?.data_proxima_checagem && <Typography variant="subtitle1" fontWeight="500">
+                Próxima checagem: {fDate(instrumento?.data_proxima_checagem)}
               </Typography>}
               {!!instrumento?.instrumento?.tipo_de_instrumento?.modelo && <Typography variant="subtitle1" fontWeight="500">
                 Modelo: {instrumento?.instrumento?.tipo_de_instrumento?.modelo}

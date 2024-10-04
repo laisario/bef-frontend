@@ -41,7 +41,7 @@ function ClientInstrumentInformation({ instrument, localLabels, positionLabels }
                     <Typography>Número de série: {instrument?.numero_de_serie} </Typography>
                 )}
                 {instrument?.instrumento?.capacidade_de_medicao?.valor && (
-                    <Typography>Resolução: {instrument?.instrumento?.capacidade_de_medicao?.valor} {instrument?.instrumento?.capacidade_de_medicao?.unidade} </Typography>
+                    <Typography>Capacidade de medição: {instrument?.instrumento?.capacidade_de_medicao?.valor} {instrument?.instrumento?.capacidade_de_medicao?.unidade} </Typography>
                 )}
                 {instrument?.instrumento?.preco_calibracao_no_cliente && (
                     <Typography>Preço calibração cliente: {instrument?.instrumento?.preco_calibracao_no_cliente} </Typography>
@@ -77,7 +77,7 @@ function ClientInstrumentInformation({ instrument, localLabels, positionLabels }
                     <Typography>Dias úteis: {instrument?.dias_uteis} </Typography>
                 )}
                 {instrument?.frequencia && (
-                    <Typography>Frequência: {instrument?.frequencia > 1 ? `${instrument?.frequencia} anos` : `${instrument?.frequencia} ano`} </Typography>
+                    <Typography>Frequência: {instrument?.frequencia > 1 ? `${instrument?.frequencia} meses` : `${instrument?.frequencia} mês`} </Typography>
                 )}
                 {instrument?.laboratorio && (
                     <Typography>Laboratório: {instrument?.laboratorio} </Typography>
