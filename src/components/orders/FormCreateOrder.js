@@ -55,6 +55,8 @@ function FormCreateOrder({ setOpen, setAlert, onClose, open, admin, refetch }) {
     }
   };
 
+  console.log(cliente)
+
   return (
     <Dialog
       open={open}
@@ -88,7 +90,7 @@ function FormCreateOrder({ setOpen, setAlert, onClose, open, admin, refetch }) {
           />
         )}
 
-        {!!cliente?.id && <Autocomplete
+        {<Autocomplete
           multiple
           autoHighlight
           options={todosInstrumentos?.results || []}

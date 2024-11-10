@@ -1,7 +1,7 @@
 import { IconButton, Tooltip } from '@mui/material'
 import React from 'react'
 
-function Button({ title, action, icon }) {
+function ButtonTooltip({ title, action, icon }) {
     return (
       <Tooltip title={title}>
         <IconButton size="small" onClick={action}>
@@ -11,4 +11,4 @@ function Button({ title, action, icon }) {
     )
   }
 
-export default Button
+export default ButtonTooltip

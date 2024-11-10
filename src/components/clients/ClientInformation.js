@@ -1,70 +1,42 @@
 import React from 'react'
-import { Box, Divider, Paper, Typography } from '@mui/material'
+import { Box, Divider, Paper, Stack, Typography } from '@mui/material'
 import ApartmentIcon from '@mui/icons-material/Apartment';
-import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
-import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
-import useResponsive from '../../hooks/useResponsive';
+import LocationCityIcon from '@mui/icons-material/LocationCity';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import PhoneIcon from '@mui/icons-material/Phone';
+import BadgeIcon from '@mui/icons-material/Badge';
+import HomeIcon from '@mui/icons-material/Home';
+import EmailIcon from '@mui/icons-material/Email';
+
+const Information = ({ icon, value }) => (
+        <Stack alignItems="center" direction="row" gap={1}>
+            {icon}
+            <Typography variant='body1' fontWeight="500">
+                {value}
+            </Typography>
+        </Stack>
+    )
 
 
-function ClientInformation({data}) {
-    const isMobile = useResponsive('down', 'md');
+function ClientInformation({ data, isMobile }) {
     return (
-        <Paper sx={{ padding: 4, display: "flex", justifyContent: "space-between", flexDirection: isMobile ? 'column' : 'row' }}>
+        <Paper sx={{ padding: 4, display: "flex", justifyContent: "space-around", flexDirection: isMobile ? 'column' : 'row' }}>
             <Box>
-                <Typography variant='h6' sx={{mb: 2}}>
-                    <ApartmentIcon/> Informações empresa
-                </Typography>
-                <Typography variant='body1' fontWeight="500">
-                    <strong>Razão social:</strong> {data?.empresa?.razao_social}
-                </Typography>
-                <Typography variant='body1' fontWeight="500">
-                    <strong>CNPJ:</strong> {data?.empresa?.cnpj}
-                </Typography>
-                <Typography variant='body1' fontWeight="500">
-                    <strong>Filial:</strong> {data?.empresa?.filial}
-                </Typography>
-                {!data?.empresa?.isento && (
-                    <Typography variant='body1' fontWeight="500">
-                        <strong>Inscrição estadual:</strong> {data?.empresa?.ie}
-                    </Typography>
-                )}
+                {!!data?.empresa?.cnpj && <Information value={data?.empresa?.cnpj} icon={<ApartmentIcon fontSize='small' />} />}
+                {!data?.empresa?.isento && !!data?.empresa?.ie && (<Information value={data?.empresa?.ie} icon={<strong>IE</strong>} />)}
+                {!!data?.usuario?.username && <Information value={data?.usuario?.username} icon={<EmailIcon fontSize='small' />}/>}
+                {!!data?.telefone && <Information value={data?.telefone} icon={<PhoneIcon fontSize='small' />} />}
             </Box>
-            {(!!data?.nome || !!data?.telefone || !!data?.cpf) && (
-                <>
-                    <Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />
-                    <Box sx={{ my: isMobile ? 1.5 : 0 }}>
-                        <Typography variant='h6' sx={{mb: 2}}>
-                            <ContactPhoneIcon /> Informações contato
-                        </Typography>
-                        {!!data?.nome && (
-                            <Typography variant='body1' fontWeight="500">
-                                {data?.nome}
-                            </Typography>
-                        )}
-                        {!!data?.telefone && (
-                            <Typography variant='body1' fontWeight="500">
-                                <strong>Telefone:</strong> {data?.telefone}
-                            </Typography>
-                        )}
-                        {!!data?.cpf && (
-                            <Typography variant='body1' fontWeight="500">
-                                <strong>CPF:</strong> {data?.cpf}
-                            </Typography>
-                        )}
-                    </Box>
-                </>
-            )}
-            <Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />
+
+            {!isMobile && <Divider orientation="vertical" flexItem />}
+
             <Box>
-                <Typography variant='h6' sx={{mb: 2}}>
-                    <AlternateEmailIcon /> Informações usuário
-                </Typography>
-                <Typography variant='body1' fontWeight="500">
-                    <strong>Username:</strong> {data?.usuario?.username}
-                </Typography>
-                <Typography variant='body1' fontWeight="500">
-                    <strong>Email:</strong> {data?.usuario?.email}
-                </Typography>
+                {!!data?.empresa?.filial && <Information value={data?.empresa?.filial} icon={<LocationCityIcon fontSize='small'/>} />}
+                {!!data?.empresa?.nome_fantasia && <Information value={data?.empresa?.nome_fantasia} icon={<DriveFileRenameOutlineIcon fontSize='small'/>} />}
+                {!!data?.cpf && (
+                   <Information icon={<BadgeIcon fontSize='small' />} value={data?.cpf} />
+                )}
+                {!!data?.endereco?.logradouro && (<Information value={`${data?.endereco?.logradouro}, ${data?.endereco?.numero} - ${data?.endereco?.bairro?.nome}, ${data?.endereco?.bairro?.cidade?.nome} - ${data?.endereco?.bairro?.cidade?.uf?.sigla}`} icon={<HomeIcon fontSize='small' />} />)}
             </Box>
         </Paper>
     )

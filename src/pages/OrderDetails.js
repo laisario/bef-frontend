@@ -158,7 +158,7 @@ function OrderDetails() {
         )}
 
         <Paper sx={{ padding: 4 }}>
-          {data?.status === "E" ? <Typography variant='subtitle1'>Aguardando a proposta ser elaborada...</Typography> : (
+          {data?.status === "E" ? <Typography variant='subtitle1'>As informações da proposta aparecerão aqui após a elaboração pela equipe</Typography> : (
             <InformationProposol
               data={data}
               isMobile={isMobile}

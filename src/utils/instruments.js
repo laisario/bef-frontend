@@ -10,3 +10,10 @@ export const positionLabels = {
     "I": "Inativo",
     "F": "Fora de uso"
 }
+
+export const colorPositionInstrument = {
+    U: 'success',
+    E: 'secondary',
+    I: 'info',
+    F: 'warning',
+  };

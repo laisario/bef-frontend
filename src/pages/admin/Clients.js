@@ -16,14 +16,6 @@ const headCells = [
       id: 'empresa',
       label: 'Empresa',
   },
-  {
-      id: 'email',
-      label: 'Email',
-  },
-  {
-      id: 'filial',
-      label: 'Filial',
-  },
 ];
 
 // ------------------------------------------------------------------------------------------
@@ -117,17 +109,8 @@ function Clients() {
                             />
                         </TableCell>
                         <TableCell>
-                          {row?.empresa?.razao_social}
+                          {row?.empresa?.razao_social || row?.nome}
                         </TableCell>
-                        <TableCell
-                          component="th"
-                          id={index}
-                          scope="row"
-                          padding="none"
-                        >
-                          {row?.usuario?.email}
-                        </TableCell>
-                        <TableCell>{row?.empresa?.filial}</TableCell>
                       </TableRow>
                     );
                   }) : <CircularProgress />}

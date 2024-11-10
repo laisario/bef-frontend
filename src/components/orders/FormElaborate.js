@@ -23,21 +23,15 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import DescriptionIcon from '@mui/icons-material/Description';
+import CloseIcon from '@mui/icons-material/Close';
 import { useForm, useWatch } from 'react-hook-form';
 import dayjs from 'dayjs';
-import { LoadingButton } from '@mui/lab';
-import CloseIcon from '@mui/icons-material/Close';
 import { axiosForFiles } from '../../api';
 import Iconify from '../iconify';
 import useUsers from '../../hooks/useUsers';
 import FormAdress from '../address/FormAdress';
+import { truncateString } from '../../utils/formatString';
 
-function truncateString(str, num) {
-  if (str.length > num) {
-    return `${str.slice(0, num)}...`
-  }
-  return str;
-}
 
 function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAlert, editProposol, elaborate }) {
   const [anexos, setAnexos] = useState([])
@@ -83,10 +77,10 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
       const formData = new FormData()
       formData.append('anexo', file)
       setLoadingAnexo(true)
-      const { data, status } = await axiosForFiles.patch(`/propostas/${data?.id}/anexar/`, formData)
+      const { data: anexo, status } = await axiosForFiles.patch(`/propostas/${data?.id}/anexar/`, formData)
       setLoadingAnexo(false)
       if (status === 201) {
-        setAnexos(oldAnexos => [...oldAnexos, data])
+        setAnexos(oldAnexos => [...oldAnexos, anexo])
       }
     })
   }
@@ -106,6 +100,7 @@ function FormElaborate({ data, open, setElaborate, setResponseStatus, setOpenAle
   const handleClose = () => {
     setElaborate(false)
     form.reset()
+    setLoadingAnexo(false)
   }
 
   useEffect(() => {

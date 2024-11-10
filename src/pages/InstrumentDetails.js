@@ -8,20 +8,7 @@ import { fDate } from '../utils/formatTime';
 import useInstrumentos from '../hooks/useInstrumentos';
 import CalibracaoCard from '../components/instrumentos/CalibracaoCard';
 import useResponsive from '../hooks/useResponsive';
-
-const posicaoInstrumento = {
-  U: 'Em uso',
-  E: 'Em estoque',
-  I: 'Inativo',
-  F: 'Fora de uso',
-};
-
-const colorPosicaoInstrumento = {
-  U: 'success',
-  E: 'secondary',
-  I: 'info',
-  F: 'warning',
-};
+import { positionLabels, colorPositionInstrument } from '../utils/instruments';
 
 function InstrumentDetails() {
   const { id } = useParams();
@@ -87,8 +74,8 @@ function InstrumentDetails() {
             </Box>
             <Box display="flex" gap={1} flexDirection={isMobile ? 'row' : "column"} justifyContent="flex-start">
               <Chip
-                label={posicaoInstrumento[instrumento?.posicao]}
-                color={colorPosicaoInstrumento[instrumento?.posicao]}
+                label={positionLabels[instrumento?.posicao]}
+                color={colorPositionInstrument[instrumento?.posicao]}
                 variant="filled"
                 sx={{ color: theme.palette.common.white }}
               />

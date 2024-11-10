@@ -96,7 +96,6 @@ const useOrders = (id, cliente) => {
 
   const deleteOrderAndNavigate = async () => {
     deleteOrder([id])
-    await refetch()
     navigate('/admin/propostas');
   };
 
@@ -110,6 +109,22 @@ const useOrders = (id, cliente) => {
 
   const { mutate: removeInstrumentProposal, isLoading: isRemoving } = useMutation({
     mutationFn: removeInstrument,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['propostas'] })
+    },
+  })
+
+
+  const createOrder = async ({instrumentos, cliente, ...rest}) => {
+    try {
+      await axios.post('/propostas/', { instrumentos: instrumentos?.map(instrumento => instrumento?.id), cliente: cliente?.id, ...rest });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const { mutate: mutateCreateOrder, isLoading: isLoadingCreateOrder, isSuccess: isSuccessCreateOrder } = useMutation({
+    mutationFn: createOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['propostas'] })
     },
@@ -232,7 +247,10 @@ const useOrders = (id, cliente) => {
     statusString,
     sendProposolByEmail,
     removeInstrumentProposal,
-    isRemoving
+    isRemoving,
+    mutateCreateOrder,
+    isLoadingCreateOrder,
+    isSuccessCreateOrder
   };
 };
 

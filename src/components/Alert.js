@@ -2,9 +2,9 @@ import { Snackbar, Stack } from '@mui/material';
 import React from 'react';
 
 const vertical =  'top';
-const horizontal = 'right';
+const horizontal = 'center';
 
-function Alert({open, setOpen, texto}) {
+function Alert({open, setOpen, texto, severity = 'success'}) {
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -20,7 +20,7 @@ function Alert({open, setOpen, texto}) {
         key={vertical + horizontal}
         onClose={handleCloseAlert}
       >
-        <Alert onClose={handleCloseAlert} severity="success" sx={{ width: '100%' }}>
+        <Alert onClose={handleCloseAlert} severity={severity} sx={{ width: '100%' }}>
           {texto}
         </Alert>
       </Snackbar>

@@ -1,12 +1,10 @@
 import debounce from 'lodash.debounce';
 import { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { axios } from '../api';
 
 const useInstrumentos = (id, cliente, pageSize = 8) => {
-  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(0);
@@ -34,13 +32,17 @@ const useInstrumentos = (id, cliente, pageSize = 8) => {
   const handleSearch = debounce((value) => setDebouncedSearch(value));
 
   useEffect(() => { handleSearch(search) }, [search, handleSearch])
-
-
-
-  const deleteInstrument = async () => {
-    await axios.delete(`/instrumentos/${id}`);
-    navigate('/dashboard/instrumentos');
+  
+  const deleteInstrument = async (idInstrument) => {
+    await axios.delete(`/instrumentos/${idInstrument}`);
   };
+
+  const { mutate: mutateDelete, isLoading: isDeleting } = useMutation({
+    mutationFn: deleteInstrument,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instrumentos'] })
+    },
+  })
 
   const update = async ({ idCalibration, analiseCliente }) => {
     const patchData = { analise_critica: analiseCliente?.criticalAnalysis }
@@ -59,37 +61,71 @@ const useInstrumentos = (id, cliente, pageSize = 8) => {
     },
   })
 
-  const updateInstrument = async (form) => {
-    const modifiedData = {
-      tag: form?.tag,
-      numero_de_serie: form?.numeroDeSerie,
-      data_ultima_calibracao: form?.dataUltimaCalibracao && dayjs(form?.dataUltimaCalibracao)?.format('YYYY-MM-DD'),
-      local: form?.local,
-      instrumento: {
-        maximo: form?.maximo,
-        minimo: form?.minimo,
-        unidade: form?.unidade,
-        preco_calibracao_no_laboratorio: form?.precoCalibracao,
-        preco_calibracao_no_cliente: form?.precoCalibracao,
-        capacidade_de_medicao: {
-          valor: form?.capacidadeMedicao,
-          unidade: form?.unidadeMedicao,
-        },
+  const formatedData = (form) => ({
+    tag: form?.tag,
+    numero_de_serie: form?.numeroDeSerie,
+    data_proxima_checagem: form?.dataProximaChecagem && dayjs(form?.dataProximaChecagem)?.format('YYYY-MM-DD'),
+    data_ultima_calibracao: form?.dataUltimaCalibracao && dayjs(form?.dataUltimaCalibracao)?.format('YYYY-MM-DD'),
+    local: form?.local,
+    instrumento: {
+      maximo: form?.maximo,
+      minimo: form?.minimo,
+      unidade: form?.unidade,
+      preco_calibracao_no_laboratorio: form?.precoCalibracaoLaboratorio,
+      preco_calibracao_no_cliente: form?.precoCalibracaoCliente,
+      capacidade_de_medicao: {
+        valor: form?.capacidadeMedicao,
+        unidade: form?.unidadeMedicao,
       },
-      preco_alternativo_calibracao: form?.precoAlternativoCalibracao,
-      dias_uteis: form?.diasUteis,
-      pontos_de_calibracao: form?.pontosCalibracao?.length ? form?.pontosCalibracao?.map(ponto => ({ nome: ponto })) : [],
-      posicao: form?.posicao,
-    }
+      tipo_de_instrumento: {
+        descricao: form?.descricao,
+        fabricante: form?.fabricante,
+        modelo: form?.modelo,
+        resolucao: form?.resolucao,
+      },
+      procedimento_relacionado: {
+        codigo: form?.procedimentoRelacionado
+      },
+      tipo_de_servico: form?.tipoDeServico,
+    },
+    preco_alternativo_calibracao: form?.precoAlternativoCalibracao,
+    dias_uteis: form?.diasUteis,
+    pontos_de_calibracao: form?.pontosCalibracao?.length ? form?.pontosCalibracao?.map(ponto => ({ nome: ponto })) : [],
+    posicao: form?.posicao,
+    frequencia: form?.frequencia,
+    laboratorio: form?.laboratorio,
+    observacoes: form?.observacoes,
+    cliente: form?.client,
+  })
 
-    const response = await axios.patch(`/instrumentos/${id}/`, modifiedData);
-    return response.data;
+
+
+  const updateInstrument = async (form) => {
+    const data = formatedData(form)
+
+    const response = await axios.patch(`/instrumentos/${id}/`, data);
+    return response;
   }
 
-  const { mutate: mutateInstrument, isLoading: isUpdatingInstrument } = useMutation({
+  const { mutate: mutateUpdate, isLoading: isUpdatingInstrument, isError: isErrorUp, isSuccess: isSuccessUp } = useMutation({
     mutationFn: updateInstrument,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instrumentos'] })
       queryClient.invalidateQueries({ queryKey: ['propostas'] })
+    },
+  })
+
+  const createInstrument = async (form) => {
+    const data = formatedData(form)
+
+    const response = await axios.post(`/instrumentos/`, data);
+    return response;
+  }
+
+  const { mutate: mutateCreate, isLoading: isCreating, isError: isErrorCreate, error: errorCreate, isSuccess: isSuccessCreate } = useMutation({
+    mutationFn: createInstrument,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instrumentos'] })
     },
   })
 
@@ -103,12 +139,21 @@ const useInstrumentos = (id, cliente, pageSize = 8) => {
     search,
     setSearch,
     mutate,
-    mutateInstrument,
+    mutateUpdate,
     handleChangePage,
     handleChangeRowsPerPage,
     page,
     rowsPerPage,
-    isUpdatingInstrument
+    isUpdatingInstrument,
+    mutateDelete,
+    isDeleting,
+    mutateCreate,
+    isCreating,
+    isErrorUp,
+    isErrorCreate,
+    errorCreate,
+    isSuccessCreate,
+    isSuccessUp,
   };
 };
 
