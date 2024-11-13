@@ -1,32 +1,61 @@
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import { Alert, CircularProgress, FormControl, FormControlLabel, FormLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select } from '@mui/material';
+import { useEffect } from 'react';
+import {
+    Button,
+    TextField,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Alert,
+    CircularProgress,
+    FormControl,
+    FormControlLabel,
+    FormLabel,
+    Grid,
+    InputLabel,
+    MenuItem,
+    Radio,
+    RadioGroup,
+    Select,
+    Typography
+} from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
-import { useWatch } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import useProcedimentos from '../../../hooks/useProcedimentos';
 import useUsers from '../../../hooks/useUsers';
-import useDocumentos from '../../../hooks/useDocumentos';
-import { axios, axiosForFiles } from '../../../api';
 
-export default function FormCreate({ open, setOpen, form }) {
-    const [loading, setIsLoading] = useState(false);
-    const [erro, setErro] = useState({});
+
+const erroMessages = {
+    "status": 'Selecione um status para o documento.',
+    "data_revisao": "Preencha a data de revisão.",
+    "data_validade": "Preencha a data de validade.",
+    "arquivo": "Faça upload de um arquivo válido.",
+}
+
+export default function FormCreate({ open, setOpen, mutateCreate, isErrorCreate, errorCreate, isCreating, isSuccessCreate }) {
     const { data: procedimentos } = useProcedimentos();
     const { data: users } = useUsers();
-    const { refetch } = useDocumentos()
+    const form = useForm({
+        defaultValues: {
+            codigo: '',
+            identificador: '',
+            titulo: '',
+            status: '',
+            elaborador: '',
+            frequencia: null,
+            arquivo: null,
+            dataValidade: '',
+            dataRevisao: '',
+        }
+    })
+
     const handleClose = () => {
         form.reset()
-        setErro({})
         setOpen(false);
     };
 
@@ -37,12 +66,14 @@ export default function FormCreate({ open, setOpen, form }) {
         }
     };
 
-    const erroMessages = {
-        "status": 'Selecione um status para o documento.',
-        "data_revisao": "Preencha a data de revisão.",
-        "data_validade": "Preencha a data de validade.",
-        "arquivo": erro?.arquivo,
-    }
+
+    useEffect(() => {
+        if (isSuccessCreate) {
+            form.reset()
+            setOpen(false);
+        } 
+    }, [isSuccessCreate])
+
 
 
     const {
@@ -68,8 +99,7 @@ export default function FormCreate({ open, setOpen, form }) {
                         onSubmit: async (event) => {
                             event.preventDefault();
                             try {
-                                setIsLoading(true);
-                                const response = await axios.post('/documentos/', {
+                                mutateCreate({
                                     codigo,
                                     identificador,
                                     titulo,
@@ -78,22 +108,12 @@ export default function FormCreate({ open, setOpen, form }) {
                                     data_validade: dayjs(dataValidade).format('YYYY-MM-DD' || null),
                                     criador: elaborador,
                                     frequencia,
+                                    arquivo,
                                 });
-                                if (response?.data?.id) {
-                                    const formData = new FormData()
-                                    formData.append("arquivo", arquivo)
-                                    await axiosForFiles.patch(`/documentos/${response?.data?.id}/anexar/`, formData)
-                                }
-                                setIsLoading(false);
-                                setOpen(false);
-                                form.reset()
-                                await refetch();
                                 return { error: false };
 
                             } catch (err) {
                                 console.log(err)
-                                setIsLoading(false);
-                                setErro(err.response.data)
                                 return { error: err };
                             }
                         },
@@ -266,7 +286,8 @@ export default function FormCreate({ open, setOpen, form }) {
                                 Ver arquivo
                             </Button>
                         }
-                        {!!erro && Object.keys(erro)?.map((errKeys, i) => <Alert severity="error" key={i}>{erroMessages[errKeys]}</Alert>)}
+                        <Typography variant='body2' fontSize={12} color="primary">Formatos dísponiveis: PDF, XLSX, XLSM, DOCX, DOC, PPTX</Typography>
+                        {isErrorCreate && Object.keys(errorCreate?.response?.data)?.map((errKeys, i) => <Alert severity="error" key={i}>{erroMessages[errKeys]}</Alert>)}
                     </DialogContent>
 
                     <DialogActions>
@@ -275,7 +296,7 @@ export default function FormCreate({ open, setOpen, form }) {
                                 <Button onClick={handleClose}>Cancelar</Button>
                             </Grid>
                             <Grid item>
-                                {loading ? <CircularProgress /> : <Button size="large" variant="contained" type="submit">Criar documento</Button>}
+                                {isCreating ? <CircularProgress /> : <Button size="large" variant="contained" type="submit">Criar documento</Button>}
                             </Grid>
                         </Grid>
                     </DialogActions>

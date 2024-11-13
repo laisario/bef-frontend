@@ -7,7 +7,6 @@ import useResponsive from '../../hooks/useResponsive';
 
 function TableToolbar({ numSelected, form, selectedClients, deleteClients }) {
     const isDesktop = useResponsive('up', 'md');
- 
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
@@ -32,7 +31,8 @@ function TableToolbar({ numSelected, form, selectedClients, deleteClients }) {
                     <Grid container display="flex" justifyContent="center" alignItems="center">
                         <Grid item sm={6} xs={12}>
                             <TextField
-                                label='Procure pelo nome ou empresa'
+                                label='Busque'
+                                placeholder='empresa...'
                                 {...form.register("search")}
                                 name="search"
                                 id='search-bar'

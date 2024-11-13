@@ -1,15 +1,10 @@
 import { Alert, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormLabel, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import React, { useState } from 'react'
-import { useParams } from 'react-router-dom';
+import React, { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form';
 import useUsers from '../../../hooks/useUsers';
-import { axios, axiosForFiles } from '../../../api';
-import useDocumentos from '../../../hooks/useDocumentos';
 
-function FormCreateRevision({ open, setOpen, idCreator, setRevisions }) {
-    const [isLoading, setIsLoading] = useState(false);
-    const [errMsg, setErrMsg] = useState('');
+function FormCreateRevision({ open, setOpen, idCreator, mutateCreateRevision, isSuccessCreateRevision, isErrorCreateRevision, errorCreateRevision, isCreatingRevision, }) {
     const form = useForm({
         defaultValues: {
             arquivo: null,
@@ -23,8 +18,6 @@ function FormCreateRevision({ open, setOpen, idCreator, setRevisions }) {
         aprovadores
     } = useWatch({ control: form.control })
     const { data: users } = useUsers();
-    const { id } = useParams();
-    const { refetch } = useDocumentos(id);
     const handleClose = () => {
         setOpen(false);
         form.reset();
@@ -37,6 +30,13 @@ function FormCreateRevision({ open, setOpen, idCreator, setRevisions }) {
         }
     };
 
+    useEffect(() => {
+        if (isSuccessCreateRevision) {
+            form.reset()
+            handleClose()
+        }
+    }, [isSuccessCreateRevision])
+
     const usersWithoutCreator = users?.filter((user) => user.id !== idCreator)
 
     return (
@@ -48,32 +48,16 @@ function FormCreateRevision({ open, setOpen, idCreator, setRevisions }) {
                 onSubmit: async (event) => {
                     event.preventDefault();
                     try {
-                        setIsLoading(true);
-                        const response = await axios.post(`/documentos/${id}/revisar/`, {
-                            alteracao,
-                            aprovadores,
-                        });
-                        if (response?.data?.revisao_id) {
-                            const formData = new FormData()
-                            formData.append("arquivo", arquivo)
-                            await axiosForFiles.patch(`/documentos/${id}/alterar_anexo/`, formData)
-                        }
-                        setRevisions((oldRev) => [...oldRev, response?.data?.revisao])
-                        setIsLoading(false);
-                        handleClose()
-                        await refetch();
-                        return { error: false };
+                        mutateCreateRevision({ alteracao, aprovadores, arquivo })
                     } catch (err) {
-                        setIsLoading(false);
-                        setErrMsg(err.message);
-                        return { error: true };
+                        console.log(err)
                     }
                 },
             }}
         >
             <DialogTitle>Revise o documento</DialogTitle>
-            <DialogContent sx={{display: 'flex', justifyContent: 'center', alignItems: "center", flexDirection: "column"}}>
-                {isLoading
+            <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: "center", flexDirection: "column" }}>
+                {isCreatingRevision
                     ? <CircularProgress />
                     : (<Grid container display="flex" flexDirection="column" spacing={2}>
                         <Grid item>
@@ -145,11 +129,11 @@ function FormCreateRevision({ open, setOpen, idCreator, setRevisions }) {
                         </Grid>
                     </Grid>)
                 }
-                {!!errMsg && <Alert severity="error">{errMsg}</Alert>}
+                {isErrorCreateRevision && Object.keys(errorCreateRevision?.response?.data)?.map((errKeys, i) => <Alert severity="error" key={i}>{erroMessages[errKeys]}</Alert>)}
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancelar</Button>
-                {!isLoading && <Button type="submit">Criar revisão</Button>}
+                {!isCreatingRevision && <Button type="submit">Criar revisão</Button>}
             </DialogActions>
         </Dialog>
     );

@@ -5,7 +5,6 @@ import {
     CardActions,
     Box,
     Divider,
-    Link,
     CircularProgress,
     IconButton,
 } from '@mui/material'
@@ -21,8 +20,7 @@ import { statusLabel, statusColor, analiseCriticaColor, analiseCriticaLabel } fr
 import Label from '../label';
 import Form from './Form';
 import FormCertificate from './FormCertificate';
-
-const Attachment = ({ url, content }) => <Link underline='none' target="_blank" href={url}>{content}</Link>
+import Attachment from '../Attachment';
 
 function Calibration(props) {
     const { calibration,
@@ -57,9 +55,7 @@ function Calibration(props) {
             overflow: "auto"
         }}>
             <CardContent sx={{ display: 'flex', gap: 2, justifyContent: "space-between", flexDirection: isMobile ? 'column' : 'row' }}>
-                <Box
-                    width={(!calibration?.certificados?.length || isMobile) ? "100%" : "60%"}
-                >
+                <Box width={(!calibration?.certificados?.length || isMobile) ? "100%" : "60%"}>
                     <CardActions sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                         {isLoadingAddCertificate ? <CircularProgress /> : <ButtonTooltip title="Adicionar certificado" variant='filled' icon={<AddIcon />} action={handleOpenCertificate} />}
                         <FormCertificate
@@ -69,7 +65,7 @@ function Calibration(props) {
                             calibration={calibration}
                         />
                         {isLoadingEdit ? <CircularProgress /> : <ButtonTooltip title="Editar calibração" action={handleOpen} icon={<EditIcon />} />}
-                        <Form mutateEdit={mutateEdit} calibration={calibration} open={openEdit} isMobile={isMobile} handleClose={handleClose} />
+                        <Form mutate={mutateEdit} calibration={calibration} open={openEdit} isMobile={isMobile} handleClose={handleClose} />
                         {isDeleting ? <CircularProgress /> : <ButtonTooltip title="Apagar calibração" variant='filled' icon={<DeleteIcon />} action={handleDelete} />}
                     </CardActions>
                     {calibration?.ordem_de_servico && (
@@ -100,9 +96,7 @@ function Calibration(props) {
 
                     {(calibration?.analise_critica)
                         && <ContentRow title="Análise critica" colorTitle='black' my={1} value={<Label color={analiseCriticaColor[calibration?.analise_critica]}>{analiseCriticaLabel[calibration?.analise_critica]}</Label>} />
-
                     }
-
                     {calibration?.restricao_analise_critica && (
                         <ContentRow isMobile title="Restrição análise crítica:" value={calibration?.restricao_analise_critica} />
                     )}
@@ -117,15 +111,15 @@ function Calibration(props) {
                         flexDirection="column"
                     >
                         {isLoadingDeleteCertificate ? <CircularProgress /> : calibration?.certificados?.map((certificado, i) => (
-                            <Box key={certificado?.id} sx={{ bgcolor: 'background.neutral', p: 2, borderRadius: 2 }}>
+                            <Box key={certificado?.id + i} sx={{ bgcolor: 'background.neutral', p: 2, borderRadius: 2 }}>
                                 <Box display="flex" justifyContent="space-between" alignItems="flex-start">
                                     {certificado?.numero && <ContentRow colorTitle='black' title="Certificado:" isMobile value={<Attachment url={certificado?.arquivo} content={certificado?.numero} />} />}
                                     <IconButton size='small' onClick={() => deleteCertificate(certificado?.id)}>
                                         <ClearIcon />
                                     </IconButton>
                                 </Box>
-                                {(certificado?.anexos?.map(({ anexo }, index) => (
-                                    <ContentRow my={0} title={`Anexo ${index + 1}`} value={<Attachment url={anexo} content={<AttachmentIcon fontSize='small' />} />} />
+                                {(certificado?.anexos?.map(({ anexo, id }, index) => (
+                                    <ContentRow my={0} key={id + index} title={`Anexo ${index + 1}`} value={<Attachment url={anexo} content={<AttachmentIcon fontSize='small' />} />} />
                                 )))}
                             </Box>
                         ))}

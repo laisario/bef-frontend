@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Chip, Container, Grid, Paper, Stack, Typography } from '@mui/material';
+import { Box, Chip, Container, Divider, Paper, Stack, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { Helmet } from 'react-helmet-async';
 import { useTheme } from '@emotion/react';
@@ -8,13 +8,18 @@ import { fDate } from '../utils/formatTime';
 import useInstrumentos from '../hooks/useInstrumentos';
 import CalibracaoCard from '../components/instrumentos/CalibracaoCard';
 import useResponsive from '../hooks/useResponsive';
-import { positionLabels, colorPositionInstrument } from '../utils/instruments';
+import { positionLabels, colorPositionInstrument, localLabels } from '../utils/instruments';
+import ContentRow from '../components/ContentRowCard';
 
 function InstrumentDetails() {
   const { id } = useParams();
   const theme = useTheme();
-  const { todosInstrumentos: instrumento, mutate, refetch } = useInstrumentos(id);
+  const { todosInstrumentos: instrumento, mutateCriticalAnalisys, isLoadingCriticalAnalisys, isSuccessCriticalAnalisys } = useInstrumentos(id);
   const isMobile = useResponsive('down', 'md');
+
+  const modelo = instrumento?.instrumento?.tipo_de_instrumento?.modelo
+  const fabricante = instrumento?.instrumento?.tipo_de_instrumento?.fabricante
+  
   return (
     <>
       <Helmet>
@@ -35,42 +40,26 @@ function InstrumentDetails() {
             }
           </Box>
         </Stack>
-        <Paper sx={{ padding: 4, }}>
-          <Grid container flexDirection={isMobile ? "column-reverse" : 'row'} justifyContent="space-between">
-            <Box>
-              {!!instrumento?.instrumento?.tipo_de_instrumento?.descricao &&
-                <Typography variant="h6">{instrumento?.instrumento.tipo_de_instrumento.descricao}</Typography>
-              }
-              {(instrumento?.instrumento?.minimo || instrumento?.instrumento?.maximo) && <Typography variant="OVERLINE TEXT" marginY="2px" fontWeight="500">
-                Faixa de medição: {instrumento?.instrumento?.minimo} {!!instrumento?.instrumento?.maximo && `/ ${instrumento?.instrumento?.maximo}`} {instrumento?.instrumento?.unidade}
-              </Typography>}
-              {!!instrumento?.data_ultima_calibracao && <Typography variant="subtitle1" fontWeight="500">
-                Última calibração: {fDate(instrumento?.data_ultima_calibracao)}
-              </Typography>}
-              {!!instrumento?.data_proxima_calibracao && <Typography variant="subtitle1" fontWeight="500">
-                Próxima calibração: {fDate(instrumento?.data_proxima_calibracao)}
-              </Typography>}
-              {!!instrumento?.data_proxima_checagem && <Typography variant="subtitle1" fontWeight="500">
-                Próxima checagem: {fDate(instrumento?.data_proxima_checagem)}
-              </Typography>}
-              {!!instrumento?.instrumento?.tipo_de_instrumento?.modelo && <Typography variant="subtitle1" fontWeight="500">
-                Modelo: {instrumento?.instrumento?.tipo_de_instrumento?.modelo}
-              </Typography>}
-              {!!instrumento?.instrumento?.tipo_de_instrumento?.fabricante && <Typography variant="subtitle1" fontWeight="500">
-                Fabricante: {instrumento?.instrumento?.tipo_de_instrumento?.fabricante}
-              </Typography>}
-              {!!instrumento?.frequencia && <Typography variant="subtitle1" fontWeight="500">
-                Frequência: {instrumento?.frequencia} {+(instrumento?.frequencia) > 1 ? 'meses' : 'mês'}
-              </Typography>}
-              {!!instrumento?.instrumento?.tipo_de_instrumento?.resolução && <Typography variant="subtitle1" fontWeight="500">
-                Resolução: {instrumento?.instrumento?.tipo_de_instrumento?.resolução}
-              </Typography>}
-              {!!instrumento?.laboratorio && <Typography variant="subtitle1" fontWeight="500">
-                Laboratório: {instrumento?.laboratorio}
-              </Typography>}
-              {!!instrumento?.instrumento?.procedimento_relacionado?.codigo && <Typography variant="subtitle1" fontWeight="500">
-                Procedimento relacionado: {instrumento?.instrumento?.procedimento_relacionado.codigo}
-              </Typography>}
+        <Paper sx={{ padding: 4 }}>
+          <Stack flexDirection={isMobile ? 'column' : 'row'} gap={2} divider={<Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />} justifyContent='space-between'>
+            <Box width="100%">
+              {(!!instrumento?.instrumento?.tipo_de_instrumento?.descricao || !!modelo) && <ContentRow title={instrumento?.instrumento.tipo_de_instrumento.descricao} value={!!modelo && modelo} />}
+              {!!fabricante && <ContentRow title="Fabricante" value={fabricante} />}
+              {(instrumento?.instrumento?.minimo || instrumento?.instrumento?.maximo)
+                && <ContentRow title="Faixa de medição" value={`${instrumento?.instrumento?.minimo} ${!!instrumento?.instrumento?.maximo && `- ${instrumento?.instrumento?.maximo}`} ${instrumento?.instrumento?.unidade}`} />}
+              {!!instrumento?.instrumento?.tipo_de_instrumento?.resolucao && <ContentRow title="Resolução" value={instrumento?.instrumento?.tipo_de_instrumento?.resolucao} />}
+              {!!instrumento?.laboratorio && <ContentRow title="Laboratório" value={instrumento?.laboratorio} />}
+              {instrumento?.local && <ContentRow title="Local" value={localLabels[instrumento?.local]} />}
+              {instrumento?.dias_uteis && <ContentRow title="Dias úteis" value={instrumento?.dias_uteis} />}
+            </Box>
+            <Box width="100%">
+              {!!instrumento?.instrumento?.procedimento_relacionado?.codigo && <ContentRow title="Procedimento relacionado" value={instrumento?.instrumento?.procedimento_relacionado?.codigo} />}
+              {!!instrumento?.instrumento?.capacidade_de_medicao?.valor && <ContentRow title="Capacidade de medição" value={`${instrumento?.instrumento?.capacidade_de_medicao?.valor} ${instrumento?.instrumento?.capacidade_de_medicao?.unidade}`} />}
+              {!!instrumento?.data_ultima_calibracao && <ContentRow title="Última calibração" value={fDate(instrumento?.data_ultima_calibracao, "dd/MM/yy")} />}
+              {!!instrumento?.data_proxima_calibracao && <ContentRow title="Próxima calibração" value={fDate(instrumento?.data_proxima_calibracao, "dd/MM/yy")} />}
+              {!!instrumento?.data_proxima_checagem && <ContentRow title="Próxima checagem" value={fDate(instrumento?.data_proxima_checagem, "dd/MM/yy")} />}
+              {!!instrumento?.frequencia && <ContentRow title="Frequência" value={`${instrumento?.frequencia} ${+(instrumento?.frequencia) > 1 ? 'meses' : 'mês'}`} />}
+              {!!instrumento?.pontos_de_calibracao?.length && <ContentRow title="Pontos de calibração:" isMobile value={instrumento?.pontos_de_calibracao?.map(({ nome }) => nome).join(", ")} />}
             </Box>
             <Box display="flex" gap={1} flexDirection={isMobile ? 'row' : "column"} justifyContent="flex-start">
               <Chip
@@ -86,72 +75,23 @@ function InstrumentDetails() {
                 sx={{ color: theme.palette.common.white }}
               />
             </Box>
-          </Grid>
+          </Stack>
           {!!instrumento?.calibracoes?.length && (
             <>
               <Typography variant="h6" my={2}>
                 Calibrações
               </Typography>
-              <Box display="flex" gap={3} sx={{ overflowX: 'auto' }} width="100%">
+              <Box display="flex" gap={2} sx={{ overflowX: 'auto' }} width="100%">
                 {instrumento?.calibracoes?.map(
-                  (
-                    {
-                      certificado,
-                      criterio_de_aceitacao: criterioDeAceitacao,
-                      incerteza,
-                      local,
-                      maior_erro: maiorErro,
-                      numero_do_certificado: numeroDoCertificado,
-                      observacoes,
-                      ordem_de_servico: ordemDeServico,
-                      referencia_do_criterio: referenciaDoCriterio,
-                      status,
-                      data,
-                      id,
-                      analise_critica: analiseCritica,
-                      restricao_analise_critica: restricaoAnaliseCritica,
-                    },
-                    index
-                  ) => (
+                  (calibracao, i) => (
                     <CalibracaoCard
-                      calibracao={{
-                        certificado,
-                        criterioDeAceitacao,
-                        incerteza,
-                        local,
-                        maiorErro,
-                        numeroDoCertificado,
-                        observacoes,
-                        ordemDeServico,
-                        referenciaDoCriterio,
-                        status,
-                        data,
-                        id,
-                        analiseCritica,
-                        restricaoAnaliseCritica
-                      }}
-                      key={index}
-                      specialCases={{
-                        criterioDeAceitacao: 'Critério de aceitação',
-                        maiorErro: 'Maior Erro',
-                        numeroDoCertificado: 'Número do certificado',
-                        observacoes: 'Observações',
-                        ordemDeServico: 'Ordem de serviço',
-                        referenciaDoCriterio: 'Referência do critério',
-                      }}
-                      titles={[
-                        'criterioDeAceitacao',
-                        'referenciaDoCriterio',
-                        'incerteza',
-                        'maiorErro',
-                        'ordemDeServico',
-                        'local',
-                        'observacoes',
-                        'numeroDoCertificado',
-                      ]}
-                      mutate={mutate}
-                      refetch={refetch}
+                      calibracao={calibracao}
+                      mutateCriticalAnalisys={mutateCriticalAnalisys}
+                      isLoadingCriticalAnalisys={isLoadingCriticalAnalisys}
+                      isSuccessCriticalAnalisys={isSuccessCriticalAnalisys}
                       theme={theme}
+                      isMobile={isMobile}
+                      key={calibracao?.id + i}
                     />
                   )
                 )}

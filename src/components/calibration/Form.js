@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
-import React, { useState } from 'react'
+import React from 'react'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/pt-br';
 import dayjs from 'dayjs';
@@ -7,10 +7,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useForm, useWatch } from 'react-hook-form';
 import Row from '../Row';
-import Alert from '../Alert';
 
-function Form({ open, handleClose, create, isMobile, calibration, mutateCriation, errorCreating, isSuccessCreate, mutateEdit }) {
-    const [alertOpen, setAlertOpen] = useState(false)
+function Form({ open, handleClose, create, isMobile, calibration, mutate }) {
     const form = useForm({
         defaultValues: {
             local: calibration?.local ? calibration?.local : '',
@@ -27,22 +25,11 @@ function Form({ open, handleClose, create, isMobile, calibration, mutateCriation
         data,
     } = useWatch({ control: form.control })
 
-    const submitCreate = () => {
-        mutateCriation(form?.watch())
+    const saveAndCreateAnother = () => {
+        mutate(form?.watch())
         form?.reset()
-        handleClose();
     }
 
-    const submitEdit = () => {
-        mutateEdit({form: form?.watch(), id: calibration?.id})
-        form?.reset()
-        handleClose();
-    }
-    const saveAndCreateAnother = () => {
-        mutateCriation(form?.watch())
-        setAlertOpen(true)
-        form?.reset()
-    }
     return (
         <Dialog
             open={open}
@@ -51,11 +38,13 @@ function Form({ open, handleClose, create, isMobile, calibration, mutateCriation
                 component: 'form',
                 onSubmit: (event) => {
                     event.preventDefault();
-                    if (create) {
-                        submitCreate()
-                    } else {
-                        submitEdit()
+                    const params = {form: form?.watch()}
+                    if (!create) {
+                        params.id = calibration?.id
                     }
+                    mutate(params)
+                    form?.reset()
+                    handleClose();
                 },
             }}
         >
@@ -142,13 +131,13 @@ function Form({ open, handleClose, create, isMobile, calibration, mutateCriation
                     rows={1}
                     {...form.register("observacoes")}
                 />
-                <Alert open={alertOpen} setOpen={setAlertOpen} severity={isSuccessCreate ? 'success' : 'error'} texto={isSuccessCreate ? `Calibração ${create ? 'criada' : 'editada'} com sucesso!` : `Falha ao ${create ? 'criar' : 'editar'} calibração.`} />
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancelar</Button>
                 {create && <Button onClick={saveAndCreateAnother} type="submit" variant="outlined" color="secondary">Salvar e adicionar outro</Button>}
                 <Button variant="contained" type="submit">{create ? 'Salvar' : 'Editar'}</Button>
             </DialogActions>
+
         </Dialog>
     )
 }

@@ -4,7 +4,6 @@ import { Box, Button, Card, Divider, Typography, CardHeader, CardContent, Link }
 import { Timeline, TimelineDot, TimelineItem, TimelineContent, TimelineSeparator, TimelineConnector } from '@mui/lab';
 import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom';
 // utils
-import { fDate } from '../../../utils/formatTime';
 import Iconify from '../../../components/iconify';
 // ----------------------------------------------------------------------
 
@@ -97,7 +96,7 @@ function OrderItem({ item, isLast }) {
           {client}
         </Typography>
         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-          {fDate(time)}
+          {time}
         </Typography>
       </TimelineContent>
     </TimelineItem>

@@ -25,7 +25,7 @@ function Calibrations({ calibrations, isMobile, setSelectedCalibration, selected
     <List sx={{
       width: '100%',
       overflow: 'auto',
-      maxHeight: isMobile ? '200px' : '300px',
+      maxHeight: 'auto'
     }}>
       {!calibrations?.length ? <Typography color='grey' fontWeight={400} textAlign='center'>Nenhuma calibração cadastrada</Typography> :
         <FixedSizeList

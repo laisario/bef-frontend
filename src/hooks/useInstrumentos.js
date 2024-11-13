@@ -32,7 +32,7 @@ const useInstrumentos = (id, cliente, pageSize = 8) => {
   const handleSearch = debounce((value) => setDebouncedSearch(value));
 
   useEffect(() => { handleSearch(search) }, [search, handleSearch])
-  
+
   const deleteInstrument = async (idInstrument) => {
     await axios.delete(`/instrumentos/${idInstrument}`);
   };
@@ -44,7 +44,7 @@ const useInstrumentos = (id, cliente, pageSize = 8) => {
     },
   })
 
-  const update = async ({ idCalibration, analiseCliente }) => {
+  const sendCriticalAnalisys = async ({ idCalibration, analiseCliente }) => {
     const patchData = { analise_critica: analiseCliente?.criticalAnalysis }
     if (analiseCliente?.restrictions?.length) {
       patchData.restricao_analise_critica = analiseCliente?.restrictions
@@ -54,8 +54,8 @@ const useInstrumentos = (id, cliente, pageSize = 8) => {
 
   }
 
-  const { mutate } = useMutation({
-    mutationFn: update,
+  const { mutate: mutateCriticalAnalisys, isLoading: isLoadingCriticalAnalisys, isSuccess: isSuccessCriticalAnalisys } = useMutation({
+    mutationFn: sendCriticalAnalisys,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instrumentos'] })
     },
@@ -100,10 +100,10 @@ const useInstrumentos = (id, cliente, pageSize = 8) => {
 
 
 
+
   const updateInstrument = async (form) => {
     const data = formatedData(form)
-
-    const response = await axios.patch(`/instrumentos/${id}/`, data);
+    const response = await axios.patch(`/instrumentos/${form?.instrumento}/`, data);
     return response;
   }
 
@@ -138,7 +138,6 @@ const useInstrumentos = (id, cliente, pageSize = 8) => {
     refetch,
     search,
     setSearch,
-    mutate,
     mutateUpdate,
     handleChangePage,
     handleChangeRowsPerPage,
@@ -154,6 +153,9 @@ const useInstrumentos = (id, cliente, pageSize = 8) => {
     errorCreate,
     isSuccessCreate,
     isSuccessUp,
+    mutateCriticalAnalisys,
+    isLoadingCriticalAnalisys,
+    isSuccessCriticalAnalisys,
   };
 };
 

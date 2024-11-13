@@ -50,6 +50,7 @@ export default function GlobalStyles() {
         },
         '&::-webkit-scrollbar': {
           width: '6px',
+          height: '6px'
         },
         '&::-webkit-scrollbar-thumb': {
           backgroundColor: '#888',

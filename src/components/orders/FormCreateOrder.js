@@ -55,7 +55,6 @@ function FormCreateOrder({ setOpen, setAlert, onClose, open, admin, refetch }) {
     }
   };
 
-  console.log(cliente)
 
   return (
     <Dialog

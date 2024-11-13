@@ -15,6 +15,8 @@ import {
   Snackbar,
   TablePagination,
   Checkbox,
+  CircularProgress,
+  Box,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Label from '../components/label';
@@ -26,43 +28,45 @@ import FormCreateOrder from '../components/orders/FormCreateOrder';
 import TableHeader from '../components/TableHeader';
 import TableToolbar from '../components/orders/TableToolbar';
 import { useAuth } from '../context/Auth';
+import EmptyYet from '../components/EmptyYet';
+import useResponsive from '../hooks/useResponsive';
 // -------------------------------------------------------------------------------------------
 
 const headCellsAdmin = [
   {
-      id: 'numero',
-      label: 'Número',
+    id: 'numero',
+    label: 'Número',
   },
   {
-      id: 'data',
-      label: 'Data',
+    id: 'data',
+    label: 'Data',
   },
   {
-      id: 'cliente',
-      label: 'Cliente',
+    id: 'cliente',
+    label: 'Cliente',
   },
   {
-      id: 'status',
-      label: 'Status',
+    id: 'status',
+    label: 'Status',
   },
 ];
 
 const headCells = [
   {
-      id: 'numero',
-      label: 'Número',
+    id: 'numero',
+    label: 'Número',
   },
   {
-      id: 'data',
-      label: 'Data',
+    id: 'data',
+    label: 'Data',
   },
   {
-      id: 'total',
-      label: 'Total',
+    id: 'total',
+    label: 'Total',
   },
   {
-      id: 'status',
-      label: 'Status',
+    id: 'status',
+    label: 'Status',
   },
 ];
 
@@ -71,7 +75,7 @@ function Orders() {
   const [open, setOpen] = useState(false);
   const [alert, setAlert] = useState({ propostaEnviada: false, vertical: 'top', horizontal: 'right' });
   const [selectedOrders, setSelectedOrders] = useState([]);
-
+  const isMobile = useResponsive('down', 'md');
   const { user: { admin } } = useAuth();
 
   const { data,
@@ -117,7 +121,7 @@ function Orders() {
   };
 
   const isSelected = (id) => selectedOrders.indexOf(id) !== -1;
-  
+
   return (
     <>
       <Helmet>
@@ -134,68 +138,73 @@ function Orders() {
             Nova proposta
           </Button>
         </Stack>
-        <Card>
-          <TableToolbar form={formFilter} numSelected={selectedOrders.length} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders} admin={admin} deleteOrder={deleteOrder} />
-          <Scrollbar>
-            <TableContainer sx={{ minWidth: 800 }}>
-              <Table>
-                <TableHeader
-                  numSelected={selectedOrders?.length}
-                  onSelectAllClick={handleSelectAllClick}
-                  rowCount={data?.results?.length}
-                  checkbox={admin}
-                  headCells={admin ? headCellsAdmin : headCells}
-                />
-                <TableBody>
-                  {isLoading ? <Typography variant='subtitle1'>Carregando...</Typography> : data?.results?.map((row, index) => {
-                    const { id, data_criacao: dataCriacao, status, cliente, numero, total } = row;
-                    const data = new Date(dataCriacao);
-                    const isItemSelected = isSelected(row.id);
-                    return (
-                      <TableRow
-                        hover
-                        key={id}
-                        tabIndex={-1}
-                        onClick={() => { navigate(admin ? `/admin/proposta/${id}/${cliente?.id}` : `/dashboard/proposta/${id}`, { replace: true }) }}
-                      >
-                        {admin &&
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              color="primary"
-                              onClick={(event) => handleClick(event, row.id)}
-                              checked={isItemSelected}
-                              inputProps={{
-                                'aria-labelledby': index,
-                              }}
-                            />
+        {isLoading
+          ? (<Box display="flex" height="70vh" justifyContent="center" alignItems="center" spacing={3}>
+            <CircularProgress size="96px" />
+          </Box>)
+          : !data?.results?.length ? <EmptyYet content="proposta" isMobile={isMobile} /> :(<Card>
+            <TableToolbar form={formFilter} numSelected={selectedOrders.length} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders} admin={admin} deleteOrder={deleteOrder} />
+            <Scrollbar>
+              <TableContainer sx={{ minWidth: 800 }}>
+                <Table>
+                  <TableHeader
+                    numSelected={selectedOrders?.length}
+                    onSelectAllClick={handleSelectAllClick}
+                    rowCount={data?.results?.length}
+                    checkbox={admin}
+                    headCells={admin ? headCellsAdmin : headCells}
+                  />
+                  <TableBody>
+                    {data?.results?.map((row, index) => {
+                      const { id, data_criacao: dataCriacao, status, cliente, numero, total } = row;
+                      const data = dataCriacao;
+                      const isItemSelected = isSelected(row.id);
+                      return (
+                        <TableRow
+                          hover
+                          key={id}
+                          tabIndex={-1}
+                          onClick={() => { navigate(admin ? `/admin/proposta/${id}/${cliente?.id}` : `/dashboard/proposta/${id}`, { replace: true }) }}
+                        >
+                          {admin &&
+                            <TableCell padding="checkbox">
+                              <Checkbox
+                                color="primary"
+                                onClick={(event) => handleClick(event, row.id)}
+                                checked={isItemSelected}
+                                inputProps={{
+                                  'aria-labelledby': index,
+                                }}
+                              />
+                            </TableCell>
+                          }
+                          <TableCell align="left">{numero}</TableCell>
+
+                          <TableCell align="left">{fDate(data)}</TableCell>
+                          {admin ? (<TableCell align="left">{cliente?.empresa?.razao_social || cliente?.nome}</TableCell>) : (<TableCell align="left">{+total > 0 ? `R$ ${total}` : "Aguardando resposta"}</TableCell>)}
+
+                          <TableCell align="left">
+                            <Label color={statusColor[status]}>{statusString[status]}</Label>
                           </TableCell>
-                        }
-                        <TableCell align="left">{numero}</TableCell>
-
-                        <TableCell align="left">{fDate(data)}</TableCell>
-                        {admin ? (<TableCell align="left">{cliente?.empresa?.razao_social || cliente?.nome}</TableCell>) : (<TableCell align="left">{+total > 0 ? `R$ ${total}` : "Aguardando resposta"}</TableCell>)}
-
-                        <TableCell align="left">
-                          <Label color={statusColor[status]}>{statusString[status]}</Label>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25, 100]}
-                component="div"
-                count={data?.count || 0}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                labelRowsPerPage="Linhas por páginas"
-              />
-            </TableContainer>
-          </Scrollbar>
-        </Card>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25, 100]}
+                  component="div"
+                  count={data?.count || 0}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  labelRowsPerPage="Linhas por páginas"
+                />
+              </TableContainer>
+            </Scrollbar>
+          </Card>)
+        }
 
         <FormCreateOrder open={open} setOpen={setOpen} setAlert={setAlert} onClose={handleClose} admin={admin} refetch={refetch} />
 

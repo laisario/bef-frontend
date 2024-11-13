@@ -19,7 +19,7 @@ import InstrumentInformation from './InstrumentInformation'
 import CalibrationPanel from '../calibration/CalibrationPanel';
 
 
-function ClientInstrumentInformation({ instrument, isMobile, mutateDelete, isDeleting, handleOpenAlert, }) {
+function ClientInstrumentInformation({ instrument, isMobile, mutateDelete, isDeleting, handleOpenAlert, mutateUpdate, isUpdatingInstrument }) {
     const [openFormEdit, setOpenFormEdit] = useState(false);
     const [selectedCalibration, setSelectedCalibration] = useState(null);
     const [valueTab, setValueTab] = useState('information');
@@ -75,6 +75,8 @@ function ClientInstrumentInformation({ instrument, isMobile, mutateDelete, isDel
                     open={openFormEdit}
                     instrument={instrument}
                     isMobile={isMobile}
+                    mutate={mutateUpdate}
+                    isLoading={isUpdatingInstrument}
                 />
                 {isDeleting ? <CircularProgress /> : <Button variant="contained" size="small" onClick={() => mutateDelete(instrument?.id)} endIcon={<DeleteForeverIcon />}>Excluir instrumento</Button>}
             </AccordionActions>

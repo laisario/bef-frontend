@@ -1,5 +1,5 @@
 import { Alert, Box, Button, CircularProgress, Container, InputAdornment, Paper, Snackbar, Stack, TablePagination, TextField, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
@@ -26,19 +26,38 @@ function ClientDetails() {
     setSearch,
     isDeleting,
     mutateDelete,
+    mutateUpdate,
+    isUpdatingInstrument,
+    isSuccessCreate,
+    isSuccessUp,
+    isCreating,
+    mutateCreate,
+    isErrorCreate,
+    isErrorUp,
   } = useInstrumentos(null, data?.id, 5);
   const isMobile = useResponsive('down', 'md');
+  const handleOpenAlert = (msg, color) => setOpenAlert({ open: true, msg, color, });
+
+  useEffect(() => {
+    if (isSuccessCreate) {
+      handleOpenAlert('Instrumento criado com sucesso!', 'success')
+    } else if (isSuccessUp) {
+      handleOpenAlert('Instrumento editado com sucesso!', 'success')
+    } else if (isErrorCreate || isErrorUp) {
+      handleOpenAlert('Erro ao processar a ação, verifique se preencheu os campos necessários e tente novamente!', 'error')
+    }
+  }, [isSuccessCreate, isSuccessUp, isErrorCreate, isErrorUp])
 
   const handleCloseFormCreate = () => setOpenFormCreate(false)
   const handleOpenFormCreate = () => setOpenFormCreate(true)
 
-  const handleOpenAlert = (msg, color) => setOpenAlert({ open: true, msg, color, });
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
     setOpenAlert({ open: false, msg: '', color: 'success' })
   }
+
   return (
     <>
       <Helmet>
@@ -77,7 +96,16 @@ function ClientDetails() {
               }}
             />
             <Button variant='contained' onClick={handleOpenFormCreate} size={isMobile ? 'small' : 'medium'} >Novo instrumento</Button>
-            <EditInstrument create handleOpenAlert={handleOpenAlert} clientId={id} handleClose={handleCloseFormCreate} open={openFormCreate} isMobile={isMobile} />
+            <EditInstrument
+              mutate={mutateCreate}
+              isLoading={isCreating}
+              create
+              handleOpenAlert={handleOpenAlert}
+              clientId={id}
+              handleClose={handleCloseFormCreate}
+              open={openFormCreate}
+              isMobile={isMobile}
+            />
           </Stack>
         </Stack>
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -88,7 +116,16 @@ function ClientDetails() {
               </Box>
             )
             : todosInstrumentos?.results?.length ? todosInstrumentos?.results?.map((instrument, index) => (
-              <ClientInstrumentInformation handleOpenAlert={handleOpenAlert} key={index + instrument?.id} instrument={instrument} isMobile={isMobile} isDeleting={isDeleting} mutateDelete={mutateDelete} />
+              <ClientInstrumentInformation
+                handleOpenAlert={handleOpenAlert}
+                key={index + instrument?.id}
+                instrument={instrument}
+                isMobile={isMobile}
+                isDeleting={isDeleting}
+                mutateDelete={mutateDelete}
+                isUpdatingInstrument={isUpdatingInstrument}
+                mutateUpdate={mutateUpdate}
+              />
             ))
               : (
                 <Paper square={false} variant='elevation' sx={{ backgroundColor: '#e5e5e5', p: 1, mt: 2, }}>
@@ -114,7 +151,6 @@ function ClientDetails() {
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage="Instrumentos por página"
         />
-
       </Container>
     </>
   )

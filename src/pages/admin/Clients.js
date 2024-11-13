@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Card, Checkbox, CircularProgress, Container, Grid, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow, Typography } from '@mui/material';
+import { Card, Checkbox, Container, Grid, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import useClients from '../../hooks/useClients';
@@ -8,13 +8,15 @@ import TableToolbar from '../../components/clients/TableToolbar';
 import TableHeader from '../../components/TableHeader';
 import { useAuth } from '../../context/Auth';
 import Scrollbar from '../../components/scrollbar/Scrollbar';
+import Loading from '../../components/Loading';
+import EmptyYet from '../../components/EmptyYet';
 
 // ---------------------------------------------------------------------------------------
 
 const headCells = [
   {
-      id: 'empresa',
-      label: 'Empresa',
+    id: 'empresa',
+    label: 'Empresa',
   },
 ];
 
@@ -65,70 +67,74 @@ function Clients() {
           </Grid>
         </Grid>
 
-        <Card>
-          <TableToolbar
-            numSelected={selectedClients?.length}
-            deleteClients={() => { deleteClients(selectedClients); setSelectedClients([]) }}
-            form={formFilter}
-            isLoading={isLoading}
-          />
-          <Scrollbar>
-            <TableContainer sx={{ minWidth: 800 }}>
-              <Table
-                aria-labelledby="tabelaClientes"
-              >
-                <TableHeader
-                  numSelected={selectedClients.length}
-                  onSelectAllClick={handleSelectAllClick}
-                  rowCount={data?.results?.length}
-                  headCells={headCells}
-                  admin={user?.admin}
-                  checkbox
-                />
-                <TableBody>
-                  {!isLoading ? data?.results?.map((row, index) => {
-                    const isItemSelected = isSelected(row.id);
-                    return (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={row.id}
-                        onClick={() => { navigate(`/admin/cliente/${row?.id}`, { replace: true }) }}
-                        sx={{ cursor: 'pointer' }}
-                      >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            color="primary"
-                            onClick={(event) => handleClick(event, row.id)}
-                            checked={isItemSelected}
-                            inputProps={{
-                              'aria-labelledby': index,
-                            }}
-                            />
-                        </TableCell>
-                        <TableCell>
-                          {row?.empresa?.razao_social || row?.nome}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  }) : <CircularProgress />}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Scrollbar>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25, 50, 100]}
-            component="div"
-            count={data?.count || 0}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage="Linhas por páginas"
-          />
-        </Card>
+        {isLoading
+          ? <Loading />
+          : !data?.results?.length
+            ? <EmptyYet content="cliente" isMobile={isMobile} />
+            : <Card>
+              <TableToolbar
+                numSelected={selectedClients?.length}
+                deleteClients={() => { deleteClients(selectedClients); setSelectedClients([]) }}
+                form={formFilter}
+                isLoading={isLoading}
+              />
+              <Scrollbar>
+                <TableContainer sx={{ minWidth: 800 }}>
+                  <Table
+                    aria-labelledby="tabelaClientes"
+                  >
+                    <TableHeader
+                      numSelected={selectedClients.length}
+                      onSelectAllClick={handleSelectAllClick}
+                      rowCount={data?.results?.length}
+                      headCells={headCells}
+                      admin={user?.admin}
+                      checkbox
+                    />
+                    <TableBody>
+                      {data?.results?.map((row, index) => {
+                        const isItemSelected = isSelected(row.id);
+                        return (
+                          <TableRow
+                            hover
+                            role="checkbox"
+                            aria-checked={isItemSelected}
+                            tabIndex={-1}
+                            key={row.id}
+                            onClick={() => { navigate(`/admin/cliente/${row?.id}`, { replace: true }) }}
+                            sx={{ cursor: 'pointer' }}
+                          >
+                            <TableCell padding="checkbox">
+                              <Checkbox
+                                color="primary"
+                                onClick={(event) => handleClick(event, row.id)}
+                                checked={isItemSelected}
+                                inputProps={{
+                                  'aria-labelledby': index,
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              {row?.empresa?.razao_social || row?.nome}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Scrollbar>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                component="div"
+                count={data?.count || 0}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage="Linhas por páginas"
+              />
+            </Card>}
       </Container>
     </>
   );

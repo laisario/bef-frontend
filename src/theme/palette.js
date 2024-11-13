@@ -2,6 +2,7 @@ import { alpha } from '@mui/material/styles';
 
 
 const PRIMARY = {
+  translucent: 'rgba(255, 217, 194, 0.5)',
   lighter: '#FFD9C2',  
   light: '#FFA373',    
   main: '#FD7622',
@@ -11,6 +12,7 @@ const PRIMARY = {
 };
 
 const SECONDARY = {
+  translucent: 'rgba(170, 170, 170, 0.5)',
   lighter: '#AAAAAA',  
   light: '#777777',
   main: '#555555',

@@ -43,7 +43,7 @@ function CardInformation({ instrument, isMobile, admin, removeInstrumentProposal
       scroll: "auto",
       mb: 2,
     }}>
-      {edit && <EditInstrument handleOpenAlert={handleOpenAlert} handleClose={handleClose} open={edit} instrument={instrument} isMobile={isMobile} />}
+      <EditInstrument handleOpenAlert={handleOpenAlert} handleClose={handleClose} open={edit} instrument={instrument} isMobile={isMobile} />
       <CardContent p={2} sx={{
         padding: 2,
         height: '250px',
@@ -68,11 +68,8 @@ function CardInformation({ instrument, isMobile, admin, removeInstrumentProposal
         {!!instrument?.instrumento?.tipo_de_instrumento?.resolucao
           && (<ContentRow colorValue={"black"} title="Resolução" value={instrument?.instrumento?.tipo_de_instrumento?.resolucao} />)}
 
-
         {!!instrument?.instrumento?.procedimento_relacionado?.codigo
           && (<ContentRow colorValue={"black"} title="Procedimento relacionado" value={instrument?.instrumento?.procedimento_relacionado?.codigo} />)}
-
-
 
         {!!instrument?.tag
           && (<ContentRow colorValue={"black"} title="Tag" value={instrument?.tag} />)}
@@ -89,11 +86,8 @@ function CardInformation({ instrument, isMobile, admin, removeInstrumentProposal
         {!!instrument?.data_proxima_checagem &&
           (<ContentRow colorValue={"black"} title="Próxima checagem" value={fDate(instrument?.data_proxima_checagem, "dd/MM/yyyy")} />)}
 
-
         {!!instrument?.frequencia && (
           <ContentRow colorValue={"black"} title="Frequência" value={instrument?.frequencia > 1 ? `${instrument?.frequencia} meses` : `$${instrument?.frequencia} mês`} />)}
-
-
 
         {(!!instrument?.instrumento?.minimo || !!instrument?.instrumento?.maximo) &&
           (<ContentRow colorValue={"black"} title="Faixa atendida" isMobile={isMobile} value={`${instrument?.instrumento?.minimo} ${!!instrument?.instrumento?.maximo && `- ${instrument?.instrumento?.maximo}`} ${!!instrument?.instrumento?.unidade && `- ${instrument?.instrumento?.unidade}`}`} />)}

@@ -46,7 +46,19 @@ const StyledSwiper = styled(Swiper)`
 function DocumentsDetails() {
   const { id, idRevisao } = useParams();
   const [swiper, setSwiper] = useState(null)
-  const { data, status, statusColor, openFormRevision, setOpenFormRevision, isLoading } = useDocumentos(id);
+  const {
+    data,
+    status,
+    statusColor,
+    openFormRevision,
+    setOpenFormRevision,
+    isLoading,
+    mutateCreateRevision,
+    isCreatingRevision,
+    isSuccessCreateRevision,
+    isErrorCreateRevision,
+    errorCreateRevision,
+  } = useDocumentos(id);
   const { user } = useAuth()
   const url = !!data?.arquivo && new URL(`${data?.arquivo}`);
 
@@ -92,7 +104,7 @@ function DocumentsDetails() {
                     Revisões
                   </Typography>
                   {revisoes?.length > 1 && (
-                    <Button size='small' onClick={() => navigate(`/admin/documento/${id}/revisoes`, { state: { data: {revisoes, user, titulo: data?.titulo} }})}>Ver todas</Button>
+                    <Button size='small' onClick={() => navigate(`/admin/documento/${id}/revisoes`, { state: { data: { revisoes, user, titulo: data?.titulo } } })}>Ver todas</Button>
                   )}
                 </Box>
                 <StyledSwiper
@@ -107,14 +119,23 @@ function DocumentsDetails() {
                   onSwiper={(swiper) => setSwiper(swiper)}
                 >
                   {revisoes.map(revisao => (<SwiperSlide key={revisao.id}>
-                    <RevisionCard revisao={revisao} user={user}/>
+                    <RevisionCard revisao={revisao} user={user} />
                   </SwiperSlide>))}
                 </StyledSwiper>
               </Box>
             }
           </Grid>
         </Grid>
-        {openFormRevision && <FormCreateRevision idCreator={data?.criador?.id} open={openFormRevision} setOpen={setOpenFormRevision} />}
+        <FormCreateRevision
+          idCreator={data?.criador?.id}
+          open={openFormRevision}
+          mutateCreateRevision={mutateCreateRevision}
+          setOpen={setOpenFormRevision}
+          isSuccessCreateRevision={isSuccessCreateRevision}
+          isErrorCreateRevision={isErrorCreateRevision}
+          errorCreateRevision={errorCreateRevision}
+          isCreatingRevision={isCreatingRevision}
+        />
       </Container>
     </>
   )

@@ -1,4 +1,4 @@
-import { format, getTime, formatDistanceToNow, addDays, isPast, addYears } from 'date-fns';
+import { format, getTime, formatDistanceToNow, addDays, isPast, addYears, parseISO } from 'date-fns';
 import ptLocale from 'date-fns/locale/pt-BR';
 
 // ----------------------------------------------------------------------
@@ -6,7 +6,8 @@ import ptLocale from 'date-fns/locale/pt-BR';
 export function fDate(date, newFormat) {
   const fm = newFormat || "dd 'de' MMMM 'de' yyyy";
 
-  return date ? format(new Date(date), fm, { locale: ptLocale }) : '';
+
+  return date ? format(parseISO(date), fm, { locale: ptLocale }) : '';
 }
 
 export function fTimestamp(date) {

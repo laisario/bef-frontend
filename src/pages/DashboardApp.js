@@ -6,6 +6,7 @@ import { Grid, Container, CircularProgress } from '@mui/material';
 import { AppOrderTimeline, AppWidgetSummary, AppListItems } from '../sections/@dashboard/app';
 import { useAuth } from '../context/Auth';
 import { axios } from '../api';
+import { fDate } from '../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
@@ -121,7 +122,7 @@ export default function DashboardApp() {
                   id: proposta?.id,
                   title: `Proposta ${proposta?.numero}`,
                   status: proposta?.status,
-                  time: new Date(proposta?.data_criacao),
+                  time: fDate(proposta?.data_criacao),
                   url: user?.admin ? `/admin/proposta/${proposta?.id}/${proposta?.cliente?.id}` : `/dashboard/proposta/${proposta?.id}`,
                   client: proposta?.cliente?.empresa?.razao_social || proposta?.cliente?.nome,
                 }))}

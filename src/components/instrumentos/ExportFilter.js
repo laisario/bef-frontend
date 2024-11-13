@@ -107,7 +107,7 @@ function ExportFilter({ open, handleClose, selecionados, handleChangeCheckbox, v
                 <Button onClick={() => { setCsvContent(null); handleClose() }}>Cancelar</Button>
                 <Button type="submit">Exportar</Button>
             </DialogActions>
-            <CsvViewer csvContent={csvContent} fileName="meus_instrumentos" />
+            <CsvViewer csvContent={csvContent}  onClose={handleClose} fileName="meus_instrumentos" />
         </Dialog >
     )
 }

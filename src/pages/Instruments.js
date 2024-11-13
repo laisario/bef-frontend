@@ -2,16 +2,15 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
-import { Box, Button, Checkbox, CircularProgress, Container, FormControlLabel, FormGroup, Stack, TablePagination, Typography } from '@mui/material';
+import { Box, Button, Checkbox, Container, FormControlLabel, FormGroup, Stack, TablePagination, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import ExportFilter from '../components/instrumentos/ExportFilter';
 import { ProductList } from '../sections/@dashboard/products';
 import useInstrumentos from '../hooks/useInstrumentos';
 import useResponsive from '../hooks/useResponsive';
-
-// ----------------------------------------------------------------------
-
+import Loading from '../components/Loading';
+import EmptyYet from '../components/EmptyYet';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -78,7 +77,7 @@ export default function Instruments() {
     const { name, checked } = event.target;
     setValueCheckbox({ ...valueCheckbox, [name]: checked });
   };
-  
+
   useEffect(() => {
     if (selectAll) {
       setSelecionados(todosInstrumentos?.results?.map(({ id }) => id))
@@ -120,7 +119,7 @@ export default function Instruments() {
 
       <Container>
         <Stack
-          direction={isMobile? "column" : "row"}
+          direction={isMobile ? "column" : "row"}
           alignItems="center"
           justifyContent="space-between"
           mb={5}
@@ -128,7 +127,7 @@ export default function Instruments() {
           <Typography variant="h4" gutterBottom>
             Meus Instrumentos
           </Typography>
-          <Box sx={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "center", alignItems: 'center'}}>
+          <Box sx={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "center", alignItems: 'center' }}>
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
@@ -157,7 +156,11 @@ export default function Instruments() {
             setError={setError}
             selectAll={selectAll}
           />
-          {isLoading ? <CircularProgress /> : <ProductList products={todosInstrumentos} setSelecionados={setSelecionados} selecionados={selecionados} />}
+          {isLoading
+            ? <Loading />
+            : (todosInstrumentos?.results?.length
+              ? <ProductList products={todosInstrumentos} setSelecionados={setSelecionados} selecionados={selecionados} />
+              : <EmptyYet isMobile={isMobile} content="instrumento" />)}
           <TablePagination
             rowsPerPageOptions={[8, 16, 32, 64, 128]}
             component="div"

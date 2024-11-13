@@ -37,12 +37,12 @@ function TableToolbar({ numSelected, form, selectedOrders, admin, setSelectedOrd
                     <Grid container display="flex" justifyContent="space-between" alignItems="center">
                         <Grid item sm={6} xs={8}>
                             <TextField
-                                label={admin ? 'Busque cliente ou número' : 'Busque número'}
+                                label='Busque'
                                 {...form.register("search")}
                                 name="search"
+                                placeholder={admin ? 'Cliente ou número' : 'Número'}
                                 id='search-bar'
                                 fullWidth
-                                size='small'
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
@@ -52,20 +52,22 @@ function TableToolbar({ numSelected, form, selectedOrders, admin, setSelectedOrd
                                 }}
                             />
                         </Grid>
-                        <OrderFilterSidebar
-                            openFilter={filter}
-                            onOpenFilter={() => setFilter(true)}
-                            onCloseFilter={() => setFilter(false)}
-                            form={form}
-                            resetFilters={resetFilters}
-                        />
+                        <Grid item>
+                            <OrderFilterSidebar
+                                openFilter={filter}
+                                onOpenFilter={() => setFilter(true)}
+                                onCloseFilter={() => setFilter(false)}
+                                form={form}
+                                resetFilters={resetFilters}
+                            />
+                        </Grid>
                     </Grid>
                 )}
 
                 {admin && numSelected > 0 && (
                     <Tooltip title="Delete">
                         <IconButton>
-                            <DeleteIcon onClick={() => {deleteOrder(selectedOrders); setSelectedOrders([])}} />
+                            <DeleteIcon onClick={() => { deleteOrder(selectedOrders); setSelectedOrders([]) }} />
                         </IconButton>
                     </Tooltip>
                 )}

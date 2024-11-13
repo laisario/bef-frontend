@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useQuery, useMutation } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import debounce from 'lodash.debounce';
 import { useForm, useWatch } from 'react-hook-form';
 
-import { axios } from '../api';
+import { axios, axiosForFiles } from '../api';
 import { isPastFromToday } from '../utils/formatTime';
 
 const useDocumentos = (id) => {
@@ -17,23 +17,14 @@ const useDocumentos = (id) => {
       status: "",
     }
   })
+
   const {
     search,
     status: statusFilter,
   } = useWatch({ control: formFilter.control })
-  const formCreate = useForm({
-    defaultValues: {
-      codigo: '',
-      identificador: '',
-      titulo: '',
-      status: '',
-      elaborador: '',
-      frequencia: null,
-      arquivo: null,
-      dataValidade: '',
-      dataRevisao: '',
-    }
-  })
+
+  const queryClient = useQueryClient()
+
   const { data, error, isLoading, refetch, isError } = useQuery(['documentos', id, page, rowsPerPage, debouncedSearch, statusFilter], async () => {
     if (id) {
       const response = await axios.get(`/documentos/${id}`);
@@ -46,6 +37,53 @@ const useDocumentos = (id) => {
   const handleSearch = debounce((value) => setDebouncedSearch(value));
 
   useEffect(() => { handleSearch(search) }, [search, handleSearch])
+
+  const create = async (form) => {
+    const response = await axios.post('/documentos/', {
+      codigo: form?.codigo,
+      identificador: form?.identificador,
+      titulo: form?.titulo,
+      status: form?.status,
+      data_revisao: form?.data_revisao,
+      data_validade: form?.data_validade,
+      criador: form?.criador,
+      frequencia: form?.frequencia,
+    });
+    if (response?.data?.id) {
+      const formData = new FormData()
+      formData.append("arquivo", form?.arquivo)
+      await axiosForFiles.patch(`/documentos/${response?.data?.id}/anexar/`, formData)
+    }
+    return response
+  }
+
+  const { mutate: mutateCreate, isLoading: isCreating, isError: isErrorCreate, isSuccess: isSuccessCreate, error: errorCreate } = useMutation({
+    mutationFn: create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['documentos'] })
+    },
+  })
+
+  const createRevision = async (form) => {
+    const response = await axios.post(`/documentos/${id}/revisar/`, {
+      alteracao: form?.alteracao,
+      aprovadores: form?.aprovadores,
+    });
+    if (response?.data?.revisao_id) {
+      const formData = new FormData()
+      formData.append("arquivo", form?.arquivo)
+      await axiosForFiles.patch(`/documentos/${id}/alterar_anexo/`, formData)
+    }
+    return response
+  }
+
+  const { mutate: mutateCreateRevision, isLoading: isCreatingRevision, isError: isErrorCreateRevision, isSuccess: isSuccessCreateRevision, error: errorCreateRevision } = useMutation({
+    mutationFn: createRevision,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['documentos'] })
+    },
+  })
+
 
   const status = {
     'V': 'Vigente',
@@ -60,9 +98,10 @@ const useDocumentos = (id) => {
     'V': 'success',
   };
 
+
   const { mutate: deleteDocumentos, isLoading: isDeleting } = useMutation(async (ids) => Promise.all(ids?.map((id) => axios.delete(`/documentos/${id}`))), {
     onSuccess: () => {
-      refetch()
+      queryClient.invalidateQueries({ queryKey: ['documentos'] })
     },
   })
 
@@ -99,8 +138,17 @@ const useDocumentos = (id) => {
     handleChangeRowsPerPage,
     documentosVencidos,
     formFilter,
-    formCreate,
     isError,
+    mutateCreate,
+    isCreating,
+    isSuccessCreate,
+    isErrorCreate,
+    errorCreate,
+    mutateCreateRevision,
+    isCreatingRevision,
+    isSuccessCreateRevision,
+    isErrorCreateRevision,
+    errorCreateRevision,
   }
 }
 
