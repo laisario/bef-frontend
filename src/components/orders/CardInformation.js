@@ -32,7 +32,6 @@ function CardInformation({ instrument, isMobile, admin, removeInstrumentProposal
     }
     setOpenAlert({ open: false, msg: '', color: 'success' })
   }
-  console.log(instrument)
   return (
     <Card sx={{
       backgroundColor: theme.palette.background.neutral,

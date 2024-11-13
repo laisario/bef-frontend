@@ -4,6 +4,14 @@ import React, { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form';
 import useUsers from '../../../hooks/useUsers';
 
+const erroMessages = {
+    "status": 'Selecione um status para o documento.',
+    "data_revisao": "Preencha a data de revisão.",
+    "data_validade": "Preencha a data de validade.",
+    "arquivo": "Faça upload de um arquivo válido.",
+}
+
+
 function FormCreateRevision({ open, setOpen, idCreator, mutateCreateRevision, isSuccessCreateRevision, isErrorCreateRevision, errorCreateRevision, isCreatingRevision, }) {
     const form = useForm({
         defaultValues: {
