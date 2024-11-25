@@ -33,6 +33,7 @@ function Calibration(props) {
         isLoadingAddCertificate,
         mutateDeleteCertificate,
         isLoadingDeleteCertificate,
+        refetch,
     } = props;
 
     const [openEdit, setOpenEdit] = useState(false)
@@ -63,6 +64,7 @@ function Calibration(props) {
                             open={openCreate}
                             handleClose={handleCloseCertificate}
                             calibration={calibration}
+                            refetch={refetch}
                         />
                         {isLoadingEdit ? <CircularProgress /> : <ButtonTooltip title="Editar calibração" action={handleOpen} icon={<EditIcon />} />}
                         <Form mutate={mutateEdit} calibration={calibration} open={openEdit} isMobile={isMobile} handleClose={handleClose} />
@@ -81,12 +83,9 @@ function Calibration(props) {
                         && <ContentRow title="Resultado" colorTitle='black' my={1} value={<Label color={statusColor[calibration?.status]}>{statusLabel[calibration?.status]}</Label>} />
                     }
 
-                    {calibration?.maior_erro && (
-                        <ContentRow title="Maior erro" value={calibration?.maior_erro} />
-                    )}
-                    {calibration?.incerteza && (
-                        <ContentRow title="Incerteza" value={calibration?.incerteza} />
-                    )}
+                    <ContentRow title="Maior erro" value={calibration?.maior_erro ? calibration?.maior_erro : "Não faz parte do cálculo"} />
+
+                    <ContentRow title="Incerteza" value={calibration?.incerteza ? calibration?.incerteza : "Não faz parte do cálculo"} />
                     {calibration?.criterio_de_aceitacao && (
                         <ContentRow title="Critério de aceitação" value={calibration?.criterio_de_aceitacao} />
                     )}

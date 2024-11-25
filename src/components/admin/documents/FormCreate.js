@@ -286,7 +286,7 @@ export default function FormCreate({ open, setOpen, mutateCreate, isErrorCreate,
                                 Ver arquivo
                             </Button>
                         }
-                        <Typography variant='body2' fontSize={12} color="primary">Formatos dísponiveis: PDF, XLSX, XLSM, DOCX, DOC, PPTX</Typography>
+                        <Typography variant='body2' fontSize={12} color="primary">Formatos dísponiveis: PDF, XLSX, XLSM, DOCX, DOC, PPTX, PPT</Typography>
                         {isErrorCreate && Object.keys(errorCreate?.response?.data)?.map((errKeys, i) => <Alert severity="error" key={i}>{erroMessages[errKeys]}</Alert>)}
                     </DialogContent>
 

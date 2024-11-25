@@ -13,6 +13,7 @@ function PreviewCalibration(props) {
         isLoadingAddCertificate,
         mutateDeleteCertificate,
         isLoadingDeleteCertificate,
+        refetch
     } = props;
 
     return (
@@ -27,6 +28,7 @@ function PreviewCalibration(props) {
             {!calibration
                 ? <Typography color='grey' fontWeight={400} textAlign="center">Selecione uma calibração para visualizá-la</Typography>
                 : <Calibration
+                    refetch={refetch}
                     isMobile={isMobile}
                     calibration={calibration}
                     mutateEdit={mutateEdit}

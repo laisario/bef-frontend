@@ -7,7 +7,7 @@ import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { truncateString } from '../../utils/formatString';
 
 
-function FormCertificate({ open, handleClose, calibration, mutateAddCertificate}) {
+function FormCertificate({ open, handleClose, calibration, mutateAddCertificate, refetch}) {
     const ref = useRef(null)
     const form = useForm({
         defaultValues: {
@@ -44,7 +44,10 @@ function FormCertificate({ open, handleClose, calibration, mutateAddCertificate}
     }
 
     const save = async() => {
-        mutateAddCertificate({id: calibration?.id, arquivo, numero: numeroDoCertificado, anexos,})
+        await mutateAddCertificate({id: calibration?.id, arquivo, numero: numeroDoCertificado, anexos})
+        setTimeout(() => {
+            refetch()
+        }, 3000);
     }
 
     const saveAddAnother = () => {
@@ -54,9 +57,9 @@ function FormCertificate({ open, handleClose, calibration, mutateAddCertificate}
     }
 
     const handleCloseAndClean = () => {
-        handleClose()
         form?.reset();
         remove();
+        handleClose()
     }
 
     return (
@@ -68,7 +71,6 @@ function FormCertificate({ open, handleClose, calibration, mutateAddCertificate}
                 onSubmit: (event) => {
                     event.preventDefault();
                     save();
-                    form.reset();
                     handleCloseAndClean();
                 },
             }}

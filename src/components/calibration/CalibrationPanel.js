@@ -30,7 +30,8 @@ function CalibrationPanel({ isMobile, selectedCalibration, setSelectedCalibratio
         isErrorDeleteCertificate,
         isErrorCreate,
         isErrorDelete,
-        isErrorEdit
+        isErrorEdit,
+        refetch
     } = useCalibrations(null, instrument)
     const [openAlert, setOpenAlert] = useState({ open: false, msg: '', color: 'success' })
     const [openForm, setOpenForm] = useState(false);
@@ -101,13 +102,16 @@ function CalibrationPanel({ isMobile, selectedCalibration, setSelectedCalibratio
                 isLoadingAddCertificate={isLoadingAddCertificate}
                 mutateDeleteCertificate={mutateDeleteCertificate}
                 isLoadingDeleteCertificate={isLoadingDeleteCertificate}
+                refetch={refetch}
             />
             <Snackbar
                 open={openAlert?.open}
                 autoHideDuration={2000}
                 onClose={handleCloseAlert}
             >
-                <Alert onClose={handleCloseAlert} severity={openAlert?.color}>{openAlert?.msg}</Alert>
+                <div>
+                    <Alert onClose={handleCloseAlert} severity={openAlert?.color}>{openAlert?.msg}</Alert>
+                </div>
             </Snackbar>
 
         </Stack>

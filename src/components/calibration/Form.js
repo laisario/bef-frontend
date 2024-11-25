@@ -25,10 +25,6 @@ function Form({ open, handleClose, create, isMobile, calibration, mutate }) {
         data,
     } = useWatch({ control: form.control })
 
-    const saveAndCreateAnother = () => {
-        mutate(form?.watch())
-        form?.reset()
-    }
 
     return (
         <Dialog
@@ -81,7 +77,6 @@ function Form({ open, handleClose, create, isMobile, calibration, mutate }) {
                         label="Maior erro"
                         fullWidth
                         {...form.register("maiorErro")}
-                        required
                     />
                     <TextField
                         autoFocus
@@ -89,7 +84,6 @@ function Form({ open, handleClose, create, isMobile, calibration, mutate }) {
                         label="Incerteza"
                         fullWidth
                         {...form.register("incerteza")}
-                        required
                     />
                     {!isMobile && (
                         <TextField
@@ -99,7 +93,6 @@ function Form({ open, handleClose, create, isMobile, calibration, mutate }) {
                             fullWidth
                             type='number'
                             {...form.register("criterioDeAceitacao")}
-                            required
                         />
                     )}
                 </Row>
@@ -111,7 +104,6 @@ function Form({ open, handleClose, create, isMobile, calibration, mutate }) {
                             label="Critério de aceitação"
                             fullWidth
                             {...form.register("criterioDeAceitacao")}
-                            required
                         />
                     )}
                     <TextField
@@ -134,7 +126,6 @@ function Form({ open, handleClose, create, isMobile, calibration, mutate }) {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancelar</Button>
-                {create && <Button onClick={saveAndCreateAnother} type="submit" variant="outlined" color="secondary">Salvar e adicionar outro</Button>}
                 <Button variant="contained" type="submit">{create ? 'Salvar' : 'Editar'}</Button>
             </DialogActions>
 
