@@ -21,7 +21,6 @@ import CalibrationPanel from '../calibration/CalibrationPanel';
 
 function ClientInstrumentInformation({ instrument, isMobile, mutateDelete, isDeleting, handleOpenAlert, mutateUpdate, isUpdatingInstrument }) {
     const [openFormEdit, setOpenFormEdit] = useState(false);
-    const [selectedCalibration, setSelectedCalibration] = useState(null);
     const [valueTab, setValueTab] = useState('information');
     const handleCloseFormEdit = () => setOpenFormEdit(false);
     const handleOpenFormEdit = () => setOpenFormEdit(true);
@@ -60,8 +59,6 @@ function ClientInstrumentInformation({ instrument, isMobile, mutateDelete, isDel
                     <TabPanel value="calibration" label="Calibracoes">
                         <CalibrationPanel
                             isMobile={isMobile}
-                            selectedCalibration={selectedCalibration}
-                            setSelectedCalibration={setSelectedCalibration}
                             instrument={instrument?.id}
                         />
                     </TabPanel>

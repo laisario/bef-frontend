@@ -85,6 +85,7 @@ const useCalibrations = (id, instrumento) => {
     mutationFn: edit,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calibracoes'] })
+      queryClient.invalidateQueries({ queryKey: ['instrumentos'] })
     },
   })
 

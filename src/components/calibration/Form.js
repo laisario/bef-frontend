@@ -17,14 +17,13 @@ function Form({ open, handleClose, create, isMobile, calibration, mutate }) {
             observacoes: calibration?.observacoes ? calibration?.observacoes : '',
             maiorErro: calibration?.maior_erro ? calibration?.maior_erro : null,
             incerteza: calibration?.incerteza ? calibration?.incerteza : null,
-            criterioDeAceitacao: calibration?.criterio_de_aceitacao ? calibration?.criterio_de_aceitacao : null,
+            criterioDeAceitacao: calibration?.criterio_de_aceitacao !== 'none' || calibration?.criterio_de_aceitacao ? calibration?.criterio_de_aceitacao : '',
             referenciaDoCriterio: calibration?.referencia_do_criterio ? calibration?.referencia_do_criterio : null,
         }
     })
     const {
         data,
     } = useWatch({ control: form.control })
-
 
     return (
         <Dialog
@@ -91,7 +90,6 @@ function Form({ open, handleClose, create, isMobile, calibration, mutate }) {
                             id="criterioDeAceitacao"
                             label="Critério de aceitação"
                             fullWidth
-                            type='number'
                             {...form.register("criterioDeAceitacao")}
                         />
                     )}

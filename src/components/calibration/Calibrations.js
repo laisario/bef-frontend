@@ -9,7 +9,7 @@ function Calibrations({ calibrations, isMobile, setSelectedCalibration, selected
     const { index, style } = props;
     return (
       <div key={index + calibrations[index]?.id}>
-        <ListItem style={style} disablePadding onClick={() => setSelectedCalibration(index)} sx={{ bgcolor: selectedCalibration === index ? 'background.neutral' : 'background.paper', }}>
+        <ListItem style={style} disablePadding onClick={() => setSelectedCalibration(calibrations[index])} sx={{ bgcolor: selectedCalibration?.id === calibrations[index]?.id ? 'background.neutral' : 'background.paper', }}>
           <ListItemAvatar sx={{p: 1}}>
             <Avatar>
               OS
